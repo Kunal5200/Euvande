@@ -81,7 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   MaterialPageRoute(builder: (context) => const ProductSellDashboardScreen()),
                   )
                   }, AssetImage("assets/icons/car.png"),
-                      "Sell Car", "pre-owned car for sale →", Colors.blue[100])
+                      "Sell Car", "from your home", Colors.blue[100])
                 ]),
                 SizedBox(
                   height: 10,

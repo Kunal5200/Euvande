@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -15,52 +16,50 @@ class _ProductSellDashboardScreenState
   bool _rememberMe = false;
   final items = [
     "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-left-view-121.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-view-118.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-view-119.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/grille-97.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-fog-lamp-41.jpg",
-
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-view-118.jpg",
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-view-119.jpg",
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/grille-97.jpg",
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-fog-lamp-41.jpg",
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(""),
+          title: Text("Product Sell Dashboard"),
         ),
         body: Container(
           child: SingleChildScrollView(
             physics: AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(
-                // horizontal: 40.0,
-                // vertical: 120.0,
-                ),
+            padding: EdgeInsets.all(20),
             child: Column(
               children: [
-
-
+                _buildTitleSection(),
+                _buildProductSection(),
               ],
             ),
           ),
         ));
   }
 
-  Widget _buildImageList() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          for (var i = 0; i < items.length; i++) ...[
-            Container(
-              width: 150.0,
-              height: 180.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.cover, image: NetworkImage(items[i])),
-              ),
-            )
-          ]
+  Widget _buildTitleSection() {
+    return Container(
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Sell your car at",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            "the best price",
+            style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic),
+          ),
         ],
       ),
     );
@@ -68,8 +67,8 @@ class _ProductSellDashboardScreenState
 
   Widget _buildProductSection() {
     return Container(
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
+      padding: EdgeInsets.all(20),
+      margin: EdgeInsets.only(top: 15),
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -78,209 +77,135 @@ class _ProductSellDashboardScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Mercedes Maybach S",
+            "Enter your card vehicle identification number",
             style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            "1,000 kms • petrol • automatic • first owner",
-            style: TextStyle(
-              color: Colors.black26,
-              fontSize: 12,
-            ),
-          ),
-          SizedBox(
-            height: 2,
-          ),
-          Text(
-            "€ 1.25 - €2.45 lakh",
-            style: TextStyle(
-                color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
           ),
           SizedBox(
             height: 10,
+          ),
+          TextField(
+            style: TextStyle(fontSize: 14),
+            decoration: InputDecoration(
+              floatingLabelBehavior: FloatingLabelBehavior.never,
+              hintText: "(e.g. 1HGBH41JXMN109186)",
+              hintStyle: TextStyle(fontSize: 14),
+              contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              border: OutlineInputBorder(
+                  // borderSide: BorderSide.none
+                  ),
+            ),
+            keyboardType: TextInputType.name,
           ),
           ElevatedButton(
             style: raisedButtonStyle,
             child: Text(
-              'Buy Now',
-              style: TextStyle(color: Colors.white),
+              'Sell my car'.toUpperCase(),
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Sending Message"),
+                content: Text("Coming Soon"),
               ));
             },
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductDetailsTitleSection() {
-    return Container(
-      alignment: Alignment.centerLeft,
-      height: 40,
-      child: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        // This next line does the trick.
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          ElevatedButton(
-              onPressed: () => {},
-              style: raisedButtonStyleRound,
-              child: Text(
-                "OVERVIEW",
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              )),
-          SizedBox(
-            width: 10,
+          Row(
+            children: [
+              Expanded(child: Divider()),
+              Text(
+                " OR ",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Expanded(child: Divider()),
+            ],
           ),
-          ElevatedButton(
-              onPressed: () => {},
-              style: raisedButtonStyleRound,
-              child: Text(
-                "SPECS & FEATURE",
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              )),
-          SizedBox(
-            width: 10,
-          ),
-          ElevatedButton(
-              onPressed: () => {},
-              style: raisedButtonStyleRound,
-              child: Text(
-                "OVERVIEW",
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ))
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductOverviewSection() {
-    return Container(
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      alignment: Alignment.centerLeft,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1, color: Colors.black12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
           Text(
-            "Car Overview",
+            "Select your car brand",
             style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+                color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
           ),
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(Icons.calendar_today, "Registration Year", "2023"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(Icons.shield, "Insurance Validity", "Comprehensive"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(Icons.water_drop, "Fuel Type", "Petrol"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(
-              Icons.airline_seat_recline_extra_rounded, "Seats", "5 Seats"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(Icons.electric_meter, "KMS Driven", "1,000 Kms"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductSpecificationSection() {
-    return Container(
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      alignment: Alignment.centerLeft,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1, color: Colors.black12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Car Specification",
-            style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          _buildInfoRow(null, "Registration Year", "2023"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(null, "Insurance Validity", "Comprehensive"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(null, "Fuel Type", "Petrol"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(null, "Seats", "5 Seats"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(null, "KMS Driven", "1,000 Kms"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductGallerySection() {
-    return Container(
-      height: 300,
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      alignment: Alignment.centerLeft,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1, color: Colors.black12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Gallery Experiance",
-            style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Expanded(
-              child: GridView.count(
-                // Create a grid with 2 columns. If you change the scrollDirection to
-                // horizontal, this produces 2 rows.
-                crossAxisCount: 3,
-                // Generate 100 widgets that display their index in the List.
-                children: List.generate(items.length, (index) {
-                  return Center(
-                    child:
-                    Container(
-                      width: 100.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover, image: NetworkImage(items[index])),
-                      ),
-                    ),
-                  );
-                }),
-              ),),
+          Container(
+            height: 330,
+            child: GridView.count(
+              // Create a grid with 2 columns. If you change the scrollDirection to
+              // horizontal, this produces 2 rows.
+              crossAxisCount: 3,
+              // Generate 100 widgets that display their index in the List.
+              children: List.generate(9, (index) {
+                return index != 8
+                    ? GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text("Coming Soon"),
+                          ));
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 50.0,
+                                height: 50.0,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image:
+                                          AssetImage("assets/logos/logo.png")),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                "Brand name",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ProductSellJourneyScreen()),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "View All\nBrands",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ));
+              }),
+            ),
+          )
         ],
       ),
     );

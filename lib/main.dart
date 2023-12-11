@@ -18,18 +18,12 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'Gilroy'
-            '' ,
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-
-        primarySwatch: Colors.blue,
+            '',
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange)
+            .copyWith(
+                background: Color(0xfffafcff),
+                primary: Colors.black,
+                secondary: Colors.black),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -67,9 +61,10 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
+
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
     DashboardScreen(),
@@ -84,10 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
-        child:  Center(
+        child: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
       ),
@@ -102,9 +96,11 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Business',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/user.png", color : Colors.black54, height: 20, width: 20),
+            icon: Image.asset("assets/icons/user.png",
+                color: Colors.black54, height: 20, width: 20),
             label: 'profile',
-            activeIcon: Image.asset("assets/icons/user.png",  color : Colors.black, height: 20, width: 20),
+            activeIcon: Image.asset("assets/icons/user.png",
+                color: Colors.black, height: 20, width: 20),
           ),
         ],
         currentIndex: _selectedIndex,

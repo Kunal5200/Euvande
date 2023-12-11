@@ -37,6 +37,7 @@ dependencies:
   carousel_slider: ^4.2.1
   intl_phone_field: ^3.2.0
   lottie: ^2.7.0
+  scrollable_list_tabview: ^0.2.0-nullsafety
 
 dev_dependencies:
   flutter_test:
