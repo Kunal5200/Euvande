@@ -3,6 +3,8 @@ import 'package:euvande/component/ProductJourneyTabView.dart';
 import 'package:euvande/screen/dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_brands_screen.dart';
 import 'package:euvande/screen/product_sell_model_screen.dart';
+import 'package:euvande/screen/product_sell_odometer_screen.dart';
+import 'package:euvande/screen/product_sell_ownership_screen.dart';
 import 'package:euvande/screen/product_sell_period_screen.dart';
 import 'package:euvande/screen/product_sell_variant_screen.dart';
 import 'package:euvande/utilities/constants.dart';
@@ -50,6 +52,21 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
       "desc": "Odometer",
       "type": "odometer",
     },
+    {
+      "title": "Location",
+      "desc": "Location",
+      "type": "location",
+    },
+    {
+      "title": "Specifications",
+      "desc": "Specifications",
+      "type": "specifications",
+    },
+    {
+      "title": "Contact Information",
+      "desc": "ContactInformation",
+      "type": "contactInformation",
+    },
   ];
 
   @override
@@ -96,11 +113,15 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
       case "variant":
         return ProductSellVariantScreen();
       case "ownership":
-        return DashboardScreen();
-      case "period":
-        return DashboardScreen();
+        return ProductSellOwnerShipScreen();
       case "odometer":
-        return DashboardScreen();
+        return ProductSellOdometerScreen();
+      case "location":
+        return ProductSellOdometerScreen();
+      case "specifications":
+        return ProductSellOdometerScreen();
+      case "contactInformation":
+        return ProductSellOdometerScreen();
     }
     
     return Text("n/a");
