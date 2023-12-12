@@ -38,6 +38,10 @@ dependencies:
   intl_phone_field: ^3.2.0
   lottie: ^2.7.0
   scrollable_list_tabview: ^0.2.0-nullsafety
+  csc_picker: ^0.2.7
+  image_picker: ^1.0.4
+  video_player: ^2.8.1
+  extended_image: ^8.2.0
 
 dev_dependencies:
   flutter_test:

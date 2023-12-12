@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/screen/image_screen.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/utilities/constants.dart';
@@ -67,6 +68,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildSellPurchase(
                           () =>
                       {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ImageScreen()),
+                        )
                       },
                       AssetImage("assets/icons/car.png"),
                       "Buy Used Car",

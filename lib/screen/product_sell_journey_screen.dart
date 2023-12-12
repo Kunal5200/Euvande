@@ -2,11 +2,15 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/component/ProductJourneyTabView.dart';
 import 'package:euvande/screen/dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_brands_screen.dart';
+import 'package:euvande/screen/product_sell_contact_info_screen.dart';
+import 'package:euvande/screen/product_sell_location_screen.dart';
 import 'package:euvande/screen/product_sell_model_screen.dart';
 import 'package:euvande/screen/product_sell_odometer_screen.dart';
 import 'package:euvande/screen/product_sell_ownership_screen.dart';
 import 'package:euvande/screen/product_sell_period_screen.dart';
+import 'package:euvande/screen/product_sell_specification_screen.dart';
 import 'package:euvande/screen/product_sell_variant_screen.dart';
+import 'package:euvande/screen/product_sell_vehicle_image_upload_screen.dart';
 import 'package:euvande/utilities/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -22,6 +26,11 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   final tabItems = [
+    {
+      "title": "Photos",
+      "desc": "Photos",
+      "type": "photos",
+    },
     {
       "title": "Make",
       "desc": "Make",
@@ -117,11 +126,13 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
       case "odometer":
         return ProductSellOdometerScreen();
       case "location":
-        return ProductSellOdometerScreen();
+        return ProductSellLocationScreen();
       case "specifications":
-        return ProductSellOdometerScreen();
+        return ProductSellSpecificationScreen();
       case "contactInformation":
-        return ProductSellOdometerScreen();
+        return ProductSellContactInfoScreen();
+      case "photos":
+        return ProductSellVehicleImageUploadScreen();
     }
     
     return Text("n/a");
