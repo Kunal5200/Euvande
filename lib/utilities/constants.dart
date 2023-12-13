@@ -24,3 +24,12 @@ final ButtonStyle raisedButtonStyleForm = ElevatedButton.styleFrom(
     borderRadius: BorderRadius.all(Radius.circular(2)),
   ),
 );
+final ButtonStyle raisedButtonStyleFormOutline = ElevatedButton.styleFrom(
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+  minimumSize: Size(double.infinity, 36),
+  padding: EdgeInsets.symmetric(vertical: 14),
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(2)),
+  ),
+);
