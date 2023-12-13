@@ -18,6 +18,9 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(""),
+      ),
       body: Container(
         padding: EdgeInsets.symmetric(),
         child: Form(
