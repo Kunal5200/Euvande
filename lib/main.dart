@@ -1,4 +1,5 @@
 import 'package:euvande/screen/dashboard_screen.dart';
+import 'package:euvande/screen/profile_detail_screen.dart';
 import 'package:euvande/screen/registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -67,8 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
-    DashboardScreen(),
     RegistrationScreen(),
+    ProfileDetailsScreen(),
   ];
 
   void _onItemTapped(int index) {
