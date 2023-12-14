@@ -27,11 +27,6 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
   late TabController _tabController;
   final tabItems = [
     {
-      "title": "Photos",
-      "desc": "Photos",
-      "type": "photos",
-    },
-    {
       "title": "Make",
       "desc": "Make",
       "type": "make",
@@ -75,6 +70,11 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
       "title": "Contact Information",
       "desc": "ContactInformation",
       "type": "contactInformation",
+    },
+    {
+      "title": "Photos",
+      "desc": "Photos",
+      "type": "photos",
     },
   ];
 

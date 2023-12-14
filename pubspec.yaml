@@ -108,6 +108,9 @@ flutter:
 
     #Images Register
     - assets/images/
+    - assets/images/exterior/
+    - assets/images/interior/
+    - assets/images/wheel/
 
 
   fonts:
