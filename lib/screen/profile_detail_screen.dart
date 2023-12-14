@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/profile_setting_screen.dart';
 import 'package:euvande/utilities/constants.dart';
 import 'package:flutter/material.dart';
@@ -89,9 +90,12 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
             onPressed: () {
-              // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              //   content: Text("Sending Message"),
-              // ));
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+
             },
           ),
           SizedBox(
@@ -104,6 +108,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
 
   Widget _buildMenuItem(String title, IconData iconData) {
     return Container(
+      color: Colors.transparent,
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
         children: [
