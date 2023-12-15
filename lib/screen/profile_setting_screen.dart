@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/registration_screen.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 

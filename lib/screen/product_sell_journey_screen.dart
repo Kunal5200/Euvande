@@ -11,7 +11,7 @@ import 'package:euvande/screen/product_sell_period_screen.dart';
 import 'package:euvande/screen/product_sell_specification_screen.dart';
 import 'package:euvande/screen/product_sell_variant_screen.dart';
 import 'package:euvande/screen/product_sell_vehicle_image_upload_screen.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellJourneyScreen extends StatefulWidget {

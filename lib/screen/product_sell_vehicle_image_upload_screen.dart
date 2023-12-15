@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

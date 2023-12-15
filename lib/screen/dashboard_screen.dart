@@ -2,7 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/screen/image_screen.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/utilities/ProductItemList.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -13,6 +14,9 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+
+  List<ProductItemList> productItemList  = [];
+
   final items = [
     Container(
       margin: EdgeInsets.all(6.0),
@@ -48,6 +52,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     ),
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    productItemList.add(
+        ProductItemList(
+            productName: "Mercedes Maybach S",
+            productStartPrice: "€ 1.25 - €2.45 lakh",
+            productMaxPrice: "",
+            productImageURLs: "assets/images/mercedes/1.jpg")
+    );
+
+    productItemList.add(
+        ProductItemList(
+            productName: "BMW i5",
+            productStartPrice: "€ 1.25 - €2.45 lakh",
+            productMaxPrice: "",
+            productImageURLs: "assets/images/bmw/1.jpg")
+    );
+
+    productItemList.add(
+        ProductItemList(
+            productName: "Range Rover",
+            productStartPrice: "€ 1.25 - €2.45 lakh",
+            productMaxPrice: "",
+            productImageURLs: "assets/images/rangerover/1.jpg")
+    );
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -207,11 +242,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // This next line does the trick.
               scrollDirection: Axis.horizontal,
               children: <Widget>[
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
+                _buildProductItem(productItemList[1]),
+                _buildProductItem(productItemList[0]),
+                _buildProductItem(productItemList[2]),
               ],
             ),
           ),
@@ -244,11 +277,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // This next line does the trick.
               scrollDirection: Axis.horizontal,
               children: <Widget>[
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
+                _buildProductItem(productItemList[2]),
+                _buildProductItem(productItemList[1]),
+                _buildProductItem(productItemList[0]),
               ],
             ),
           ),
@@ -257,7 +288,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildProductItem() {
+  Widget _buildProductItem(ProductItemList itemList) {
     return GestureDetector(
       onTap: () =>
       {
@@ -278,23 +309,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: BoxDecoration(
                 image: DecorationImage(
                     fit: BoxFit.cover,
-                    image: AssetImage("assets/images/imgCar1.png")),
+                    image: AssetImage(itemList.productImageURLs)),
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                color: Colors.redAccent,
+                color: Colors.white,
               ),
             ),
             SizedBox(
               height: 10,
             ),
             Text(
-              "Mercedes Maybach S",
+              itemList.productName,
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 12,
                  ),
             ),
             Text(
-              "€ 1.25 - €2.45 lakh",
+              itemList.productStartPrice,
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 16,
