@@ -32,22 +32,30 @@ class Data {
   String accessToken;
   String refreshToken;
   String group;
+  String name;
+  String email;
 
   Data({
     required this.accessToken,
     required this.refreshToken,
     required this.group,
+    required this.name,
+    required this.email,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     accessToken: json["accessToken"],
     refreshToken: json["refreshToken"],
     group: json["group"],
+    name: json["name"],
+    email: "test@abc.com"//json["email"],
   );
 
   Map<String, dynamic> toJson() => {
     "accessToken": accessToken,
     "refreshToken": refreshToken,
     "group": group,
+    "name": name,
+    "email": email,
   };
 }

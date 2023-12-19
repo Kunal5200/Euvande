@@ -4,4 +4,5 @@ class ApiConstants {
   static String register = 'authentication/api/user/register';
   static String verify = 'authentication/api/user/verify';
   static String login = 'authentication/api/user/login';
+  static String forgotPassword = 'authentication/api/forgotPassword';
 }

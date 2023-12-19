@@ -52,6 +52,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           builder: (context) => Otp(
                 response: responseModel,
                 referenceId: responseModel.data.referenceId,
+              verificationFor : REGISTER
               )),
     );
 
@@ -87,6 +88,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xfffafcff),
+        ),
         body: Container(
       padding: EdgeInsets.symmetric(horizontal: 25),
       child: SingleChildScrollView(
@@ -96,20 +100,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(
-                height: 40,
-              ),
               Container(
-                width: 100.0,
-                height: 100.0,
+                width: 150.0,
+                height: 150.0,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                       fit: BoxFit.cover,
                       image: AssetImage("assets/logos/logo.png")),
                 ),
-              ),
-              SizedBox(
-                height: 15,
               ),
               TextFormField(
                 controller: nameController,
@@ -258,7 +256,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               ),
               GestureDetector(
                 onTap: () => {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const LoginScreen()),
@@ -305,11 +303,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         .then((value) => {
 
       _navigateOTPScreen(context, value),
+
       setState(() {
         submitButtonText = 'Proceed'.toUpperCase();
         isEnabled = true;
       }),
-
 
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(
@@ -317,6 +315,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       )),
     })
         .catchError((onError) {
+
       setState(() {
         submitButtonText = 'Proceed'.toUpperCase();
         isEnabled = true;

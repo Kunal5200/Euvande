@@ -6,21 +6,61 @@ import 'package:euvande/model/response/VerifyResponseModel.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/Constants.dart';
 import 'package:euvande/utilities/KeyConstants.dart';
+import 'package:euvande/utilities/MyLocalStorage.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Otp extends StatefulWidget {
+  final String verificationFor;
   final Object response;
   final int referenceId;
 
-  Otp({super.key, required this.response, required this.referenceId});
+  Otp(
+      {super.key,
+      required this.response,
+      required this.referenceId,
+      required this.verificationFor});
 
   @override
   _OtpState createState() => new _OtpState();
 }
 
 class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  String sendOTPButtonText = "Submit";
+  bool isEnabled = true;
+  final TextEditingController passwordController =
+      TextEditingController(text: "123456");
+  final TextEditingController rePasswordController =
+      TextEditingController(text: "123456");
+
+  final textFieldFocusNode = FocusNode();
+  final textFieldFocusNode1 = FocusNode();
+  bool _obscured = true;
+  bool _obscured1 = true;
+
+  void _toggleObscured() {
+    setState(() {
+      _obscured = !_obscured;
+      if (textFieldFocusNode.hasPrimaryFocus)
+        return; // If focus is on text field, dont unfocus
+      textFieldFocusNode.canRequestFocus =
+          false; // Prevents focus if tap on eye
+    });
+  }
+
+  void _toggleObscured1() {
+    setState(() {
+      _obscured1 = !_obscured1;
+      if (textFieldFocusNode1.hasPrimaryFocus)
+        return; // If focus is on text field, dont unfocus
+      textFieldFocusNode1.canRequestFocus =
+          false; // Prevents focus if tap on eye
+    });
+  }
+
   // Constants
   final int time = 30;
   late AnimationController _controller;
@@ -290,6 +330,10 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
+    passwordController.dispose();
+    rePasswordController.dispose();
+    textFieldFocusNode.dispose();
+
     super.dispose();
   }
 
@@ -401,7 +445,149 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
             _fifthDigit.toString() +
             _sixDigit.toString();
 
-        verifyOTP(otp);
+        switch (widget.verificationFor) {
+          case REGISTER:
+            verifyRegisterOTP(otp);
+            break;
+          case FORGET_PASSWORD:
+            showModalBottomSheet<void>(
+              context: context,
+              isDismissible: false,
+              backgroundColor: Colors.white,
+              builder: (BuildContext context) {
+                return Form(
+                    key: _formKey,
+                    child: SizedBox(
+                      height: 300,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              "New Password",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "Enter a new password to reset your password.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            TextFormField(
+                              controller: passwordController,
+                              keyboardType: TextInputType.visiblePassword,
+                              obscureText: _obscured,
+                              focusNode: textFieldFocusNode,
+                              decoration: InputDecoration(
+                                labelText: "Password",
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(), // Apply corner radius
+                                ),
+                                prefixIcon: Icon(Icons.lock_rounded, size: 24),
+                                suffixIcon: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                  child: GestureDetector(
+                                    onTap: _toggleObscured,
+                                    child: Icon(
+                                      _obscured
+                                          ? Icons.visibility_rounded
+                                          : Icons.visibility_off_rounded,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This field is required';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                              controller: rePasswordController,
+                              keyboardType: TextInputType.visiblePassword,
+                              obscureText: _obscured1,
+                              focusNode: textFieldFocusNode1,
+                              decoration: InputDecoration(
+                                labelText: "Re-Type Password",
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(), // Apply corner radius
+                                ),
+                                prefixIcon: Icon(Icons.lock_rounded, size: 24),
+                                suffixIcon: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                  child: GestureDetector(
+                                    onTap: _toggleObscured1,
+                                    child: Icon(
+                                      _obscured1
+                                          ? Icons.visibility_rounded
+                                          : Icons.visibility_off_rounded,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This field is required';
+                                } else if (passwordController.text != value) {
+                                  return 'Password not matched';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            ElevatedButton(
+                              style: raisedButtonStyle,
+                              child: Text(
+                                sendOTPButtonText,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                              onPressed: () {
+                                if (isEnabled &&
+                                    _formKey.currentState!.validate()) {
+                                  verifyForgetPasswordOTP(
+                                      otp, passwordController.text);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ));
+              },
+            );
+            break;
+        }
       }
     });
   }
@@ -423,15 +609,14 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
     setState(() {});
   }
 
-  void verifyOTP(String otp) {
-    Future<VerifyResponseModel> response = ApiService()
-        .verify(VerifyRequestModel(referenceId: widget.referenceId, otp: otp));
+  void verifyRegisterOTP(String otp) {
+    Future<VerifyResponseModel> response = ApiService().verify(
+        VerifyRequestModel(
+            referenceId: widget.referenceId, otp: otp, password: ''));
     response
         .then((value) => {
-
-      MyLocalStorage.setItem(LOCAL_STORAGE_LOGIN_DATA, value),
-
-      Navigator.pop(context, {"result": "OK", "data": value}),
+              SharedPrefManager.setLoginData(value.toJson() as String),
+              Navigator.pop(context, {"result": "OK", "data": value}),
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(value.message),
               )),
@@ -451,6 +636,33 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
         ));
       }
     });
+  }
+
+  void verifyForgetPasswordOTP(String otp, password) {
+    Future<VerifyResponseModel> response = ApiService().verify(
+        VerifyRequestModel(
+            referenceId: widget.referenceId, otp: otp, password: password));
+    response
+        .then((value) => {
+              Navigator.pop(context, {"result": "OK", "data": value}),
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(value.message),
+              )),
+            })
+        .catchError((onError) {
+      Response response = onError.response as Response;
+      if (response.statusCode == 408) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Invalid OTP Entered"),
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(onError.message),
+        ));
+      }
+    });
+
+    Navigator.pop(context);
   }
 }
 

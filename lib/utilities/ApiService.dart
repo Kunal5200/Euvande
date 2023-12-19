@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:euvande/model/request/LoginRequestModel.dart';
@@ -8,11 +9,16 @@ import 'package:euvande/model/response/RegisterResponseModel.dart';
 import 'package:euvande/model/response/UserModel.dart';
 import 'package:euvande/model/response/VerifyResponseModel.dart';
 import 'package:euvande/utilities/ApiConstants.dart';
+import 'package:euvande/utilities/LoggerInterceptor.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 
 class ApiService {
-  final dio = Dio();
+  final dio = Dio()..interceptors.addAll([
+    LoggerInterceptor(), //custom logger interceptor.
+  ]);
+
   final option = Options(headers: {
     Headers.contentTypeHeader: Headers.jsonContentType,
     // "Authorization":"Bearer ${token}",
@@ -21,13 +27,15 @@ class ApiService {
   Future<RegisterResponseModel> register(
       RegisterRequestModel loginOrRegisterRequestModel) async {
     Response response = await dio
-        .post(ApiConstants.baseUrl + ApiConstants.register, options: option, data: loginOrRegisterRequestModel);
+        .post(ApiConstants.baseUrl + ApiConstants.register, options: option,
+        data: loginOrRegisterRequestModel);
     print(response);
     if (response.statusCode == 200) {
       return RegisterResponseModel.fromJson(response.data);
     } else {
       return Future.error(
-          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}"
+      );
     }
   }
 
@@ -51,7 +59,21 @@ class ApiService {
         options: option,
         data: loginRequestModel);
     if (response.statusCode == 200) {
-      return LoginResponseModel.fromJson(response.data);
+      return LoginResponseModel.fromJson(jsonDecode(jsonEncode(response.data)));
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
+  Future<RegisterResponseModel> forgotPassword(RegisterRequestModel registerRequestModel) async {
+    Response response = await dio.post(
+        ApiConstants.baseUrl + ApiConstants.forgotPassword,
+        options: option,
+        data: registerRequestModel);
+
+    if (response.statusCode == 200) {
+      return RegisterResponseModel.fromJson(jsonDecode(jsonEncode(response.data)));
     } else {
       return Future.error(
           "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");

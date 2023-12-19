@@ -44,6 +44,7 @@ dependencies:
   extended_image: ^8.2.0
   dio: ^5.4.0
   localstorage: ^4.0.1+4
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

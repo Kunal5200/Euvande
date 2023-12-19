@@ -1,5 +1,15 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/main.dart';
+import 'package:euvande/model/response/LoginResponseModel.dart';
+import 'package:euvande/screen/change_password_screen.dart';
+import 'package:euvande/screen/dashboard_screen.dart';
+import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/profile_setting_screen.dart';
+import 'package:euvande/utilities/Constants.dart';
+import 'package:euvande/utilities/KeyConstants.dart';
+import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +21,20 @@ class ProfileDetailsScreen extends StatefulWidget {
 }
 
 class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
+  LoginResponseModel? loginResponseModel = null;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    SharedPrefManager.getLoginData().then((value) => {
+          setState(() {
+            loginResponseModel = value;
+          }),
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,23 +99,34 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProfileSettingScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const ChangePasswordScreen()),
               );
             },
             child: _buildMenuItem("Profile Setting", Icons.settings),
           ),
-
           SizedBox(height: 30),
           ElevatedButton(
             style: raisedButtonStyle,
             child: Text(
-              'Logout',
+              loginResponseModel == null ? "Login" : "Logout",
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
             onPressed: () {
-              // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              //   content: Text("Sending Message"),
-              // ));
+              if(  loginResponseModel == null){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const LoginScreen()),
+                );
+              } else{
+                SharedPrefManager.logout();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MyHomePage(title: "title")),
+                );
+              }
             },
           ),
           SizedBox(
@@ -128,11 +163,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Anshuman",
+            loginResponseModel == null ? "N/A" : loginResponseModel!.data.name,
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
           Text(
-            "9876543210",
+            loginResponseModel == null ? "N/A" : loginResponseModel!.data.email,
             style: TextStyle(
               fontSize: 14,
             ),

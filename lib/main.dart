@@ -1,7 +1,10 @@
+import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/screen/dashboard_screen.dart';
+import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/profile_detail_screen.dart';
 import 'package:euvande/screen/registration_screen.dart';
 import 'package:euvande/screen/splash_screen.dart';
+import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -52,18 +55,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late LoginResponseModel? loginResponseModel;
 
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
-    RegistrationScreen(),
     ProfileDetailsScreen(),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 1 && loginResponseModel == null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const LoginScreen()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    SharedPrefManager.getLoginData().then((value) => {
+          setState(() {
+            loginResponseModel = value;
+          }),
+        });
   }
 
   @override
@@ -79,10 +102,6 @@ class _MyHomePageState extends State<MyHomePage> {
           const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
           ),
           BottomNavigationBarItem(
             icon: Image.asset("assets/icons/user.png",
