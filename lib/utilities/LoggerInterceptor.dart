@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:euvande/screen/login_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 // Author: Hari Shankar
 // Date: 28-07-2023
@@ -59,8 +61,26 @@ void logDebug(String message, {Level level = Level.info}) {
 
 // Define an interceptor that logs the requests and responses
 class LoggerInterceptor extends Interceptor {
+  BuildContext context;
+
+  LoggerInterceptor(this.context);
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+
+    if(err.response!.statusCode == 401){
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const LoginScreen()),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(err.response!.data["message"].toString()),
+    ));
+
     final options = err.requestOptions;
     final requestPath = '${options.baseUrl}${options.path}';
 

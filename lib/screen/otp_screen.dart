@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:euvande/model/request/VerifyRequestModel.dart';
@@ -341,12 +342,17 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
     return new Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: _getAppbar,
       backgroundColor: Colors.white,
-      body: new Container(
-        width: _screenSize!.width,
+      body: Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          width: _screenSize!.width,
 //        padding: new EdgeInsets.only(bottom: 16.0),
-        child: _getInputPart,
+          child: _getInputPart,
+        ),
       ),
     );
   }
@@ -452,10 +458,14 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
           case FORGET_PASSWORD:
             showModalBottomSheet<void>(
               context: context,
+              isScrollControlled: true,
               isDismissible: false,
               backgroundColor: Colors.white,
               builder: (BuildContext context) {
-                return Form(
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Form(
                     key: _formKey,
                     child: SizedBox(
                       height: 300,
@@ -463,9 +473,9 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
+                            BorderRadius.all(Radius.circular(15))),
                         padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
@@ -500,12 +510,12 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
                                 labelText: "Password",
                                 border: OutlineInputBorder(
                                   borderSide:
-                                      BorderSide(), // Apply corner radius
+                                  BorderSide(), // Apply corner radius
                                 ),
                                 prefixIcon: Icon(Icons.lock_rounded, size: 24),
                                 suffixIcon: Padding(
                                   padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                  const EdgeInsets.fromLTRB(0, 0, 4, 0),
                                   child: GestureDetector(
                                     onTap: _toggleObscured,
                                     child: Icon(
@@ -536,12 +546,12 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
                                 labelText: "Re-Type Password",
                                 border: OutlineInputBorder(
                                   borderSide:
-                                      BorderSide(), // Apply corner radius
+                                  BorderSide(), // Apply corner radius
                                 ),
                                 prefixIcon: Icon(Icons.lock_rounded, size: 24),
                                 suffixIcon: Padding(
                                   padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                  const EdgeInsets.fromLTRB(0, 0, 4, 0),
                                   child: GestureDetector(
                                     onTap: _toggleObscured1,
                                     child: Icon(
@@ -583,7 +593,8 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
                           ],
                         ),
                       ),
-                    ));
+                    )),
+                );
               },
             );
             break;
@@ -610,36 +621,24 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
   }
 
   void verifyRegisterOTP(String otp) {
-    Future<VerifyResponseModel> response = ApiService().verify(
+    Future<VerifyResponseModel> response = ApiService(context).verify(
         VerifyRequestModel(
             referenceId: widget.referenceId, otp: otp, password: ''));
     response
         .then((value) => {
-              SharedPrefManager.setLoginData(value.toJson() as String),
-              Navigator.pop(context, {"result": "OK", "data": value}),
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(value.message),
-              )),
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Successfully registered"),
-              ))
+      SharedPrefManager.setLoginData(jsonEncode(value.toJson())),
+      Navigator.pop(context, {"result": "OK", "data": value}),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(value.message),
+      )),
             })
         .catchError((onError) {
-      Response response = onError.response as Response;
-      if (response.statusCode == 408) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Invalid OTP Entered"),
-        ));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(onError.message),
-        ));
-      }
+
     });
   }
 
   void verifyForgetPasswordOTP(String otp, password) {
-    Future<VerifyResponseModel> response = ApiService().verify(
+    Future<VerifyResponseModel> response = ApiService(context).forgotPasswordVerify(
         VerifyRequestModel(
             referenceId: widget.referenceId, otp: otp, password: password));
     response

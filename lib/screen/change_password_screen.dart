@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:euvande/main.dart';
+import 'package:euvande/model/request/ChangePasswordRequestModel.dart';
 import 'package:euvande/model/request/LoginRequestModel.dart';
 import 'package:euvande/model/request/RegisterRequestModel.dart';
+import 'package:euvande/model/response/ChangePasswordResponseModel.dart';
 import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/model/response/RegisterResponseModel.dart';
 import 'package:euvande/screen/otp_screen.dart';
@@ -22,10 +24,15 @@ class ChangePasswordScreen extends StatefulWidget {
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   GlobalKey<FormState> _formKey = GlobalKey();
-  GlobalKey<FormState> _formForgetPasswordKey = GlobalKey();
 
   final textFieldFocusNode = FocusNode();
   bool _obscured = true;
+
+  final textFieldFocusNode1 = FocusNode();
+  bool _obscured1 = true;
+
+  final textFieldFocusNode2 = FocusNode();
+  bool _obscured2 = true;
 
   void _toggleObscured() {
     setState(() {
@@ -33,7 +40,31 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if (textFieldFocusNode.hasPrimaryFocus)
         return; // If focus is on text field, dont unfocus
       textFieldFocusNode.canRequestFocus =
-          false; // Prevents focus if tap on eye
+      false;
+
+
+    });
+  }
+
+  void _toggleObscured1() {
+    setState(() {
+      _obscured1 = !_obscured1;
+
+      if (textFieldFocusNode1.hasPrimaryFocus)
+        return; // If focus is on text field, dont unfocus
+      textFieldFocusNode1.canRequestFocus =
+      false;
+    });
+  }
+
+  void _toggleObscured2() {
+    setState(() {
+      _obscured2 = !_obscured2;
+
+      if (textFieldFocusNode2.hasPrimaryFocus)
+        return; // If focus is on text field, dont unfocus
+      textFieldFocusNode2.canRequestFocus =
+      false;
     });
   }
 
@@ -41,15 +72,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   String sendOTPButtonText = "Next";
   bool isEnabled = true;
   final TextEditingController oldPasswordController =
-      TextEditingController(text: "asek304@gmail.com");
+      TextEditingController(text: "123456");
   final TextEditingController passwordController =
+      TextEditingController(text: "123456");
+  final TextEditingController confirmPasswordController =
       TextEditingController(text: "123456");
 
   @override
   void dispose() {
     oldPasswordController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     textFieldFocusNode.dispose();
+    textFieldFocusNode1.dispose();
+    textFieldFocusNode2.dispose();
 
     super.dispose();
   }
@@ -59,6 +95,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xfffafcff),
+        title: Text("Change Password"),
       ),
         body: Container(
             padding: EdgeInsets.symmetric(horizontal: 25),
@@ -78,7 +115,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             image: AssetImage("assets/logos/logo.png")),
                       ),
                     ),TextFormField(
-                        controller: passwordController,
+                        controller: oldPasswordController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'This field is required';
@@ -119,8 +156,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           return null;
                         },
                         keyboardType: TextInputType.visiblePassword,
-                        obscureText: _obscured,
-                        focusNode: textFieldFocusNode,
+                        obscureText: _obscured1,
+                        focusNode: textFieldFocusNode1,
                         decoration: InputDecoration(
                           labelText: "New Password",
                           border: OutlineInputBorder(
@@ -130,9 +167,42 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           suffixIcon: Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                             child: GestureDetector(
-                              onTap: _toggleObscured,
+                              onTap: _toggleObscured1,
                               child: Icon(
-                                _obscured
+                                _obscured1
+                                    ? Icons.visibility_rounded
+                                    : Icons.visibility_off_rounded,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        )),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    TextFormField(
+                        controller: confirmPasswordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.visiblePassword,
+                        obscureText: _obscured2,
+                        focusNode: textFieldFocusNode2,
+                        decoration: InputDecoration(
+                          labelText: "Confirm Password",
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(), // Apply corner radius
+                          ),
+                          prefixIcon: Icon(Icons.lock_rounded, size: 24),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                            child: GestureDetector(
+                              onTap: _toggleObscured2,
+                              child: Icon(
+                                _obscured2
                                     ? Icons.visibility_rounded
                                     : Icons.visibility_off_rounded,
                                 size: 24,
@@ -197,18 +267,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   void callChangePasswordAPI() {
+
     setState(() {
-      submitButtonText = "Logging...";
+      submitButtonText = "Processing...";
       isEnabled = false;
     });
 
-    Future<LoginResponseModel> response = ApiService().login(LoginRequestModel(
-        email: oldPasswordController.text, password: passwordController.text));
+    Future<ChangePasswordResponseModel> response = ApiService(context).changePassword(ChangePasswordRequestModel(oldPassword: oldPasswordController.text, newPassword: passwordController.text,));
     response
         .then((value) => {
-              SharedPrefManager.setLoginData(jsonEncode(value.toJson())),
+              SharedPrefManager.updateAccessToken(value.data!.accessToken),
               setState(() {
-                submitButtonText = "Login";
+                submitButtonText = "Update Password";
                 isEnabled = true;
               }),
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -218,11 +288,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const MyHomePage(title: "")),
-                  ModalRoute.withName("/RegistrationScreen"))
+                  ModalRoute.withName("/MyHomePage"))
             })
         .catchError((onError) {
       setState(() {
-        submitButtonText = "Login";
+        submitButtonText = "Update Password";
         isEnabled = true;
       });
 

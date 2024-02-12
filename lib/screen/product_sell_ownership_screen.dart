@@ -4,7 +4,9 @@ import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellOwnerShipScreen extends StatefulWidget {
-  const ProductSellOwnerShipScreen({super.key});
+  const ProductSellOwnerShipScreen({super.key, required this.onNext});
+
+  final TabChangeCallback onNext;
 
   @override
   State<ProductSellOwnerShipScreen> createState() =>
@@ -66,7 +68,7 @@ class _ProductSellOwnerShipScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Select Car Ownership",
+            "Select car ownership",
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
         ],
@@ -87,15 +89,21 @@ class _ProductSellOwnerShipScreenState
               padding: const EdgeInsets.all(8),
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("  "+items[index] + " Owenership", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      SizedBox(height: 5,),
-                      Divider(thickness: 0.5, color: Colors.black26,),
-                    ],
+                return GestureDetector(
+                  onTap: () {
+                    widget.onNext(items[index]);
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("  "+items[index] + " Ownership", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                        SizedBox(height: 5,),
+                        Divider(thickness: 0.5, color: Colors.black26,),
+                      ],
+                    ),
                   ),
                 );
               }

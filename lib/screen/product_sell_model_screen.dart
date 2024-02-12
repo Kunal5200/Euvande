@@ -1,47 +1,76 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/model/request/GetModelRequestModel.dart';
+import 'package:euvande/model/response/GetModelResponseModel.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ProductSellModelScreen extends StatefulWidget {
-  const ProductSellModelScreen({super.key});
+
+  const ProductSellModelScreen({super.key, required this.onNext});
+
+  final TabChangeCallback onNext;
 
   @override
-  State<ProductSellModelScreen> createState() =>
-      _ProductSellModelScreenState();
+  State<ProductSellModelScreen> createState() => _ProductSellModelScreenState();
 }
 
-class _ProductSellModelScreenState
-    extends State<ProductSellModelScreen> {
+class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
+  bool isDataLoading = true;
+  GetModelResponseModel? getModelResponseModel;
+  List<ModelData> originalData = [];
 
-  final yearItems = [
-    "BMW X1",
-    "BMW 7 Series",
-    "BMW 2 Series Gran Coupe",
-    "BMW X7",
-    "BMW 3 Series Gran Limousine",
-  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    callGetModelByMakeApi();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       child: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
             _buildTitleSection(),
-            SizedBox(height: 10,),
-            _buildSearch(),
-            _buildYearListSection(),
+            SizedBox(
+              height: 10,
+            ),
+            isDataLoading ? _showLoader() : _buildYearListSection(),
           ],
         ),
       ),
     );
   }
 
+  onSearchTextChanged(String text) async {
+
+    setState(() {
+
+      getModelResponseModel!.data.clear();
+
+      if (text.trim().isEmpty) {
+        getModelResponseModel!.data.addAll(originalData);
+      } else {
+        originalData.forEach((data) {
+          if (data.modelName.toString().toLowerCase().contains(text.toLowerCase()))
+            getModelResponseModel!.data.add(data);
+        });
+      }
+
+    });
+  }
+
   Widget _buildSearch() {
     return TextField(
+      keyboardType: TextInputType.text,
+      onChanged: onSearchTextChanged,
       style: TextStyle(fontSize: 14),
       decoration: InputDecoration(
         filled: true,
@@ -55,7 +84,6 @@ class _ProductSellModelScreenState
           // borderSide: BorderSide.none
         ),
       ),
-      keyboardType: TextInputType.name,
     );
   }
 
@@ -79,31 +107,78 @@ class _ProductSellModelScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildSearch(),
         SizedBox(
           height: 10,
         ),
         Container(
           height: 450,
-          child:  ListView.builder(
+          child: ListView.builder(
               padding: const EdgeInsets.all(8),
-              itemCount: yearItems.length,
+              itemCount: getModelResponseModel!.data.length,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("  "+yearItems[index], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      SizedBox(height: 5,),
-                      Divider(thickness: 0.5, color: Colors.black26,),
-                    ],
+                  child: GestureDetector(
+                    onTap: () {
+                      widget.onNext(getModelResponseModel!.data[index]);
+                    },
+                    child: Container(
+                        color: Colors.transparent,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "  ${getModelResponseModel!.data[index].modelName}",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Divider(
+                              thickness: 0.5,
+                              color: Colors.black26,
+                            ),
+                          ],
+                        )),
                   ),
                 );
-              }
-          ),
+              }),
         )
       ],
     );
   }
 
+  Widget _showLoader() {
+    return Center(
+      heightFactor: 12,
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  void callGetModelByMakeApi() {
+    GetModelRequestModel getModelRequestModel =
+        GetModelRequestModel(makeId: ProductSellJourneyScreen.addCarRequestModel.makeId!.toInt(), periodYear: ProductSellJourneyScreen.addCarRequestModel.year!.toInt());
+    setState(() {
+      isDataLoading = true;
+    });
+
+    Future<GetModelResponseModel> response =
+        ApiService(context).getModel(getModelRequestModel);
+    response
+        .then((value) => {
+              setState(() {
+                isDataLoading = false;
+              }),
+              getModelResponseModel = value,
+      originalData.addAll(value.data),
+      
+            })
+        .catchError((onError) {
+      setState(() {
+        isDataLoading = false;
+      });
+    });
+  }
 }

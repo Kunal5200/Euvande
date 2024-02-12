@@ -1,8 +1,11 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/component/ProductJourneyTabView.dart';
-import 'package:euvande/screen/dashboard_screen.dart';
+import 'package:euvande/model/request/AddCarRequestModel.dart';
+import 'package:euvande/model/request/AddSpecificationRequestModel.dart';
+import 'package:euvande/model/response/AddCarResponseModel.dart';
+import 'package:euvande/model/response/AddSpecificationResponseModel.dart';
+import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/screen/product_sell_brands_screen.dart';
 import 'package:euvande/screen/product_sell_contact_info_screen.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_location_screen.dart';
 import 'package:euvande/screen/product_sell_model_screen.dart';
 import 'package:euvande/screen/product_sell_odometer_screen.dart';
@@ -11,11 +14,17 @@ import 'package:euvande/screen/product_sell_period_screen.dart';
 import 'package:euvande/screen/product_sell_specification_screen.dart';
 import 'package:euvande/screen/product_sell_variant_screen.dart';
 import 'package:euvande/screen/product_sell_vehicle_image_upload_screen.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellJourneyScreen extends StatefulWidget {
-  const ProductSellJourneyScreen({super.key});
+  final GetAllMakeData? selectedBrand;
+  static late AddCarRequestModel addCarRequestModel = AddCarRequestModel();
+
+  const ProductSellJourneyScreen(
+    this.selectedBrand, {
+    super.key,
+  });
 
   @override
   State<ProductSellJourneyScreen> createState() =>
@@ -24,57 +33,72 @@ class ProductSellJourneyScreen extends StatefulWidget {
 
 class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
     with TickerProviderStateMixin {
+  int carId = 0;
+
+  bool isDataLoading = false;
+
   late TabController _tabController;
+
   final tabItems = [
     {
       "title": "Make",
       "desc": "Make",
       "type": "make",
+      "isEnabled": false,
     },
     {
       "title": "Period",
       "desc": "Period",
       "type": "period",
+      "isEnabled": false,
     },
     {
       "title": "Model",
       "desc": "Model",
       "type": "model",
+      "isEnabled": false,
     },
     {
       "title": "Variant",
       "desc": "Variant",
       "type": "variant",
+      "isEnabled": false,
     },
     {
       "title": "Ownership",
       "desc": "Ownership",
       "type": "ownership",
+      "isEnabled": false,
     },
     {
       "title": "Odometer",
       "desc": "Odometer",
       "type": "odometer",
+      "isEnabled": false,
     },
     {
       "title": "Location",
       "desc": "Location",
       "type": "location",
+      "isEnabled": false,
     },
     {
       "title": "Specifications",
       "desc": "Specifications",
       "type": "specifications",
+      "isEnabled": false,
     },
     {
       "title": "Contact Information",
       "desc": "ContactInformation",
       "type": "contactInformation",
+      "isEnabled": false,
     },
     {
       "title": "Photos",
       "desc": "Photos",
       "type": "photos",
+      "isEnabled": false,
     },
   ];
 
@@ -82,15 +106,71 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
+    if (widget.selectedBrand != null) {
+      tabItems.removeAt(0);
+      ProductSellJourneyScreen.addCarRequestModel.makeId =
+          widget.selectedBrand!.id;
+    } else if (ProductSellJourneyScreen.addCarRequestModel.makeId != null) {
+      tabItems.removeAt(0);
+    }
+
     _tabController = TabController(length: tabItems.length, vsync: this);
+
+    if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0 &&
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[0].media !=
+            null) {
+      _tabController.index = 8;
+    }else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0 &&
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[0].contactInfo !=
+            null) {
+      _tabController.index = 7;
+    }else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0 &&
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[0].specification !=
+            null) {
+      _tabController.index = 6;
+    }else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0 &&
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[0].location !=
+            null) {
+      _tabController.index = 5;
+    }
+
+    if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0) {
+      carId =
+          ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].id;
+    }
+  }
+
+  void onTap(int index) {
+    if (index < _tabController.index) {
+      setState(() {
+        _tabController.index = index;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Product Sell Dashboard"),
+          title: Text(""),
           bottom: TabBar(
+              onTap: (index) {
+                onTap(index);
+              },
               indicatorSize: TabBarIndicatorSize.label,
               isScrollable: true,
               padding: EdgeInsets.zero,
@@ -106,35 +186,184 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
                   .toList()),
         ),
         body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: tabItems.map((e) => getScreen(e)).toList(),
         ));
   }
 
-  Widget getScreen(Map<String, String> e) {
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Widget getScreen(Map<Object, Object> e) {
     switch (e["type"]) {
       case "make":
-        return ProductSellBrandsScreen();
+        return ProductSellBrandsScreen(
+          onNext: (data) {
+            ProductSellJourneyScreen.addCarRequestModel.makeId = data.id;
+            _tabController.index++;
+            // callAddCarApi(addCarRequestModel, 1);
+          },
+        );
       case "period":
-        return ProductSellPeriodScreen();
+        return ProductSellPeriodScreen(
+          onNext: (data) {
+            ProductSellJourneyScreen.addCarRequestModel.periodId = data.id;
+            ProductSellJourneyScreen.addCarRequestModel.year = data.year;
+            _tabController.index++;
+            // callAddCarApi(addCarRequestModel, 2);
+          },
+        );
       case "model":
-        return ProductSellModelScreen();
+        return ProductSellModelScreen(
+          onNext: (data) {
+            ProductSellJourneyScreen.addCarRequestModel.modelId = data.id;
+            _tabController.index++;
+            // callAddCarApi(addCarRequestModel, 3);
+          },
+        );
       case "variant":
-        return ProductSellVariantScreen();
+        return ProductSellVariantScreen(
+          onNext: (data) {
+            ProductSellJourneyScreen.addCarRequestModel.variantId = data.id;
+            _tabController.index++;
+            // callAddCarApi(addCarRequestModel, 4);
+          },
+        );
       case "ownership":
-        return ProductSellOwnerShipScreen();
+        return ProductSellOwnerShipScreen(
+          onNext: (data) {
+            ProductSellJourneyScreen.addCarRequestModel.ownership = data;
+            _tabController.index++;
+            // callAddCarApi(addCarRequestModel, 5);
+          },
+        );
       case "odometer":
-        return ProductSellOdometerScreen();
+        return ProductSellOdometerScreen(
+          onNext: (data) {
+            ProductSellJourneyScreen.addCarRequestModel.odometer = data;
+            _tabController.index++;
+            // callAddCarApi(addCarRequestModel, 6);
+          },
+        );
       case "location":
-        return ProductSellLocationScreen();
+        return ProductSellLocationScreen(
+          onNext: (data) {
+            Location location = Location(city: data, latitude: 1, longitude: 1);
+            ProductSellJourneyScreen.addCarRequestModel.location = location;
+            callAddCarApi(ProductSellJourneyScreen.addCarRequestModel, 6);
+          },
+        );
       case "specifications":
-        return ProductSellSpecificationScreen();
+        return ProductSellSpecificationScreen(
+          onNext: (data) {
+            callAddSpecificationApi(data, 7);
+          },
+          carId: carId,
+        );
       case "contactInformation":
-        return ProductSellContactInfoScreen();
+        return ProductSellContactInfoScreen(
+          onNext: (data) {
+            ContactInfo contactInfo = ContactInfo(
+                name: data.name, phoneNo: data.phoneNo, zipCode: data.zipCode);
+
+            ProductSellJourneyScreen.addCarRequestModel.contactInfo =
+                contactInfo;
+            callAddCarApi(ProductSellJourneyScreen.addCarRequestModel, 8);
+          },
+        );
       case "photos":
-        return ProductSellVehicleImageUploadScreen();
+        return ProductSellVehicleImageUploadScreen(
+          onNext: (data) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Success"),
+            ));
+            // _tabController.index = 1;
+          },
+          carId: carId,
+        );
     }
-    
+
     return Text("n/a");
   }
+
+  void callAddCarApi(AddCarRequestModel addCarRequestModel, indexNext) {
+    addCarRequestModel.id = carId;
+    setState(() {
+      showLoaderDialog(context);
+      isDataLoading = true;
+    });
+
+    Future<AddCarResponseModel> response =
+        ApiService(context).addCar(addCarRequestModel);
+    response
+        .then((value) => {
+              setState(() {
+                carId = value.data!.id;
+              }),
+              Navigator.pop(context),
+              _tabController.index = indexNext,
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(value.message),
+              )),
+            })
+        .catchError((onError) {
+      Navigator.pop(context);
+      setState(() {
+        isDataLoading = false;
+      });
+    });
+  }
+
+  void callAddSpecificationApi(
+      AddSpecificationRequestModel addSpecificationRequestModel, indexNext) {
+
+    addSpecificationRequestModel.carId =carId;
+    setState(() {
+      showLoaderDialog(context);
+      isDataLoading = true;
+    });
+
+    Future<AddSpecificationResponseModel> response =
+        ApiService(context).addSpecification(addSpecificationRequestModel);
+    response
+        .then((value) => {
+              _tabController.index = indexNext,
+              carId = value.data.id,
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(value.message),
+              )),
+              Navigator.pop(context),
+            })
+        .catchError((onError) {
+      Navigator.pop(context);
+      setState(() {
+        isDataLoading = false;
+      });
+    });
+  }
+
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(
+              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 }
+
+typedef TabChangeCallback = void Function(dynamic data);

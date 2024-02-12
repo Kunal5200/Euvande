@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String sendOTPButtonText = "Next";
   bool isEnabled = true;
   final TextEditingController emailController =
-      TextEditingController(text: "asek304@gmail.com");
+      TextEditingController(text: "raj@yopmail.com");
   final TextEditingController passwordController =
       TextEditingController(text: "123456");
 
@@ -138,10 +138,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: () => {
                         showModalBottomSheet<void>(
+                          isScrollControlled: true,
                           context: context,
                           backgroundColor: Colors.white,
                           builder: (BuildContext context) {
-                            return Form(
+                            return Padding(padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).viewInsets.bottom),
+                            child: Form(
                                 key: _formForgetPasswordKey,
                                 child: SizedBox(
                                   height: 250,
@@ -154,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         horizontal: 20, vertical: 20),
                                     child: Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
@@ -185,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 value.isEmpty) {
                                               return 'This field is required';
                                             } else if (!RegExp(
-                                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                                 .hasMatch(value)) {
                                               return 'Invalid email entered';
                                             }
@@ -197,10 +200,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                               borderSide: BorderSide(),
                                             ),
                                             prefixIcon:
-                                                Icon(Icons.email, size: 24),
+                                            Icon(Icons.email, size: 24),
                                           ),
                                           keyboardType:
-                                              TextInputType.emailAddress,
+                                          TextInputType.emailAddress,
                                         ),
                                         SizedBox(
                                           height: 10,
@@ -225,14 +228,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ],
                                     ),
                                   ),
-                                ));
+                                )),
+                            );
                           },
                         )
                       },
                       child: Container(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          "Forget Password",
+                          "Forget Password ?",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 16,
@@ -281,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 width: 10,
                               ),
                               Text(
-                                "Signup",
+                                "Sign Up",
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 16,
@@ -322,7 +326,7 @@ class _LoginScreenState extends State<LoginScreen> {
       isEnabled = false;
     });
 
-    Future<LoginResponseModel> response = ApiService().login(LoginRequestModel(
+    Future<LoginResponseModel> response = ApiService(context).login(LoginRequestModel(
         email: emailController.text, password: passwordController.text));
     response
         .then((value) => {
@@ -346,9 +350,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isEnabled = true;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(onError.message),
-      ));
+
     });
   }
 
@@ -359,11 +361,13 @@ class _LoginScreenState extends State<LoginScreen> {
       isEnabled = false;
     });
 
-    Future<RegisterResponseModel> response = ApiService().forgotPassword(
+    Future<RegisterResponseModel> response = ApiService(context).forgotPassword(
         RegisterRequestModel(
             email: emailController.text, password: '', name: ''));
     response
         .then((value) => {
+
+    // Navigator.pop(context),
               _navigateOTPScreen(context, value),
               setState(() {
                 sendOTPButtonText = "Next";
@@ -382,7 +386,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ));
     });
 
-    Navigator.pop(context);
 
   }
 }

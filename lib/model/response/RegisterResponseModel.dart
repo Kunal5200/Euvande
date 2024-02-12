@@ -30,20 +30,20 @@ class RegisterResponseModel {
 
 class Data {
   int referenceId;
-  String otp;
+  String name;
 
   Data({
     required this.referenceId,
-    required this.otp,
+    required this.name,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     referenceId: json["referenceId"],
-    otp: json["OTP"],
+    name: json["name"],
   );
 
   Map<String, dynamic> toJson() => {
     "referenceId": referenceId,
-    "OTP": otp,
+    "name": name,
   };
 }

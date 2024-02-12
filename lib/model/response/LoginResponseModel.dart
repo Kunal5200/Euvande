@@ -48,7 +48,7 @@ class Data {
     refreshToken: json["refreshToken"],
     group: json["group"],
     name: json["name"],
-    email: "test@abc.com"//json["email"],
+    email:json["email"],
   );
 
   Map<String, dynamic> toJson() => {

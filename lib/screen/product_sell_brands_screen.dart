@@ -1,32 +1,49 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/interface/ProductSelect.dart';
+import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellBrandsScreen extends StatefulWidget {
-  const ProductSellBrandsScreen({super.key});
+  const ProductSellBrandsScreen({super.key, required this.onNext});
+
+  final TabChangeCallback onNext;
 
   @override
   State<ProductSellBrandsScreen> createState() =>
       _ProductSellBrandsScreenState();
 }
 
-class _ProductSellBrandsScreenState
-    extends State<ProductSellBrandsScreen> {
-  
+class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
+  bool isBrandLoading = true;
+  GetAllMakeResponseModel? getAllMakeResponseModel;
+
+  _ProductSellBrandsScreenState();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    callGetAllMakeApi();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       child: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
             _buildTitleSection(),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             _buildSearch(),
-            _buildBrandsSection(),
+            isBrandLoading ? _showLoader() : _buildBrandsSection(),
           ],
         ),
       ),
@@ -45,8 +62,8 @@ class _ProductSellBrandsScreenState
         hintStyle: TextStyle(fontSize: 14),
         contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
         border: OutlineInputBorder(
-          // borderSide: BorderSide.none
-        ),
+            // borderSide: BorderSide.none
+            ),
       ),
       keyboardType: TextInputType.name,
     );
@@ -78,18 +95,15 @@ class _ProductSellBrandsScreenState
         Container(
           height: 450,
           child: GridView.count(
-
             // Create a grid with 2 columns. If you change the scrollDirection to
             // horizontal, this produces 2 rows.
             crossAxisCount: 4,
             // Generate 100 widgets that display their index in the List.
-            children: List.generate(100, (index) {
+            children:
+                List.generate(getAllMakeResponseModel!.data.length, (index) {
               return GestureDetector(
                 onTap: () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(const SnackBar(
-                    content: Text("Coming Soon"),
-                  ));
+                  widget.onNext(getAllMakeResponseModel!.data[index]);
                 },
                 child: Container(
                   margin: EdgeInsets.all(5),
@@ -101,23 +115,24 @@ class _ProductSellBrandsScreenState
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 35.0,
+                        width: 45.0,
                         height: 35.0,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image:
-                              AssetImage("assets/logos/logo.png")),
+                              fit: BoxFit.fill,
+                              image: NetworkImage(
+                                  getAllMakeResponseModel!.data[index].logo)),
                         ),
                       ),
                       SizedBox(
                         height: 5,
                       ),
                       Text(
-                        "Brand name",
+                        getAllMakeResponseModel!.data[index].makeName,
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 12, ),
+                          color: Colors.black,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -130,30 +145,30 @@ class _ProductSellBrandsScreenState
     );
   }
 
-  Widget _buildInfoRow(IconData? icon, String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        if (icon != null)
-          Icon(
-            icon,
-            size: 16,
-            color: Colors.black45,
-          ),
-        if (icon != null)
-          SizedBox(
-            width: 10,
-          ),
-        Text(
-          title,
-          style: TextStyle(color: Colors.black45, fontSize: 12),
-        ),
-        Spacer(),
-        Text(
-          value,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-        ),
-      ],
+  Widget _showLoader() {
+    return Center(
+      heightFactor: 12,
+      child: CircularProgressIndicator(),
     );
+  }
+
+  void callGetAllMakeApi() {
+    setState(() {
+      isBrandLoading = true;
+    });
+
+    Future<GetAllMakeResponseModel> response = ApiService(context).getAllMake();
+    response
+        .then((value) => {
+              setState(() {
+                isBrandLoading = false;
+              }),
+              getAllMakeResponseModel = value,
+            })
+        .catchError((onError) {
+      setState(() {
+        isBrandLoading = false;
+      });
+    });
   }
 }

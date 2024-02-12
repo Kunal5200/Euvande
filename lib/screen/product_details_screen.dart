@@ -1,26 +1,35 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:convert';
+
+import 'package:encrypt/encrypt.dart' as enc;
+import 'package:euvande/model/response/GetCarListResponseModel.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({super.key});
+  final Doc doc;
+
+  const ProductDetailsScreen(this.doc, {super.key});
 
   @override
-  State<ProductDetailsScreen> createState() =>
-      _ProductDetailsScreenState();
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
-class _ProductDetailsScreenState
-    extends State<ProductDetailsScreen> {
-  bool _rememberMe = false;
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+
   final items = [
     "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-left-view-121.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-view-118.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-view-119.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/grille-97.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-fog-lamp-41.jpg",
-
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-view-118.jpg",
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-view-119.jpg",
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/grille-97.jpg",
+    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-fog-lamp-41.jpg",
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,24 +59,41 @@ class _ProductDetailsScreenState
   }
 
   Widget _buildImageList() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          for (var i = 0; i < items.length; i++) ...[
-            Container(
+    return Container(
+      height: 180,
+      child: ListView.builder(
+          // physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: widget.doc.carImages.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
               width: 150.0,
               height: 180.0,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                    fit: BoxFit.cover, image: NetworkImage(items[i])),
+                    fit: BoxFit.cover, image: NetworkImage(widget.doc.carImages[index])),
               ),
-            )
-          ]
-        ],
-      ),
+            );
+          }),
     );
+      // Row(
+      //   mainAxisAlignment: MainAxisAlignment.center,
+      //   children: <Widget>[
+      //
+      //     for (var i = 0; i < widget.doc.carImages.length; i++) ...[
+      //       Container(
+      //         width: 150.0,
+      //         height: 180.0,
+      //         decoration: BoxDecoration(
+      //           image: DecorationImage(
+      //               fit: BoxFit.cover, image: NetworkImage(items[i])),
+      //         ),
+      //       )
+      //     ]
+      //   ],
+      // ),
+    // );
   }
 
   Widget _buildProductSection() {
@@ -82,12 +108,12 @@ class _ProductDetailsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "BMW i5",
+            widget.doc.make == null ? "N/A" : widget.doc.make!.makeName,
             style: TextStyle(
                 color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           Text(
-            "1,000 kms • petrol • automatic • first owner",
+            "${widget.doc.odometer.isEmpty ? "N/A" : widget.doc.odometer} • ${widget.doc.variant == null ? "N/A" : widget.doc.variant!.fuelType}  • ${widget.doc.specification==null ? "N/A" : widget.doc.specification!.transmission}  • ${widget.doc.ownership.isEmpty ? "N/A" : widget.doc.ownership} ",
             style: TextStyle(
               color: Colors.black45,
               fontSize: 12,
@@ -97,7 +123,7 @@ class _ProductDetailsScreenState
             height: 2,
           ),
           Text(
-            "€ 1.25 - €2.45 lakh",
+            "€ ${widget.doc.price} " ,
             style: TextStyle(
                 color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -266,25 +292,25 @@ class _ProductDetailsScreenState
             height: 10,
           ),
           Expanded(
-              child: GridView.count(
-                // Create a grid with 2 columns. If you change the scrollDirection to
-                // horizontal, this produces 2 rows.
-                crossAxisCount: 3,
-                // Generate 100 widgets that display their index in the List.
-                children: List.generate(items.length, (index) {
-                  return Center(
-                    child:
-                    Container(
-                      width: 100.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover, image: NetworkImage(items[index])),
-                      ),
+            child: GridView.count(
+              // Create a grid with 2 columns. If you change the scrollDirection to
+              // horizontal, this produces 2 rows.
+              crossAxisCount: 3,
+              // Generate 100 widgets that display their index in the List.
+              children: List.generate(items.length, (index) {
+                return Center(
+                  child: Container(
+                    width: 100.0,
+                    height: 100.0,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.cover, image: NetworkImage(items[index])),
                     ),
-                  );
-                }),
-              ),),
+                  ),
+                );
+              }),
+            ),
+          ),
         ],
       ),
     );

@@ -3,9 +3,12 @@ import 'dart:developer';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/main.dart';
 import 'package:euvande/model/response/LoginResponseModel.dart';
+import 'package:euvande/screen/add_address_screen.dart';
+import 'package:euvande/screen/address_list_screen.dart';
 import 'package:euvande/screen/change_password_screen.dart';
 import 'package:euvande/screen/dashboard_screen.dart';
 import 'package:euvande/screen/login_screen.dart';
+import 'package:euvande/screen/pending_product_list_screen.dart';
 import 'package:euvande/screen/profile_setting_screen.dart';
 import 'package:euvande/utilities/Constants.dart';
 import 'package:euvande/utilities/KeyConstants.dart';
@@ -92,9 +95,124 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(height: 10),
-          _buildMenuItem("My Orders", Icons.card_giftcard),
-          _buildMenuItem("Shortlisted Vehicles", Icons.card_giftcard),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PendingProductListScreen()),
+              );
+            },
+            child: _buildMenuItem("My Cars", Icons.production_quantity_limits),
+          ),
+          GestureDetector(
+            onTap: () {
+
+            },
+            child: _buildMenuItem("Shortlisted Vehicles", Icons.card_giftcard),
+          ),
           Divider(),
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet<void>(
+                isScrollControlled: true,
+                context: context,
+                backgroundColor: Colors.white,
+                builder: (BuildContext context) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: SizedBox(
+                      height: 200,
+                      child: Column(
+                        children: [
+                          SizedBox(height: 20,),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Profile Setting",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                          ),
+                          SizedBox(height: 20,),
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //           builder: (context) =>
+                          //               const ProfileSettingScreen()),
+                          //     );
+                          //   },
+                          //   child: Container(
+                          //     color: Colors.white,
+                          //     padding: EdgeInsets.symmetric(
+                          //         horizontal: 20, vertical: 10),
+                          //     child: Row(
+                          //       children: [
+                          //         Icon(
+                          //           Icons.edit,
+                          //           size: 18,
+                          //         ),
+                          //         SizedBox(
+                          //           width: 10,
+                          //         ),
+                          //         Text(
+                          //           "Edit Profile",
+                          //           style: TextStyle(
+                          //               fontSize: 16,
+                          //               fontWeight: FontWeight.bold,
+                          //               color: Colors.black),
+                          //         )
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
+                          SizedBox(height: 5,),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AddressListScreen()),
+                              );
+                            },
+                            child: Container(
+                              color: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on_outlined,
+                                    size: 18,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    "Manage Addresses",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            child: _buildMenuItem("Profile Setting", Icons.settings),
+          ),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -103,7 +221,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                     builder: (context) => const ChangePasswordScreen()),
               );
             },
-            child: _buildMenuItem("Profile Setting", Icons.settings),
+            child: _buildMenuItem("Change Password", Icons.settings),
           ),
           SizedBox(height: 30),
           ElevatedButton(
@@ -113,13 +231,12 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
             onPressed: () {
-              if(  loginResponseModel == null){
+              if (loginResponseModel == null) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const LoginScreen()),
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
                 );
-              } else{
+              } else {
                 SharedPrefManager.logout();
                 Navigator.pushReplacement(
                   context,
@@ -139,6 +256,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
 
   Widget _buildMenuItem(String title, IconData iconData) {
     return Container(
+      color: Colors.transparent,
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
         children: [

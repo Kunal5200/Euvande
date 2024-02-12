@@ -2,8 +2,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/screen/image_screen.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
+import 'package:euvande/screen/used_product_list_screen.dart';
 import 'package:euvande/utilities/ProductItemList.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
+import 'package:euvande/utilities/TitleDescriptionItemList.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
 
   List<ProductItemList> productItemList  = [];
+  List<TitleDescription> howWorksItemList  = [];
 
   final items = [
     Container(
@@ -61,7 +63,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     productItemList.add(
         ProductItemList(
             productName: "Mercedes Maybach S",
-            productStartPrice: "€ 1.25 - €2.45 lakh",
+            productStartPrice: "€ 47899 - € 5000",
             productMaxPrice: "",
             productImageURLs: "assets/images/mercedes/1.jpg")
     );
@@ -69,7 +71,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     productItemList.add(
         ProductItemList(
             productName: "BMW i5",
-            productStartPrice: "€ 1.25 - €2.45 lakh",
+            productStartPrice: "€ 47899 - € 5000",
             productMaxPrice: "",
             productImageURLs: "assets/images/bmw/1.jpg")
     );
@@ -77,10 +79,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     productItemList.add(
         ProductItemList(
             productName: "Range Rover",
-            productStartPrice: "€ 1.25 - €2.45 lakh",
+            productStartPrice: "€ 47899 - € 5000",
             productMaxPrice: "",
             productImageURLs: "assets/images/rangerover/1.jpg")
     );
+
+    howWorksItemList.add(TitleDescription(title: "European Dreams, Driven Reality.", description: "Turn your European dreams into reality with the perfect car. Explore iconic destinations, scenic routes, and cityscapes on your terms. Your dream ride awaits.", imageURLs: 'assets/images/placeholder.webp'));
+    howWorksItemList.add(TitleDescription(title: "Expert Eyes, Thorough Inspection.", description: "Our expert eyes ensure a meticulous inspection, guaranteeing your peace of mind.", imageURLs: 'assets/images/placeholder.webp'));
+    howWorksItemList.add(TitleDescription(title: "Delivered to Your Doorstep.", description: "Experience seamless convenience with our direct-to-your-door delivery service – your dream car, delivered effortlessly to your home.", imageURLs: 'assets/images/placeholder.webp'));
 
   }
 
@@ -105,7 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ImageScreen()),
+                          MaterialPageRoute(builder: (context) => const UsedProductListScreen()),
                         )
                       },
                       AssetImage("assets/icons/car.png"),
@@ -126,6 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 SizedBox(
                   height: 10,
                 ),
+                _buildHowWorksList(),
                 _buildPopularProductList(),
                 _buildUsedProductList(),
               ],
@@ -292,10 +299,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return GestureDetector(
       onTap: () =>
       {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ProductDetailsScreen()),
-        )
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const ProductDetailsScreen()),
+        // )
       },
       child: Container(
         width: 170,
@@ -346,4 +353,80 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+  Widget _buildHowWorksItem(TitleDescription itemList) {
+    return Container(
+      // padding: EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 150.0,
+            height: 75.0,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage(itemList.imageURLs)),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+              itemList.title,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.bold),
+          ),
+          Text(
+            itemList.description,
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHowWorksList() {
+    return Container(
+      color: Color(0xFFF5F7FB),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
+            child: Text(
+              "How does it work",
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 50),
+            alignment: Alignment.centerLeft,
+            child: Column(
+              children: [
+                _buildHowWorksItem(howWorksItemList[1]),
+                _buildHowWorksItem(howWorksItemList[0]),
+                _buildHowWorksItem(howWorksItemList[2]),
+              ],
+            )
+          ),
+
+        ],
+      ),
+    );
+  }
+
 }

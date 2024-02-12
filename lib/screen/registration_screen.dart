@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:euvande/main.dart';
 import 'package:euvande/model/request/RegisterRequestModel.dart';
 import 'package:euvande/model/response/RegisterResponseModel.dart';
 import 'package:euvande/screen/dashboard_screen.dart';
@@ -38,7 +39,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String submitButtonText = 'Proceed'.toUpperCase();
   bool isEnabled = true;
   final TextEditingController nameController = TextEditingController(text: "ssd");
-  final TextEditingController emailController = TextEditingController(text: "asek304@gmail.com");
+  final TextEditingController emailController = TextEditingController(text: "raj@yopmail.com");
   final TextEditingController passwordController = TextEditingController(text: "123456");
   final TextEditingController phoneNumberController = TextEditingController();
 
@@ -64,7 +65,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-            builder: (context) => const DashboardScreen()),
+            builder: (context) => const MyHomePage(title: "")),
           ModalRoute.withName("/RegistrationScreen")
       );
       ScaffoldMessenger.of(context)
@@ -294,7 +295,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   void registerAPI() {
 
-    Future<RegisterResponseModel> response = ApiService()
+    Future<RegisterResponseModel> response = ApiService(context)
         .register(RegisterRequestModel(
         email: emailController.text,
         password: passwordController.text,
