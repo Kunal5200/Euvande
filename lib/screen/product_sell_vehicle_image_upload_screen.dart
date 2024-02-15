@@ -1,21 +1,22 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:euvande/model/response/AddMediaResponseModel.dart';
+import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_details_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:image_picker/image_picker.dart';
 
 class ProductSellVehicleImageUploadScreen extends StatefulWidget {
   final int carId;
 
-  const ProductSellVehicleImageUploadScreen({super.key,  required this.onNext, required this.carId});
+  const ProductSellVehicleImageUploadScreen(
+      {super.key, required this.onNext, required this.carId});
 
   final TabChangeCallback onNext;
 
@@ -168,66 +169,13 @@ class _ProductSellVehicleImageUploadScreenState
 
   final picker = ImagePicker();
 
-
   List<double> _imageExteriorUploadProgress = List.generate(8, (index) => 0.0);
   List<double> _imageInteriorUploadProgress = List.generate(8, (index) => 0.0);
   List<double> _imageWheelUploadProgress = List.generate(8, (index) => 0.0);
 
   List<List<double>> selectedUploadProgressHolder = [];
 
-
-  Future getImageFromGallery(int categoryIndex, int index, String key) async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        selectedImageHolder[categoryIndex][index] =
-            KeyFileModel(file: File(pickedFile.path), key: key);
-        callAddMediaApi(key, File(pickedFile.path), categoryIndex, index);
-      }
-    });
-  }
-
-//Image Picker function to get image from camera
-  Future getImageFromCamera(int categoryIndex, int index, String key) async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      if (pickedFile != null) {
-        selectedImageHolder[categoryIndex][index] =
-            KeyFileModel(file: File(pickedFile.path), key: key);
-        callAddMediaApi(key, File(pickedFile.path), categoryIndex, index);
-      }
-    });
-  }
-
-  //Show options to get image from camera or gallery
-  Future showOptions(int categoryIndex, int index, String key) async {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) => CupertinoActionSheet(
-        actions: [
-          CupertinoActionSheetAction(
-            child: Text('Photo Gallery'),
-            onPressed: () {
-              // close the options modal
-              Navigator.of(context).pop();
-              // get image from gallery
-              getImageFromGallery(categoryIndex, index, key);
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: Text('Camera'),
-            onPressed: () {
-              // close the options modal
-              Navigator.of(context).pop();
-              // get image from camera
-              getImageFromCamera(categoryIndex, index, key);
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  dynamic mediaImages;
 
   @override
   void initState() {
@@ -240,6 +188,16 @@ class _ProductSellVehicleImageUploadScreenState
     selectedUploadProgressHolder.add(_imageExteriorUploadProgress);
     selectedUploadProgressHolder.add(_imageInteriorUploadProgress);
     selectedUploadProgressHolder.add(_imageWheelUploadProgress);
+
+    if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0 &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].media !=
+            null) {
+      mediaImages = ProductSellDashboardScreen
+          .getPendingCarsResponseModel!.data[0].media!.images!
+          .toJson();
+    }
   }
 
   @override
@@ -294,10 +252,31 @@ class _ProductSellVehicleImageUploadScreenState
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProductSellDetailsScreen()),
-                );
+                var flag = false;
+
+                for(int i=0; i < selectedImageHolder.length;i++){
+                  for(var mainData in selectedImageHolder[i]){
+                    if(mainData !=null){
+                      flag = true;
+                      break;
+                    }
+
+                  }
+                }
+
+                if(flag || mediaImages!=null){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProductSellDetailsScreen()),
+                  );
+                }else{
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Upload all mandatory images"),
+                  ));
+                }
+
+
               },
             ),
           ],
@@ -335,6 +314,59 @@ class _ProductSellVehicleImageUploadScreenState
     );
   }
 
+  Future getImageFromGallery(int categoryIndex, int index, String key) async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        selectedImageHolder[categoryIndex][index] =
+            KeyFileModel(file: File(pickedFile.path), key: key);
+        callAddMediaApi(key, File(pickedFile.path), categoryIndex, index);
+      }
+    });
+  }
+
+//Image Picker function to get image from camera
+  Future getImageFromCamera(int categoryIndex, int index, String key) async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    setState(() {
+      if (pickedFile != null) {
+        selectedImageHolder[categoryIndex][index] =
+            KeyFileModel(file: File(pickedFile.path), key: key);
+        callAddMediaApi(key, File(pickedFile.path), categoryIndex, index);
+      }
+    });
+  }
+
+  //Show options to get image from camera or gallery
+  Future showOptions(int categoryIndex, int index, String key) async {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            child: Text('Photo Gallery'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from gallery
+              getImageFromGallery(categoryIndex, index, key);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Text('Camera'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from camera
+              getImageFromCamera(categoryIndex, index, key);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _showLoader() {
     return Center(
       heightFactor: 12,
@@ -342,19 +374,29 @@ class _ProductSellVehicleImageUploadScreenState
     );
   }
 
-  void callAddMediaApi(String key, File file, int categoryIndex, int index,) {
+  void callAddMediaApi(
+    String key,
+    File file,
+    int categoryIndex,
+    int index,
+  ) {
     setState(() {
       isDataLoading = true;
       selectedUploadProgressHolder[categoryIndex][index] = 0.0;
     });
 
-    Future<AddMediaResponseModel> response =
-        ApiService(context).addMedia(widget.carId, key, file, (count, total) {
-          print('hhell${(( count/total)* 100)/100}');
-          setState(() {
-            selectedUploadProgressHolder[categoryIndex][index] = (( count/total)* 100)/100;
-          });
-        },);
+    Future<AddMediaResponseModel> response = ApiService(context).addMedia(
+      widget.carId,
+      key,
+      file,
+      (count, total) {
+        print('hhell${((count / total) * 100) / 100}');
+        setState(() {
+          selectedUploadProgressHolder[categoryIndex][index] =
+              ((count / total) * 100) / 100;
+        });
+      },
+    );
     response
         .then((value) => {
               setState(() {
@@ -398,7 +440,19 @@ class _ProductSellVehicleImageUploadScreenState
                       ),
                     ),
                     selectedImageHolder[categoryIndex][index] == null
-                        ? SizedBox()
+                        ? mediaImages !=null &&
+                    mediaImages[imageListData[index]["key"]] != null
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(mediaImages[
+                                          imageListData[index]["key"]])),
+                                ),
+                              )
+                            : SizedBox()
                         : Container(
                             decoration: BoxDecoration(
                               borderRadius:
@@ -446,12 +500,16 @@ class _ProductSellVehicleImageUploadScreenState
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        child:  LinearProgressIndicator(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: LinearProgressIndicator(
                           borderRadius: BorderRadius.circular(5),
-                          value: selectedUploadProgressHolder[categoryIndex][index],
+                          value: selectedUploadProgressHolder[categoryIndex]
+                              [index],
                           backgroundColor: Colors.transparent,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green,),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.green,
+                          ),
                           semanticsLabel: 'Linear progress indicator',
                         ),
                       ),

@@ -1,22 +1,12 @@
-import 'package:dio/dio.dart';
-import 'package:euvande/main.dart';
 import 'package:euvande/model/request/AddAddressRequestModel.dart';
 import 'package:euvande/model/request/EditAddressRequestModel.dart';
-import 'package:euvande/model/request/RegisterRequestModel.dart';
 import 'package:euvande/model/response/AddAddressResponseModel.dart';
 import 'package:euvande/model/response/EditAddressResponseModel.dart';
 import 'package:euvande/model/response/GetAddressResponseModel.dart';
-import 'package:euvande/model/response/RegisterResponseModel.dart';
-import 'package:euvande/screen/dashboard_screen.dart';
-import 'package:euvande/screen/otp_screen.dart';
-import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
-import 'package:euvande/utilities/KeyConstants.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:localstorage/localstorage.dart';
 
 class AddAddressScreen extends StatefulWidget {
   final GetAddressData? getAddressData;
@@ -28,7 +18,6 @@ class AddAddressScreen extends StatefulWidget {
 }
 
 class _AddAddressScreenState extends State<AddAddressScreen> {
-
   GlobalKey<FormState> _formKey = GlobalKey();
 
   String submitButtonText = 'Proceed'.toUpperCase();
@@ -256,17 +245,12 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                     onPressed: () {
-                      if (widget.getAddressData == null) {
-                        if (isEnabled && _formKey.currentState!.validate()) {
-                          setState(() {
-                            submitButtonText = "Proceeding...";
-                            isEnabled = false;
-                          });
-
+                      if (isEnabled && _formKey.currentState!.validate()) {
+                        if (widget.getAddressData == null) {
                           callAddAddressApi();
+                        } else {
+                          callEditAddressApi();
                         }
-                      } else {
-                        callEditAddressApi();
                       }
                     },
                   ),
@@ -283,6 +267,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   void callAddAddressApi() {
     setState(() {
       isDataLoading = true;
+      submitButtonText = "Proceeding...";
+      isEnabled = false;
     });
 
     AddAddressRequestModel addAddressRequestModel = AddAddressRequestModel(
@@ -298,7 +284,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         ApiService(context).addAddress(addAddressRequestModel);
     response
         .then((value) => {
-              Navigator.pop(context,  {"result": "OK", "data": value}),
+              Navigator.pop(context, {"result": "OK", "data": value}),
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(value.message),
               )),

@@ -1,6 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/screen/image_screen.dart';
-import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/used_product_list_screen.dart';
 import 'package:euvande/utilities/ProductItemList.dart';

@@ -1,6 +1,6 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/model/request/AddSpecificationRequestModel.dart';
-import 'package:euvande/model/response/AddSpecificationResponseModel.dart';
+import 'package:euvande/model/response/GetDefaultSpecificationResponseModel.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 class ProductSellSpecificationScreen extends StatefulWidget {
   final int carId;
 
-  const  ProductSellSpecificationScreen(
+  const ProductSellSpecificationScreen(
       {super.key, required this.onNext, required this.carId});
 
   final TabChangeCallback onNext;
@@ -21,35 +21,21 @@ class ProductSellSpecificationScreen extends StatefulWidget {
 
 class _ProductSellSpecificationScreenState
     extends State<ProductSellSpecificationScreen> {
-
   late AddSpecificationRequestModel addSpecificationRequestModel;
+  GetDefaultSpecificationResponseModel? getDefaultSpecificationResponseModel;
 
   bool isDataLoading = false;
+  GlobalKey<FormState> _formKey = GlobalKey();
 
   int _index = 0;
-  final List<bool> _selectedTransmission = <bool>[true, false];
-  int selectedVehicleTypeIndex = 0;
-
-  var transmissionTypes = ['Automatic', 'Manual'];
-
-  var vehicleTypeItem = [
-    "Cabriolet",
-    "Compact",
-    "Coupe",
-    "Estate car",
-    "Hatchback",
-    "Liftback",
-    "MPV",
-    "Other",
-    "Sedan",
-    "SUV",
-    "Van",
-  ];
-
-  var doorItem = [
-    "2/3",
-    "4/5",
-  ];
+  int selectedTransmissionIndex = -1;
+  int selectedVehicleTypeIndex = -1;
+  int selectedDoorsIndex = -1;
+  int selectedDrive4x4Index = -1;
+  int selectedSeatIndex = -1;
+  int selectedVInteriorIndex = -1;
+  int selectedVatIndex = -1;
+  List<bool> selectedEquipmentIndex = [];
 
   var driveType4x4Item = [
     "Yes",
@@ -80,6 +66,11 @@ class _ProductSellSpecificationScreenState
     "No",
   ];
 
+  final TextEditingController powerController =
+      TextEditingController(text: "200");
+  final TextEditingController colorController =
+      TextEditingController(text: "Black");
+
   @override
   void initState() {
     // TODO: implement initState
@@ -88,14 +79,9 @@ class _ProductSellSpecificationScreenState
     addSpecificationRequestModel = AddSpecificationRequestModel();
     addSpecificationRequestModel.carId = widget.carId;
 
-    addSpecificationRequestModel.transmission = transmissionTypes[0];
-    addSpecificationRequestModel.vehicleType = vehicleTypeItem[0];
-    addSpecificationRequestModel.doors = doorItem[0];
-    addSpecificationRequestModel.driveType4Wd = driveType4x4Item[0];
-    addSpecificationRequestModel.seats = seatsItem[0];
-    addSpecificationRequestModel.interiorMaterial = interiorMaterialItem[0];
-    addSpecificationRequestModel.vatDeduction = vatDeductionItem[0];
+    addSpecificationRequestModel.equipments = [];
 
+    callGetDefaultSpecificationApi();
   }
 
   @override
@@ -106,7 +92,7 @@ class _ProductSellSpecificationScreenState
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 50),
         child: Column(
           children: [
-            _buildTitleSection(),
+            isDataLoading ? _showLoader() : _buildTitleSection(),
             ElevatedButton(
               style: raisedButtonStyle,
               child: Text(
@@ -114,7 +100,55 @@ class _ProductSellSpecificationScreenState
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               onPressed: () {
-                widget.onNext(addSpecificationRequestModel);
+                if (addSpecificationRequestModel.transmission == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select transmission type"),
+                  ));
+                } else if (addSpecificationRequestModel.vehicleType == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select vehicle type"),
+                  ));
+                } else if (addSpecificationRequestModel.transmission == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select doors"),
+                  ));
+                } else if (addSpecificationRequestModel.driveType4Wd == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select drive type"),
+                  ));
+                } else if (addSpecificationRequestModel.seats == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select seat"),
+                  ));
+                } else if (addSpecificationRequestModel.interiorMaterial ==
+                    null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select interior material"),
+                  ));
+                } else if (addSpecificationRequestModel.vatDeduction == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select vat deduction"),
+                  ));
+                } else if (powerController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please input power of vehicle"),
+                  ));
+                } else if (colorController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please input color of vehicle"),
+                  ));
+                } else if (addSpecificationRequestModel.equipments!.length ==
+                    0) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Please select atleast one equipments"),
+                  ));
+                } else {
+                  addSpecificationRequestModel.power =
+                      powerController.text.trim();
+                  addSpecificationRequestModel.color =
+                      colorController.text.trim();
+                  widget.onNext(addSpecificationRequestModel);
+                }
               },
             ),
           ],
@@ -123,58 +157,66 @@ class _ProductSellSpecificationScreenState
     );
   }
 
+  Widget _showLoader() {
+    return Center(
+      heightFactor: 12,
+      child: CircularProgressIndicator(),
+    );
+  }
+
   Widget _buildTitleSection() {
     return Container(
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(),
       child: Stepper(
+        physics: NeverScrollableScrollPhysics(),
         controlsBuilder: (context, controller) {
           return _index == 0
               ? Row(
-            children: <Widget>[
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _index++;
-                  });
-                },
-                child: const Text('NEXT'),
-              ),
-            ],
-          )
-              : _index == 6
-              ? Row(
-            children: <Widget>[
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _index--;
-                  });
-                },
-                child: const Text('BACK'),
-              ),
-            ],
-          )
-              : Row(
-            children: <Widget>[
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _index++;
-                  });
-                },
-                child: const Text('NEXT'),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _index--;
-                  });
-                },
-                child: const Text('EXIT'),
-              ),
-            ],
-          );
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _index++;
+                        });
+                      },
+                      child: const Text('NEXT'),
+                    ),
+                  ],
+                )
+              : _index == 8
+                  ? Row(
+                      children: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _index--;
+                            });
+                          },
+                          child: const Text('BACK'),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _index++;
+                            });
+                          },
+                          child: const Text('NEXT'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _index--;
+                            });
+                          },
+                          child: const Text('EXIT'),
+                        ),
+                      ],
+                    );
         },
         currentStep: _index,
         onStepCancel: () {
@@ -207,34 +249,36 @@ class _ProductSellSpecificationScreenState
                 width: double.infinity,
                 child: Wrap(
                   // Generate 100 widgets that display their index in the List.
-                  children: List.generate(transmissionTypes.length, (index) {
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!
+                          .data!.transmission.length, (index) {
                     return GestureDetector(
                         onTap: () => setState(() {
+                              selectedTransmissionIndex = index;
 
-                          selectedVehicleTypeIndex = index;
-
-                          addSpecificationRequestModel.transmission = transmissionTypes[index];
-
-                        }),
+                              addSpecificationRequestModel.transmission =
+                                  getDefaultSpecificationResponseModel!
+                                      .data!.transmission[index];
+                            }),
                         child: Container(
                           alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 2),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                           padding: EdgeInsets.symmetric(vertical: 5),
-                          width: 80,
+                          width: 120,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5)),
-                            color: selectedVehicleTypeIndex == index
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: selectedTransmissionIndex == index
                                 ? Colors.black
                                 : Colors.black12,
                           ),
                           child: Text(
-                            transmissionTypes[index],
+                            getDefaultSpecificationResponseModel!
+                                .data!.transmission[index],
                             style: TextStyle(
                               fontSize: 12,
-                              color: selectedVehicleTypeIndex == index
+                              color: selectedTransmissionIndex == index
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -256,31 +300,34 @@ class _ProductSellSpecificationScreenState
                 width: double.infinity,
                 child: Wrap(
                   // Generate 100 widgets that display their index in the List.
-                  children: List.generate(vehicleTypeItem.length, (index) {
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!
+                          .data!.vehicleType.length, (index) {
                     return GestureDetector(
                         onTap: () => {
-                          setState(() {
-                            selectedVehicleTypeIndex = index;
-                            addSpecificationRequestModel.vehicleType = vehicleTypeItem[index];
-                          })
-
-                        },
+                              setState(() {
+                                selectedVehicleTypeIndex = index;
+                                addSpecificationRequestModel.vehicleType =
+                                    getDefaultSpecificationResponseModel!
+                                        .data!.vehicleType[index];
+                              })
+                            },
                         child: Container(
                           alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 2),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                           padding: EdgeInsets.symmetric(vertical: 5),
-                          width: 80,
+                          width: 120,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5)),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                             color: selectedVehicleTypeIndex == index
                                 ? Colors.black
                                 : Colors.black12,
                           ),
                           child: Text(
-                            vehicleTypeItem[index],
+                            getDefaultSpecificationResponseModel!
+                                .data!.vehicleType[index],
                             style: TextStyle(
                               fontSize: 12,
                               color: selectedVehicleTypeIndex == index
@@ -305,32 +352,35 @@ class _ProductSellSpecificationScreenState
                 width: double.infinity,
                 child: Wrap(
                   // Generate 100 widgets that display their index in the List.
-                  children: List.generate(doorItem.length, (index) {
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!.data!.doors.length,
+                      (index) {
                     return GestureDetector(
                         onTap: () => setState(() {
-                          selectedVehicleTypeIndex = index;
-                          addSpecificationRequestModel.doors = doorItem[index];
-
-                        }),
+                              selectedDoorsIndex = index;
+                              addSpecificationRequestModel.doors =
+                                  getDefaultSpecificationResponseModel!
+                                      .data!.doors[index];
+                            }),
                         child: Container(
                           alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 2),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                           padding: EdgeInsets.symmetric(vertical: 5),
                           width: 80,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5)),
-                            color: selectedVehicleTypeIndex == index
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: selectedDoorsIndex == index
                                 ? Colors.black
                                 : Colors.black12,
                           ),
                           child: Text(
-                            doorItem[index],
+                            getDefaultSpecificationResponseModel!
+                                .data!.doors[index],
                             style: TextStyle(
                               fontSize: 12,
-                              color: selectedVehicleTypeIndex == index
+                              color: selectedDoorsIndex == index
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -352,32 +402,35 @@ class _ProductSellSpecificationScreenState
                 width: double.infinity,
                 child: Wrap(
                   // Generate 100 widgets that display their index in the List.
-                  children: List.generate(driveType4x4Item.length, (index) {
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!
+                          .data!.driveType4Wd.length, (index) {
                     return GestureDetector(
                         onTap: () => setState(() {
-                          selectedVehicleTypeIndex = index;
-                          addSpecificationRequestModel.driveType4Wd = driveType4x4Item[index];
-
-                        }),
+                              selectedDrive4x4Index = index;
+                              addSpecificationRequestModel.driveType4Wd =
+                                  getDefaultSpecificationResponseModel!
+                                      .data!.driveType4Wd[index];
+                            }),
                         child: Container(
                           alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 2),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                           padding: EdgeInsets.symmetric(vertical: 5),
                           width: 80,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5)),
-                            color: selectedVehicleTypeIndex == index
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: selectedDrive4x4Index == index
                                 ? Colors.black
                                 : Colors.black12,
                           ),
                           child: Text(
-                            driveType4x4Item[index],
+                            getDefaultSpecificationResponseModel!
+                                .data!.driveType4Wd[index],
                             style: TextStyle(
                               fontSize: 12,
-                              color: selectedVehicleTypeIndex == index
+                              color: selectedDrive4x4Index == index
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -399,32 +452,37 @@ class _ProductSellSpecificationScreenState
                 width: double.infinity,
                 child: Wrap(
                   // Generate 100 widgets that display their index in the List.
-                  children: List.generate(seatsItem.length, (index) {
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!.data!.seats.length,
+                      (index) {
                     return GestureDetector(
                         onTap: () => setState(() {
-                          selectedVehicleTypeIndex = index;
+                              selectedSeatIndex = index;
 
-                          addSpecificationRequestModel.seats = seatsItem[index];
-                        }),
+                              addSpecificationRequestModel.seats =
+                                  getDefaultSpecificationResponseModel!
+                                      .data!.seats[index];
+                            }),
                         child: Container(
                           alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 2),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                           padding: EdgeInsets.symmetric(vertical: 5),
                           width: 80,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5)),
-                            color: selectedVehicleTypeIndex == index
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: selectedSeatIndex == index
                                 ? Colors.black
                                 : Colors.black12,
                           ),
                           child: Text(
-                            seatsItem[index].toString(),
+                            getDefaultSpecificationResponseModel!
+                                .data!.seats[index]
+                                .toString(),
                             style: TextStyle(
                               fontSize: 12,
-                              color: selectedVehicleTypeIndex == index
+                              color: selectedSeatIndex == index
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -446,32 +504,35 @@ class _ProductSellSpecificationScreenState
                 width: double.infinity,
                 child: Wrap(
                   // Generate 100 widgets that display their index in the List.
-                  children:
-                  List.generate(interiorMaterialItem.length, (index) {
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!
+                          .data!.interiorMaterial.length, (index) {
                     return GestureDetector(
                         onTap: () => setState(() {
-                          selectedVehicleTypeIndex = index;
-                          addSpecificationRequestModel.interiorMaterial = interiorMaterialItem[index];
-                        }),
+                              selectedVInteriorIndex = index;
+                              addSpecificationRequestModel.interiorMaterial =
+                                  getDefaultSpecificationResponseModel!
+                                      .data!.interiorMaterial[index];
+                            }),
                         child: Container(
                           alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 2),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                           padding: EdgeInsets.symmetric(vertical: 5),
                           width: 80,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5)),
-                            color: selectedVehicleTypeIndex == index
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: selectedVInteriorIndex == index
                                 ? Colors.black
                                 : Colors.black12,
                           ),
                           child: Text(
-                            interiorMaterialItem[index],
+                            getDefaultSpecificationResponseModel!
+                                .data!.interiorMaterial[index],
                             style: TextStyle(
                               fontSize: 12,
-                              color: selectedVehicleTypeIndex == index
+                              color: selectedVInteriorIndex == index
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -493,31 +554,149 @@ class _ProductSellSpecificationScreenState
                 width: double.infinity,
                 child: Wrap(
                   // Generate 100 widgets that display their index in the List.
-                  children: List.generate(vatDeductionItem.length, (index) {
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!
+                          .data!.vatDeduction.length, (index) {
                     return GestureDetector(
                         onTap: () => setState(() {
-                          selectedVehicleTypeIndex = index;
-                          addSpecificationRequestModel.vatDeduction = vatDeductionItem[index];
-                        }),
+                              selectedVatIndex = index;
+                              addSpecificationRequestModel.vatDeduction =
+                                  getDefaultSpecificationResponseModel!
+                                      .data!.vatDeduction[index];
+                            }),
                         child: Container(
                           alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 2),
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                           padding: EdgeInsets.symmetric(vertical: 5),
                           width: 80,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5)),
-                            color: selectedVehicleTypeIndex == index
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: selectedVatIndex == index
                                 ? Colors.black
                                 : Colors.black12,
                           ),
                           child: Text(
-                            vatDeductionItem[index],
+                            getDefaultSpecificationResponseModel!
+                                .data!.vatDeduction[index],
                             style: TextStyle(
                               fontSize: 12,
-                              color: selectedVehicleTypeIndex == index
+                              color: selectedVatIndex == index
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ));
+                  }),
+                ),
+              ),
+            ),
+          ),
+          Step(
+              isActive: _index <= 7,
+              state: _index <= 7 ? StepState.indexed : StepState.complete,
+              title: const Text('Features'),
+              content: Form(
+                  key: _formKey,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextFormField(
+                          controller: powerController,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            labelText: 'Power (kw)*',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(),
+                            ),
+                          ),
+                          keyboardType: TextInputType.name,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextFormField(
+                            controller: colorController,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              labelText: 'Color*',
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(),
+                              ),
+                            ),
+                            maxLength: 11,
+                            keyboardType: TextInputType.name),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ))),
+          Step(
+            isActive: _index <= 8,
+            state: _index <= 8 ? StepState.indexed : StepState.complete,
+            title: const Text('Equipments'),
+            content: Container(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  // Generate 100 widgets that display their index in the List.
+                  children: List.generate(
+                      getDefaultSpecificationResponseModel!
+                          .data!.equipments.length, (index) {
+                    return GestureDetector(
+                        onTap: () => setState(() {
+                              selectedEquipmentIndex[index] =
+                                  !selectedEquipmentIndex[index];
+                              if (selectedEquipmentIndex[index]) {
+                                addSpecificationRequestModel.equipments!.add(
+                                    getDefaultSpecificationResponseModel!
+                                        .data!.equipments[index]);
+                              } else {
+                                for (int i = 0;
+                                    i <
+                                        addSpecificationRequestModel
+                                            .equipments!.length;
+                                    i++) {
+                                  if (getDefaultSpecificationResponseModel!
+                                          .data!.equipments[index] ==
+                                      addSpecificationRequestModel
+                                          .equipments![i]) {
+                                    addSpecificationRequestModel.equipments!
+                                        .removeAt(i);
+                                  }
+                                }
+                              }
+
+                              print(addSpecificationRequestModel
+                                  .equipments!.length);
+                            }),
+                        child: Container(
+                          alignment: Alignment.center,
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          width: 200,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: selectedEquipmentIndex[index]
+                                ? Colors.black
+                                : Colors.black12,
+                          ),
+                          child: Text(
+                            getDefaultSpecificationResponseModel!
+                                .data!.equipments[index],
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: selectedEquipmentIndex[index]
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -534,4 +713,175 @@ class _ProductSellSpecificationScreenState
     );
   }
 
+  void callGetDefaultSpecificationApi() {
+    setState(() {
+      isDataLoading = true;
+    });
+
+    Future<GetDefaultSpecificationResponseModel> response =
+        ApiService(context).getDefaultSpecification();
+    response
+        .then((value) => {
+              setState(() {
+                isDataLoading = false;
+              }),
+              getDefaultSpecificationResponseModel = value,
+              selectedEquipmentIndex = List.generate(
+                  getDefaultSpecificationResponseModel!.data!.equipments.length,
+                  (index) => false),
+              checkPreviousSelectedData(),
+            })
+        .catchError((onError) {
+      // setState(() {
+      //   isDataLoading = false;
+      // });
+    });
+  }
+
+  checkPreviousSelectedData() {
+    if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0 &&
+        ProductSellDashboardScreen
+                .getPendingCarsResponseModel!.data[0].specification !=
+            null) {
+      for (int i = 0;
+          i < getDefaultSpecificationResponseModel!.data!.transmission.length;
+          i++) {
+        if (ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                .specification!.transmission
+                .toLowerCase() ==
+            getDefaultSpecificationResponseModel!.data!.transmission[i]
+                .toLowerCase()) {
+          selectedTransmissionIndex = i;
+
+          addSpecificationRequestModel.transmission =
+              getDefaultSpecificationResponseModel!.data!.transmission[i];
+          break;
+        }
+      }
+
+      for (int i = 0;
+          i < getDefaultSpecificationResponseModel!.data!.vehicleType.length;
+          i++) {
+        print(ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[0].specification!.vehicleType
+            .toLowerCase());
+        if (ProductSellDashboardScreen
+                .getPendingCarsResponseModel!.data[0].specification!.vehicleType
+                .toLowerCase() ==
+            getDefaultSpecificationResponseModel!.data!.vehicleType[i]
+                .toLowerCase()) {
+          selectedVehicleTypeIndex = i;
+
+          addSpecificationRequestModel.vehicleType =
+              getDefaultSpecificationResponseModel!.data!.vehicleType[i];
+          break;
+        }
+      }
+
+      for (int i = 0;
+          i < getDefaultSpecificationResponseModel!.data!.doors.length;
+          i++) {
+        if (ProductSellDashboardScreen
+                .getPendingCarsResponseModel!.data[0].specification!.doors
+                .toLowerCase() ==
+            getDefaultSpecificationResponseModel!.data!.doors[i]
+                .toLowerCase()) {
+          selectedDoorsIndex = i;
+
+          addSpecificationRequestModel.doors =
+              getDefaultSpecificationResponseModel!.data!.doors[i];
+          break;
+        }
+      }
+
+      for (int i = 0;
+          i < getDefaultSpecificationResponseModel!.data!.driveType4Wd.length;
+          i++) {
+        if (ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                .specification!.driveType4Wd
+                .toLowerCase() ==
+            getDefaultSpecificationResponseModel!.data!.driveType4Wd[i]
+                .toLowerCase()) {
+          selectedDrive4x4Index = i;
+
+          addSpecificationRequestModel.driveType4Wd =
+              getDefaultSpecificationResponseModel!.data!.driveType4Wd[i];
+          break;
+        }
+      }
+    }
+
+    for (int i = 0;
+        i < getDefaultSpecificationResponseModel!.data!.seats.length;
+        i++) {
+      if (ProductSellDashboardScreen
+              .getPendingCarsResponseModel!.data[0].specification!.seats ==
+          getDefaultSpecificationResponseModel!.data!.seats[i]) {
+        selectedSeatIndex = i;
+
+        addSpecificationRequestModel.seats =
+            getDefaultSpecificationResponseModel!.data!.seats[i];
+        break;
+      }
+    }
+
+    for (int i = 0;
+        i < getDefaultSpecificationResponseModel!.data!.interiorMaterial.length;
+        i++) {
+      if (ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+              .specification!.interiorMaterial
+              .toLowerCase() ==
+          getDefaultSpecificationResponseModel!.data!.interiorMaterial[i]
+              .toLowerCase()) {
+        selectedVInteriorIndex = i;
+
+        addSpecificationRequestModel.interiorMaterial =
+            getDefaultSpecificationResponseModel!.data!.interiorMaterial[i];
+        break;
+      }
+    }
+    for (int i = 0;
+        i < getDefaultSpecificationResponseModel!.data!.vatDeduction.length;
+        i++) {
+      if (ProductSellDashboardScreen
+              .getPendingCarsResponseModel!.data[0].specification!.vatDeduction
+              .toLowerCase() ==
+          getDefaultSpecificationResponseModel!.data!.vatDeduction[i]
+              .toLowerCase()) {
+        selectedVatIndex = i;
+
+        addSpecificationRequestModel.vatDeduction =
+            getDefaultSpecificationResponseModel!.data!.vatDeduction[i];
+        break;
+      }
+    }
+
+    powerController.text = ProductSellDashboardScreen
+        .getPendingCarsResponseModel!.data[0].specification!.power;
+    colorController.text = ProductSellDashboardScreen
+        .getPendingCarsResponseModel!.data[0].specification!.color;
+
+    for (int i = 0;
+        i < getDefaultSpecificationResponseModel!.data!.equipments.length;
+        i++) {
+      for (int j = 0;
+          j < ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+              .specification!.equipments.length;
+          j++) {
+        if (ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                .specification!.equipments[j]
+                .toLowerCase() ==
+            getDefaultSpecificationResponseModel!.data!.equipments[i]
+                .toLowerCase()) {
+          selectedEquipmentIndex[i] = true;
+
+          addSpecificationRequestModel.equipments!.add
+            (getDefaultSpecificationResponseModel!.data!.equipments[i]);
+          break;
+        }
+      }
+    }
+  }
 }

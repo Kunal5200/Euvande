@@ -69,15 +69,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    SizedBox(height: 50,),
                     Container(
                       width: 150.0,
-                      height: 150.0,
+                      height: 50.0,
                       decoration: BoxDecoration(
                         image: DecorationImage(
                             fit: BoxFit.cover,
                             image: AssetImage("assets/logos/logo.png")),
                       ),
                     ),
+                    Text("Enter your information to login account", style: TextStyle(color: Colors.black54, fontSize: 14,),),
+                    SizedBox(height: 30,),
                     TextFormField(
                       controller: emailController,
                       validator: (value) {
@@ -160,8 +163,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       MainAxisAlignment.center,
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        Text(
-                                          "Forget Passowrd",
+                                        const Text(
+                                          "Forget Password",
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 18,
@@ -236,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Container(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          "Forget Password ?",
+                          "Forget Password?",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 16,
@@ -277,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Don't have account ?",
+                                "Don't have account?",
                                 style: TextStyle(
                                     color: Colors.black, fontSize: 16),
                               ),
@@ -307,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
       MaterialPageRoute(
           builder: (context) => Otp(
               response: responseModel,
-              referenceId: responseModel.data.referenceId,
+              referenceId: responseModel.data!.referenceId.toInt(),
               verificationFor: FORGET_PASSWORD)),
     );
 
@@ -367,7 +370,7 @@ class _LoginScreenState extends State<LoginScreen> {
     response
         .then((value) => {
 
-    // Navigator.pop(context),
+    Navigator.pop(context),
               _navigateOTPScreen(context, value),
               setState(() {
                 sendOTPButtonText = "Next";

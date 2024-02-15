@@ -1,40 +1,44 @@
 import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:euvande/model/request/AddAddressRequestModel.dart';
 import 'package:euvande/model/request/AddCarRequestModel.dart';
 import 'package:euvande/model/request/AddSpecificationRequestModel.dart';
-import 'package:euvande/model/request/EditAddressRequestModel.dart';
-import 'package:euvande/model/response/AddAddressResponseModel.dart';
-import 'package:euvande/model/response/AddCarResponseModel.dart';
-import 'package:euvande/model/response/AddSpecificationResponseModel.dart';
-import 'package:euvande/model/response/DeleteCarResponseModel.dart';
-import 'package:euvande/model/response/EditAddressResponseModel.dart';
-import 'package:euvande/model/response/GetAddressResponseModel.dart';
-import 'package:euvande/model/response/GetCarListResponseModel.dart';
-import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
-import 'package:euvande/model/response/SendForApprovalResponseModel.dart';
-import 'package:path/path.dart';
 import 'package:euvande/model/request/ChangePasswordRequestModel.dart';
+import 'package:euvande/model/request/EditAddressRequestModel.dart';
 import 'package:euvande/model/request/GetModelRequestModel.dart';
 import 'package:euvande/model/request/GetPeriodByMakeRequestModel.dart';
 import 'package:euvande/model/request/GetVariantByModelRequestModel.dart';
 import 'package:euvande/model/request/LoginRequestModel.dart';
 import 'package:euvande/model/request/RegisterRequestModel.dart';
+import 'package:euvande/model/request/UpdateProfileRequestModel.dart';
 import 'package:euvande/model/request/VerifyRequestModel.dart';
+import 'package:euvande/model/response/AddAddressResponseModel.dart';
+import 'package:euvande/model/response/AddCarResponseModel.dart';
 import 'package:euvande/model/response/AddMediaResponseModel.dart';
+import 'package:euvande/model/response/AddSpecificationResponseModel.dart';
 import 'package:euvande/model/response/ChangePasswordResponseModel.dart';
+import 'package:euvande/model/response/DeleteCarResponseModel.dart';
+import 'package:euvande/model/response/EditAddressResponseModel.dart';
+import 'package:euvande/model/response/GetAddressResponseModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
+import 'package:euvande/model/response/GetCarListResponseModel.dart';
+import 'package:euvande/model/response/GetDefaultSpecificationResponseModel.dart';
 import 'package:euvande/model/response/GetModelResponseModel.dart';
+import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
 import 'package:euvande/model/response/GetPeriodByMakeResponseModel.dart';
+import 'package:euvande/model/response/GetUserDetailResponseModel.dart';
 import 'package:euvande/model/response/GetVariantByModelResponseModel.dart';
 import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/model/response/RegisterResponseModel.dart';
+import 'package:euvande/model/response/SendForApprovalResponseModel.dart';
+import 'package:euvande/model/response/UpdateProfileResponseModel.dart';
 import 'package:euvande/model/response/VerifyResponseModel.dart';
-import 'package:euvande/screen/product_sell_vehicle_image_upload_screen.dart';
 import 'package:euvande/utilities/ApiConstants.dart';
 import 'package:euvande/utilities/LoggerInterceptor.dart';
 import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:dio/dio.dart';
+import 'package:path/path.dart';
 
 class ApiService {
   final option = Options(responseType: ResponseType.json, headers: {
@@ -279,6 +283,20 @@ class ApiService {
     }
   }
 
+  Future<GetDefaultSpecificationResponseModel> getDefaultSpecification() async {
+    Response response = await dio.get(
+      ApiConstants.baseUrl + ApiConstants.getDefaultSpecification,
+      options: option,
+    );
+
+    if (response.statusCode == 200) {
+      return GetDefaultSpecificationResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
   Future<AddSpecificationResponseModel> addSpecification(
       AddSpecificationRequestModel addSpecificationRequestModel) async {
     Response response = await dio.post(
@@ -358,6 +376,35 @@ class ApiService {
     }
   }
 
+  Future<UpdateProfileResponseModel> updateUserDetail(UpdateProfileRequestModel updateProfileRequestModel) async {
+    Response response = await dio.post(
+      ApiConstants.baseUrl +
+          ApiConstants.updateUserDetail,
+      data: updateProfileRequestModel,
+      options: option,
+    );
+
+    if (response.statusCode == 200) {
+      return UpdateProfileResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
+  Future<GetUserDetailResponseModel> getUserDetail() async {
+    Response response = await dio.get(
+      ApiConstants.baseUrl + ApiConstants.getUserDetail,
+      options: option,
+    );
+
+    if (response.statusCode == 200) {
+      return GetUserDetailResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
   Future<GetCarListResponseModel> getCarList() async {
     Response response = await dio.post(
       ApiConstants.baseUrl + ApiConstants.getCarList,

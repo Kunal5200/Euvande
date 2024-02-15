@@ -1,11 +1,10 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/model/request/GetModelRequestModel.dart';
 import 'package:euvande/model/response/GetModelResponseModel.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 
 class ProductSellModelScreen extends StatefulWidget {
 
@@ -46,6 +45,26 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNoData() {
+    return Container(
+      height: 300,
+      width: double.infinity,
+      alignment: Alignment.center,
+      child: Column(
+        children: [
+          SizedBox(height: 50,),
+          Text("Sorry, model not found", style: TextStyle(fontSize: 18),),
+          SizedBox(
+              height: 200,
+              width: 200,
+              child: Lottie.asset(
+                'assets/lottie/nodata.json',
+              )),
+        ],
+      )
     );
   }
 
@@ -111,6 +130,7 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
         SizedBox(
           height: 10,
         ),
+        getModelResponseModel!.data.length ==0 ? _buildNoData() :
         Container(
           height: 450,
           child: ListView.builder(
@@ -129,7 +149,16 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "  ${getModelResponseModel!.data[index].modelName}",
+                              "  ${getModelResponseModel!.data[index]
+                                  .modelName} ${(ProductSellDashboardScreen
+                                  .getPendingCarsResponseModel != null &&
+                                  ProductSellDashboardScreen
+                                      .getPendingCarsResponseModel!.data
+                                      .length > 0 &&
+                                  ProductSellDashboardScreen
+                                      .getPendingCarsResponseModel!.data[0]
+                                      .model!.id == getModelResponseModel!.data[index].id) ?
+                              " ✓" : ""}",
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),

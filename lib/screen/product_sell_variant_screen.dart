@@ -1,11 +1,9 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/model/request/GetVariantByModelRequestModel.dart';
 import 'package:euvande/model/response/GetVariantByModelResponseModel.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
-import 'package:scrollable_list_tabview/scrollable_list_tabview.dart';
 
 class ProductSellVariantScreen extends StatefulWidget {
   const ProductSellVariantScreen({super.key, required this.onNext});
@@ -42,7 +40,7 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
   @override
   void initState() {
     super.initState();
-    callGetVariantByModelApi("Petrol");
+    callGetVariantByModelApi("Petrol", ProductSellJourneyScreen.addCarRequestModel.modelId!.toInt());
   }
 
   @override
@@ -98,8 +96,7 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
             child: ToggleButtons(
               direction: Axis.horizontal,
               onPressed: (int index) {
-                callGetVariantByModelApi(
-                    (transmissionTypes[index] as Text).data!);
+                callGetVariantByModelApi((transmissionTypes[index] as Text).data!, ProductSellJourneyScreen.addCarRequestModel.modelId!.toInt());
                 setState(() {
                   // The button that is tapped is set to true, and the others to false.
                   for (int i = 0; i < _selectedTransmission.length; i++) {
@@ -125,9 +122,10 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
     );
   }
 
-  void callGetVariantByModelApi(String fuelType) {
+  void callGetVariantByModelApi(String fuelType, int modelId) {
+
     GetVariantByModelRequestModel getVariantByModelRequestModel =
-        GetVariantByModelRequestModel(fuelType: fuelType, modelId: 1);
+        GetVariantByModelRequestModel(fuelType: fuelType, modelId: modelId);
     setState(() {
       isDataLoading = true;
     });
@@ -169,7 +167,14 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      " ${getVariantByModelResponseModel!.data[index].variantName}",
+                      " ${getVariantByModelResponseModel!.data[index]
+                          .variantName} ${(ProductSellDashboardScreen
+                          .getPendingCarsResponseModel != null &&
+                          ProductSellDashboardScreen
+                              .getPendingCarsResponseModel!.data.length > 0
+                          && ProductSellDashboardScreen
+                              .getPendingCarsResponseModel!.data[0].variant!
+                              .id == getVariantByModelResponseModel!.data[index].id) ? " ✓" : ""}",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
@@ -187,4 +192,5 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
           }),
     );
   }
+
 }

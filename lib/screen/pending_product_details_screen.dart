@@ -1,14 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/main.dart';
-import 'package:euvande/model/request/AddCarRequestModel.dart';
-import 'package:euvande/model/response/AddCarResponseModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
-import 'package:euvande/model/response/SendForApprovalResponseModel.dart';
-import 'package:euvande/screen/product_sell_dashboard_screen.dart';
-import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/ApiService.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class PendingProductDetailsScreen extends StatefulWidget {

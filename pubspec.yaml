@@ -113,6 +113,9 @@ flutter:
     #Icons Register
     - assets/lottie/
 
+    #JSON Register
+    - assets/json/
+
     #Images Register
     - assets/images/
     - assets/images/exterior/

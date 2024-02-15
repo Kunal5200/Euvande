@@ -102,6 +102,8 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
     },
   ];
 
+  int currentIndex = 0;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -110,8 +112,6 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
       tabItems.removeAt(0);
       ProductSellJourneyScreen.addCarRequestModel.makeId =
           widget.selectedBrand!.id;
-    } else if (ProductSellJourneyScreen.addCarRequestModel.makeId != null) {
-      tabItems.removeAt(0);
     }
 
     _tabController = TabController(length: tabItems.length, vsync: this);
@@ -119,32 +119,33 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
     if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
         ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
             0 &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].media !=
+            null) {
+      _tabController.index = 9;
+    } else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
+            0 &&
         ProductSellDashboardScreen
-            .getPendingCarsResponseModel!.data[0].media !=
+                .getPendingCarsResponseModel!.data[0].contactInfo !=
             null) {
       _tabController.index = 8;
-    }else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+    } else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
         ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
             0 &&
         ProductSellDashboardScreen
-            .getPendingCarsResponseModel!.data[0].contactInfo !=
+                .getPendingCarsResponseModel!.data[0].specification !=
             null) {
       _tabController.index = 7;
-    }else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
+    } else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
         ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
             0 &&
         ProductSellDashboardScreen
-            .getPendingCarsResponseModel!.data[0].specification !=
+                .getPendingCarsResponseModel!.data[0].location !=
             null) {
       _tabController.index = 6;
-    }else if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
-        ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
-            0 &&
-        ProductSellDashboardScreen
-            .getPendingCarsResponseModel!.data[0].location !=
-            null) {
-      _tabController.index = 5;
     }
+
+    currentIndex = _tabController.index;
 
     if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
         ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
@@ -169,7 +170,17 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
           title: Text(""),
           bottom: TabBar(
               onTap: (index) {
-                onTap(index);
+                if (_tabController.indexIsChanging) {
+                  print(currentIndex);
+                  if (index < currentIndex) {
+                    _tabController.index = _tabController.index;
+                  } else {
+                    _tabController.index = _tabController.previousIndex;
+                  }
+                } else {
+                  return;
+                }
+                // onTap(index);
               },
               indicatorSize: TabBarIndicatorSize.label,
               isScrollable: true,
@@ -205,6 +216,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
           onNext: (data) {
             ProductSellJourneyScreen.addCarRequestModel.makeId = data.id;
             _tabController.index++;
+            currentIndex = _tabController.index;
             // callAddCarApi(addCarRequestModel, 1);
           },
         );
@@ -214,6 +226,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
             ProductSellJourneyScreen.addCarRequestModel.periodId = data.id;
             ProductSellJourneyScreen.addCarRequestModel.year = data.year;
             _tabController.index++;
+            currentIndex = _tabController.index;
             // callAddCarApi(addCarRequestModel, 2);
           },
         );
@@ -222,6 +235,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
           onNext: (data) {
             ProductSellJourneyScreen.addCarRequestModel.modelId = data.id;
             _tabController.index++;
+            currentIndex = _tabController.index;
             // callAddCarApi(addCarRequestModel, 3);
           },
         );
@@ -230,6 +244,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
           onNext: (data) {
             ProductSellJourneyScreen.addCarRequestModel.variantId = data.id;
             _tabController.index++;
+            currentIndex = _tabController.index;
             // callAddCarApi(addCarRequestModel, 4);
           },
         );
@@ -238,6 +253,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
           onNext: (data) {
             ProductSellJourneyScreen.addCarRequestModel.ownership = data;
             _tabController.index++;
+            currentIndex = _tabController.index;
             // callAddCarApi(addCarRequestModel, 5);
           },
         );
@@ -246,6 +262,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
           onNext: (data) {
             ProductSellJourneyScreen.addCarRequestModel.odometer = data;
             _tabController.index++;
+            currentIndex = _tabController.index;
             // callAddCarApi(addCarRequestModel, 6);
           },
         );
@@ -268,7 +285,11 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
         return ProductSellContactInfoScreen(
           onNext: (data) {
             ContactInfo contactInfo = ContactInfo(
-                name: data.name, phoneNo: data.phoneNo, zipCode: data.zipCode);
+                name: data.name,
+                phoneNo: data.phoneNo,
+                zipCode: data.zipCode,
+                countryName: data.countryName,
+                countryCode: data.countryCode);
 
             ProductSellJourneyScreen.addCarRequestModel.contactInfo =
                 contactInfo;
@@ -305,7 +326,9 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
                 carId = value.data!.id;
               }),
               Navigator.pop(context),
-              _tabController.index = indexNext,
+              _tabController.index =
+                  (tabItems.length == 9 ? indexNext : indexNext + 1),
+      currentIndex = _tabController.index,
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(value.message),
               )),
@@ -320,8 +343,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
 
   void callAddSpecificationApi(
       AddSpecificationRequestModel addSpecificationRequestModel, indexNext) {
-
-    addSpecificationRequestModel.carId =carId;
+    addSpecificationRequestModel.carId = carId;
     setState(() {
       showLoaderDialog(context);
       isDataLoading = true;
@@ -331,7 +353,9 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
         ApiService(context).addSpecification(addSpecificationRequestModel);
     response
         .then((value) => {
-              _tabController.index = indexNext,
+              _tabController.index =
+                  (tabItems.length == 9 ? indexNext : indexNext + 1),
+              currentIndex = _tabController.index,
               carId = value.data.id,
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(value.message),

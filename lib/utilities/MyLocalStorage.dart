@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/utilities/KeyConstants.dart';
-import 'package:localstorage/localstorage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefManager {

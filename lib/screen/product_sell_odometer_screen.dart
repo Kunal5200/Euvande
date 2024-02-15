@@ -1,6 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellOdometerScreen extends StatefulWidget {
@@ -106,7 +105,15 @@ class _ProductSellOdometerScreenState extends State<ProductSellOdometerScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "  " + items[index] + " Kilometers",
+                            "  " + items[index] + " Kilometers ${(ProductSellDashboardScreen
+                                .getPendingCarsResponseModel != null &&
+                                ProductSellDashboardScreen
+                                    .getPendingCarsResponseModel!.data.length > 0
+                                && ProductSellDashboardScreen
+                                    .getPendingCarsResponseModel!.data[0]
+                                    .odometer.toLowerCase() == items[index]
+                                    .toLowerCase()) ?
+                            " ✓" : ""}",
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),

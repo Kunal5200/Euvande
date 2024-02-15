@@ -1,6 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellOwnerShipScreen extends StatefulWidget {
@@ -25,6 +24,13 @@ class _ProductSellOwnerShipScreenState
   ];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return  Container(
       child: SingleChildScrollView(
@@ -38,25 +44,6 @@ class _ProductSellOwnerShipScreenState
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSearch() {
-    return TextField(
-      style: TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Color(0xffebebeb),
-        prefixIcon: Icon(Icons.search_outlined),
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        hintText: "Search",
-        hintStyle: TextStyle(fontSize: 14),
-        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-        border: OutlineInputBorder(
-          // borderSide: BorderSide.none
-        ),
-      ),
-      keyboardType: TextInputType.name,
     );
   }
 
@@ -99,7 +86,16 @@ class _ProductSellOwnerShipScreenState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("  "+items[index] + " Ownership", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                        Text("  "+items[index] + " Ownership ${(ProductSellDashboardScreen
+                            .getPendingCarsResponseModel != null &&
+                            ProductSellDashboardScreen
+                                .getPendingCarsResponseModel!.data.length > 0
+                            && ProductSellDashboardScreen
+                                .getPendingCarsResponseModel!.data[0]
+                                .ownership.toLowerCase() == items[index].toLowerCase()) ?
+                        " ✓" : ""}",
+                          style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
                         SizedBox(height: 5,),
                         Divider(thickness: 0.5, color: Colors.black26,),
                       ],

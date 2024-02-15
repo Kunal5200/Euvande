@@ -1,19 +1,6 @@
-import 'dart:ffi';
-
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/model/request/EditAddressRequestModel.dart';
-import 'package:euvande/model/request/GetModelRequestModel.dart';
-import 'package:euvande/model/response/EditAddressResponseModel.dart';
-import 'package:euvande/model/response/GetAddressResponseModel.dart';
-import 'package:euvande/model/response/GetCarListResponseModel.dart';
-import 'package:euvande/model/response/GetModelResponseModel.dart';
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
-import 'package:euvande/screen/add_address_screen.dart';
 import 'package:euvande/screen/pending_product_details_screen.dart';
-import 'package:euvande/screen/product_details_screen.dart';
-import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class PendingProductListScreen extends StatefulWidget {

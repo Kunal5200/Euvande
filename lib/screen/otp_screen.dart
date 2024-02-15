@@ -5,12 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:euvande/model/request/VerifyRequestModel.dart';
 import 'package:euvande/model/response/VerifyResponseModel.dart';
 import 'package:euvande/utilities/ApiService.dart';
-import 'package:euvande/utilities/Constants.dart';
 import 'package:euvande/utilities/KeyConstants.dart';
 import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Otp extends StatefulWidget {

@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:encrypt/encrypt.dart' as enc;
 import 'package:euvande/model/response/GetCarListResponseModel.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
@@ -16,13 +13,6 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
-  final items = [
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-left-view-121.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-view-118.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-view-119.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/grille-97.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-fog-lamp-41.jpg",
-  ];
 
   @override
   void initState() {
@@ -48,7 +38,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               children: [
                 _buildImageList(),
                 _buildProductSection(),
-                _buildProductDetailsTitleSection(),
+                // _buildProductDetailsTitleSection(),
                 _buildProductOverviewSection(),
                 _buildProductSpecificationSection(),
                 _buildProductGallerySection(),
@@ -138,7 +128,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Sending Message"),
+                content: Text("Coming Soon..."),
               ));
             },
           ),
@@ -207,24 +197,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(Icons.calendar_today, "Registration Year", "2023"),
+          _buildInfoRow(null, "Launch Year", widget.doc.period!.year.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(Icons.shield, "Insurance Validity", "Comprehensive"),
+          _buildInfoRow(null, "Model", widget.doc.model!.modelName),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(Icons.water_drop, "Fuel Type", "Petrol"),
+          _buildInfoRow(null, "Variant", widget.doc.variant!.variantName),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(
-              Icons.airline_seat_recline_extra_rounded, "Seats", "5 Seats"),
+          _buildInfoRow(null, "Fuel Type", widget.doc.variant!.fuelType),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(Icons.electric_meter, "KMS Driven", "1,000 Kms"),
+          _buildInfoRow(null, "KMS Driven", widget.doc.odometer),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "Ownership", widget.doc.ownership),
         ],
       ),
     );
@@ -249,23 +242,34 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(null, "Registration Year", "2023"),
+          _buildInfoRow(null, "Transmission", widget.doc.specification!.transmission.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Insurance Validity", "Comprehensive"),
+          _buildInfoRow(null, "Vehicle Type", widget.doc.specification!.vehicleType.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Fuel Type", "Petrol"),
+          _buildInfoRow(null, "Doors", widget.doc.specification!.doors.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Seats", "5 Seats"),
+          _buildInfoRow(null, "Drive Type 4 X 4", widget.doc.specification!.driveType4Wd.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "KMS Driven", "1,000 Kms"),
+          _buildInfoRow(null, "Seats", widget.doc.specification!.seats.toString()),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "Interior Material", widget.doc.specification!.interiorMaterial.toString()),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "VAT Deduction", widget.doc.specification!.vatDeduction.toString()),
+          SizedBox(
+            height: 5,
+          ),
         ],
       ),
     );
@@ -273,7 +277,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   Widget _buildProductGallerySection() {
     return Container(
-      height: 300,
       padding: EdgeInsets.all(15),
       margin: EdgeInsets.all(10),
       alignment: Alignment.centerLeft,
@@ -291,26 +294,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           SizedBox(
             height: 10,
           ),
-          Expanded(
-            child: GridView.count(
-              // Create a grid with 2 columns. If you change the scrollDirection to
-              // horizontal, this produces 2 rows.
-              crossAxisCount: 3,
-              // Generate 100 widgets that display their index in the List.
-              children: List.generate(items.length, (index) {
-                return Center(
-                  child: Container(
-                    width: 100.0,
-                    height: 100.0,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          fit: BoxFit.cover, image: NetworkImage(items[index])),
-                    ),
+          GridView.count(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisCount: 3,
+            // Generate 100 widgets that display their index in the List.
+            children: List.generate(widget.doc.carImages.length, (index) {
+              return Center(
+                child: Container(
+                  width: 100.0,
+                  height: 100.0,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover, image: NetworkImage(widget.doc.carImages[index])),
                   ),
-                );
-              }),
-            ),
-          ),
+                ),
+              );
+            }),
+          )
         ],
       ),
     );

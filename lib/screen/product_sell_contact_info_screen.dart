@@ -1,8 +1,9 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:convert';
+
 import 'package:euvande/model/request/AddCarRequestModel.dart';
-import 'package:euvande/model/response/LoginResponseModel.dart';
+import 'package:euvande/model/response/GetUserDetailResponseModel.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/MyLocalStorage.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
@@ -18,36 +19,37 @@ class ProductSellContactInfoScreen extends StatefulWidget {
 
 class _ProductSellContactInfoScreenState
     extends State<ProductSellContactInfoScreen> {
-  LoginResponseModel? loginResponseModel = null;
 
-  var countries = [
-    "Germany",
-    "Italy",
-    "France",
-    "Czech Republic",
-    "Finland",
-  ];
+  dynamic _currentSelectedValue = null;
+  dynamic countries = null;
   GlobalKey<FormState> _formKey = GlobalKey();
 
   final TextEditingController fullNameController =
-      TextEditingController(text: "Abhishek");
+      TextEditingController();
   final TextEditingController phoneNumberController =
-      TextEditingController(text: "1234567890");
+      TextEditingController();
   final TextEditingController zipController =
-      TextEditingController(text: "123456");
+      TextEditingController();
 
-  var _currentSelectedValue;
+
+  bool isDataLoading = false;
+  GetUserDetailResponseModel? getUserDetailResponseModel;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    SharedPrefManager.getLoginData().then((value) => {
-      setState(() {
-        loginResponseModel = value;
-      }),
-    });
+    Future<dynamic> country = loadCountry();
+    country.then((value) => {
+          print("jsonResult" + value[0]["country_code"]),
+          setState(() {
+            countries = value;
+            callGetUserDetailApi();
+          }),
+        });
+
   }
 
   @override
@@ -82,12 +84,18 @@ class _ProductSellContactInfoScreenState
                 style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               onPressed: () {
-                ContactInfo contactInfo = ContactInfo(
-                    name: fullNameController.text,
-                    phoneNo: phoneNumberController.text,
-                    zipCode: zipController.text);
 
-                widget.onNext(contactInfo);
+                if (_formKey.currentState!.validate()) {
+                  ContactInfo contactInfo = ContactInfo(
+                      name: fullNameController.text,
+                      phoneNo: phoneNumberController.text,
+                      zipCode: zipController.text,
+                      countryCode: _currentSelectedValue["idd_code"].toString(),
+                      countryName: _currentSelectedValue["country_name"]
+                  );
+
+                  widget.onNext(contactInfo);
+                }
                 // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 //   content: Text("Coming Soon"),
                 // ));
@@ -118,7 +126,7 @@ class _ProductSellContactInfoScreenState
             style: TextStyle(fontSize: 10, color: Colors.green[500]),
           ),
           Text(
-              loginResponseModel == null ? "N/A" : loginResponseModel!.data.email,
+            getUserDetailResponseModel == null ? "N/A" : getUserDetailResponseModel!.data!.email,
             style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -154,6 +162,12 @@ class _ProductSellContactInfoScreenState
                 prefixIcon: Icon(Icons.person, size: 24),
               ),
               keyboardType: TextInputType.name,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field is required';
+                }
+                return null;
+              },
             ),
             SizedBox(
               height: 10,
@@ -172,6 +186,12 @@ class _ProductSellContactInfoScreenState
               maxLength: 11,
               keyboardType: TextInputType.numberWithOptions(
                   decimal: false, signed: false),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field is required';
+                }
+                return null;
+              },
             ),
             SizedBox(
               height: 10,
@@ -179,16 +199,16 @@ class _ProductSellContactInfoScreenState
             InputDecorator(
               decoration: InputDecoration(
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 labelText: 'Choose a country',
                 border: OutlineInputBorder(
                   borderSide: BorderSide(),
                 ),
-                prefixIcon: Icon(Icons.home_max_outlined, size: 24),
+                prefixIcon: Icon(Icons.place_outlined, size: 24),
               ),
-              isEmpty: _currentSelectedValue == '',
+              isEmpty: _currentSelectedValue == null,
               child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
+                child: DropdownButton<dynamic>(
                   value: _currentSelectedValue,
                   isDense: true,
                   onChanged: (value) {
@@ -196,12 +216,13 @@ class _ProductSellContactInfoScreenState
                       _currentSelectedValue = value;
                     });
                   },
-                  items: countries.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                  items: countries != null ?countries.map<DropdownMenuItem<dynamic>>((value) =>
+                  new DropdownMenuItem<dynamic>(
+                    value: value,
+                    child: new Text(value["country_name"]+" "+value["flag"],
+                      style: TextStyle(fontSize: 12),),
+                  )
+                  ).toList() : null,
                 ),
               ),
             ),
@@ -210,6 +231,12 @@ class _ProductSellContactInfoScreenState
             ),
             TextFormField(
               controller: zipController,
+              validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'This field is required';
+              }
+              return null;
+            },
               decoration: InputDecoration(
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -223,5 +250,47 @@ class _ProductSellContactInfoScreenState
             ),
           ],
         ));
+  }
+
+  Future<dynamic> loadCountry() async {
+    String data = await DefaultAssetBundle.of(context)
+        .loadString("assets/json/country.json");
+    var jsonResult = jsonDecode(data);
+
+    return jsonResult;
+  }
+
+
+  void callGetUserDetailApi() {
+
+    setState(() {
+      isDataLoading = true;
+    });
+
+    Future<GetUserDetailResponseModel> response =
+    ApiService(context).getUserDetail();
+    response
+        .then((value) => {
+      getUserDetailResponseModel = value,
+      setState(() {
+        isDataLoading = false;
+        fullNameController.text = getUserDetailResponseModel!.data!.name;
+        phoneNumberController.text =
+            getUserDetailResponseModel!.data!.phoneNo;
+
+        for (var data in countries) {
+          if (data["idd_code"].toString() ==
+              getUserDetailResponseModel!.data!.countryCode) {
+            _currentSelectedValue = data;
+            print(data);
+          }
+        }
+      }),
+    })
+        .catchError((onError) {
+      setState(() {
+        isDataLoading = false;
+      });
+    });
   }
 }

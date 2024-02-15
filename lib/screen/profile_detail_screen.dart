@@ -1,17 +1,13 @@
-import 'dart:developer';
+import 'dart:convert';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/main.dart';
+import 'package:euvande/model/response/GetUserDetailResponseModel.dart';
 import 'package:euvande/model/response/LoginResponseModel.dart';
-import 'package:euvande/screen/add_address_screen.dart';
 import 'package:euvande/screen/address_list_screen.dart';
 import 'package:euvande/screen/change_password_screen.dart';
-import 'package:euvande/screen/dashboard_screen.dart';
 import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/pending_product_list_screen.dart';
 import 'package:euvande/screen/profile_setting_screen.dart';
-import 'package:euvande/utilities/Constants.dart';
-import 'package:euvande/utilities/KeyConstants.dart';
 import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
@@ -85,6 +81,35 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
     );
   }
 
+  Future<void> _navigateUpdateProfileScreen(
+      BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProfileSettingScreen()),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    if (result != null) {
+
+      GetUserDetailResponseModel getUserDetailResponseModel =   GetUserDetailResponseModel.fromJson(json.decode(result["data"]));
+
+      SharedPrefManager.getLoginData().then((value) => {
+        setState(() {
+          loginResponseModel = value;
+          loginResponseModel!.data.name = getUserDetailResponseModel.data!.name;
+          print(getUserDetailResponseModel.data!.name);
+
+          SharedPrefManager.setLoginData(jsonEncode(loginResponseModel!.toJson()));
+        }),
+      });
+    }
+  }
+
   Widget _buildSection() {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -137,39 +162,35 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             ),
                           ),
                           SizedBox(height: 20,),
-                          // GestureDetector(
-                          //   onTap: () {
-                          //     Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (context) =>
-                          //               const ProfileSettingScreen()),
-                          //     );
-                          //   },
-                          //   child: Container(
-                          //     color: Colors.white,
-                          //     padding: EdgeInsets.symmetric(
-                          //         horizontal: 20, vertical: 10),
-                          //     child: Row(
-                          //       children: [
-                          //         Icon(
-                          //           Icons.edit,
-                          //           size: 18,
-                          //         ),
-                          //         SizedBox(
-                          //           width: 10,
-                          //         ),
-                          //         Text(
-                          //           "Edit Profile",
-                          //           style: TextStyle(
-                          //               fontSize: 16,
-                          //               fontWeight: FontWeight.bold,
-                          //               color: Colors.black),
-                          //         )
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                              _navigateUpdateProfileScreen(context);
+                            },
+                            child: Container(
+                              color: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.edit,
+                                    size: 18,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    "Edit Profile",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                           SizedBox(height: 5,),
                           GestureDetector(
                             onTap: () {
@@ -295,3 +316,5 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
     );
   }
 }
+
+

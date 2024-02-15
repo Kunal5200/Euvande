@@ -1,5 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/model/request/AddCarRequestModel.dart';
 import 'package:euvande/model/response/DeleteCarResponseModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
@@ -9,8 +7,8 @@ import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellDashboardScreen extends StatefulWidget {
+  static GetPendingCarsResponseModel? getPendingCarsResponseModel;
 
-  static late GetPendingCarsResponseModel? getPendingCarsResponseModel;
   const ProductSellDashboardScreen({super.key});
 
   @override
@@ -30,7 +28,6 @@ class _ProductSellDashboardScreenState
     super.initState();
 
     callGetPendingCarsApi();
-    callGetAllMakeApi();
   }
 
   @override
@@ -48,9 +45,11 @@ class _ProductSellDashboardScreenState
                 _buildTitleSection(),
                 isPendingCarLoading
                     ? _showLoader()
-                    : ProductSellDashboardScreen.getPendingCarsResponseModel == null
+                    : ProductSellDashboardScreen.getPendingCarsResponseModel ==
+                            null
                         ? _showLoader()
-                        : ProductSellDashboardScreen.getPendingCarsResponseModel!.data.isNotEmpty
+                        : ProductSellDashboardScreen
+                                .getPendingCarsResponseModel!.data.isNotEmpty
                             ? _buildSelectedProductSection()
                             : _buildProductSection(),
               ],
@@ -134,8 +133,11 @@ class _ProductSellDashboardScreenState
                         fit: BoxFit.fill,
                         image: NetworkImage(
                             "https://euvande-dev.s3.eu-central-1.amazonaws.com/" +
-                                ProductSellDashboardScreen.getPendingCarsResponseModel!
-                                    .data[0].make!.logo)),
+                                ProductSellDashboardScreen
+                                    .getPendingCarsResponseModel!
+                                    .data[0]
+                                    .make!
+                                    .logo)),
                   ),
                 ),
                 SizedBox(
@@ -176,13 +178,27 @@ class _ProductSellDashboardScreenState
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
               onPressed: () {
-                ProductSellJourneyScreen.addCarRequestModel.makeId = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].make!.id;
-                ProductSellJourneyScreen.addCarRequestModel.periodId = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].period!.id;
-                ProductSellJourneyScreen.addCarRequestModel.year = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].period!.year;
-                ProductSellJourneyScreen.addCarRequestModel.modelId = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].model!.id;
-                ProductSellJourneyScreen.addCarRequestModel.variantId = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].variant!.id;
-                ProductSellJourneyScreen.addCarRequestModel.ownership = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].ownership;
-                ProductSellJourneyScreen.addCarRequestModel.odometer = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].odometer;
+                ProductSellJourneyScreen.addCarRequestModel.makeId =
+                    ProductSellDashboardScreen
+                        .getPendingCarsResponseModel!.data[0].make!.id;
+                ProductSellJourneyScreen.addCarRequestModel.periodId =
+                    ProductSellDashboardScreen
+                        .getPendingCarsResponseModel!.data[0].period!.id;
+                ProductSellJourneyScreen.addCarRequestModel.year =
+                    ProductSellDashboardScreen
+                        .getPendingCarsResponseModel!.data[0].period!.year;
+                ProductSellJourneyScreen.addCarRequestModel.modelId =
+                    ProductSellDashboardScreen
+                        .getPendingCarsResponseModel!.data[0].model!.id;
+                ProductSellJourneyScreen.addCarRequestModel.variantId =
+                    ProductSellDashboardScreen
+                        .getPendingCarsResponseModel!.data[0].variant!.id;
+                ProductSellJourneyScreen.addCarRequestModel.ownership =
+                    ProductSellDashboardScreen
+                        .getPendingCarsResponseModel!.data[0].ownership;
+                ProductSellJourneyScreen.addCarRequestModel.odometer =
+                    ProductSellDashboardScreen
+                        .getPendingCarsResponseModel!.data[0].odometer;
 
                 Navigator.pushReplacement(
                   context,
@@ -193,7 +209,8 @@ class _ProductSellDashboardScreenState
             ),
             GestureDetector(
               onTap: () {
-                callDeleteCarAPI(ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].id);
+                callDeleteCarAPI(ProductSellDashboardScreen
+                    .getPendingCarsResponseModel!.data[0].id);
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -208,18 +225,16 @@ class _ProductSellDashboardScreenState
   }
 
   void callDeleteCarAPI(int id) {
-
-    Future<DeleteCarResponseModel> response = ApiService(context).deleteCar(id.toString());
+    Future<DeleteCarResponseModel> response =
+        ApiService(context).deleteCar(id.toString());
     response
         .then((value) => {
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(value.message),
-      )),
-      Navigator.pop(context)
-    })
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(value.message),
+              )),
+              Navigator.pop(context)
+            })
         .catchError((onError) {
-
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(onError.message),
       ));
@@ -430,7 +445,8 @@ class _ProductSellDashboardScreenState
               setState(() {
                 isPendingCarLoading = false;
               }),
-              ProductSellDashboardScreen.getPendingCarsResponseModel = value
+              ProductSellDashboardScreen.getPendingCarsResponseModel = value,
+              callGetAllMakeApi()
             })
         .catchError((onError) {
       setState(() {

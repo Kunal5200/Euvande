@@ -1,12 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/main.dart';
-import 'package:euvande/screen/image_screen.dart';
-import 'package:euvande/screen/product_details_screen.dart';
-import 'package:euvande/screen/product_sell_dashboard_screen.dart';
-import 'package:euvande/utilities/ProductItemList.dart';
-import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {

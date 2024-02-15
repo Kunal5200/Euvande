@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/main.dart';
 import 'package:euvande/model/request/AddCarRequestModel.dart';
 import 'package:euvande/model/response/AddCarResponseModel.dart';
@@ -20,14 +19,6 @@ class ProductSellDetailsScreen extends StatefulWidget {
 }
 
 class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
-  bool _rememberMe = false;
-  final items = [
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-left-view-121.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-view-118.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-view-119.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/grille-97.jpg",
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-fog-lamp-41.jpg",
-  ];
 
   bool isPendingCarLoading = true;
   bool isPriceAdded = false;
@@ -86,7 +77,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
                 color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           Text(
-            "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].odometer} kms • ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].variant!.fuelType} • ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.transmission} • ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].ownership} Owner",
+            "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].odometer} • ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].variant!.fuelType} • ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.transmission} • ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].ownership} Owner",
             style: TextStyle(
               color: Colors.black45,
               fontSize: 12,
@@ -126,7 +117,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "KMS Driven", "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].odometer} kms"),
+          _buildInfoRow(null, "KMS Driven", "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].odometer}"),
 
         ],
       ),
@@ -217,7 +208,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
           decoration: InputDecoration(
             contentPadding:
             EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-            labelText: 'Enter Expacted Price',
+            labelText: 'Enter Expected Price',
             border: OutlineInputBorder(
               borderSide: BorderSide(),
             ),
@@ -237,7 +228,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
           onPressed: () {
             if (cityController.text.trim().isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Please enter expacted price of your car"),
+                content: Text("Please enter expected price of your car"),
               ));
             } else {
               ProductSellJourneyScreen.addCarRequestModel.price = int.parse(cityController.text);
@@ -267,12 +258,17 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
           },
         ),
       ),
-      Container(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        child: Text(
-          "Edit Details",
-          style: TextStyle(
-              color: Colors.black45, fontSize: 12, fontWeight: FontWeight.bold),
+      GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          child: Text(
+            "Edit Details",
+            style: TextStyle(
+                color: Colors.black45, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       SizedBox(

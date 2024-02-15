@@ -1,14 +1,8 @@
-import 'dart:convert';
-
 import 'package:euvande/main.dart';
 import 'package:euvande/model/request/ChangePasswordRequestModel.dart';
-import 'package:euvande/model/request/LoginRequestModel.dart';
-import 'package:euvande/model/request/RegisterRequestModel.dart';
 import 'package:euvande/model/response/ChangePasswordResponseModel.dart';
-import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/model/response/RegisterResponseModel.dart';
 import 'package:euvande/screen/otp_screen.dart';
-import 'package:euvande/screen/registration_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/KeyConstants.dart';
 import 'package:euvande/utilities/MyLocalStorage.dart';
@@ -253,7 +247,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       MaterialPageRoute(
           builder: (context) => Otp(
               response: responseModel,
-              referenceId: responseModel.data.referenceId,
+              referenceId: responseModel.data!.referenceId.toInt(),
               verificationFor: FORGET_PASSWORD)),
     );
 

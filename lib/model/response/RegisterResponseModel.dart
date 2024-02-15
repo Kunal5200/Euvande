@@ -9,41 +9,52 @@ RegisterResponseModel registerResponseModelFromJson(String str) => RegisterRespo
 String registerResponseModelToJson(RegisterResponseModel data) => json.encode(data.toJson());
 
 class RegisterResponseModel {
-  String message;
-  Data data;
-
   RegisterResponseModel({
     required this.message,
     required this.data,
+    required this.statusCode,
   });
 
-  factory RegisterResponseModel.fromJson(Map<String, dynamic> json) => RegisterResponseModel(
-    message: json["message"],
-    data: Data.fromJson(json["data"]),
-  );
+  final String message;
+  final Data? data;
+  final num statusCode;
+
+  factory RegisterResponseModel.fromJson(Map<String, dynamic> json){
+    return RegisterResponseModel(
+      message: json["message"] ?? "",
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
+      statusCode: json["statusCode"] ?? 0,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "message": message,
-    "data": data.toJson(),
+    "data": data?.toJson(),
+    "statusCode": statusCode,
   };
+
 }
 
 class Data {
-  int referenceId;
-  String name;
-
   Data({
     required this.referenceId,
-    required this.name,
+    required this.otp,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-    referenceId: json["referenceId"],
-    name: json["name"],
-  );
+  final num referenceId;
+  final String otp;
+
+  factory Data.fromJson(Map<String, dynamic> json){
+    return Data(
+      referenceId: json["referenceId"] ?? 0,
+      otp: json["OTP"] ?? "",
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "referenceId": referenceId,
-    "name": name,
+    "OTP": otp,
   };
+
 }
+

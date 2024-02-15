@@ -2,14 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:euvande/main.dart';
 import 'package:euvande/model/request/RegisterRequestModel.dart';
 import 'package:euvande/model/response/RegisterResponseModel.dart';
-import 'package:euvande/screen/dashboard_screen.dart';
-import 'package:euvande/screen/otp_screen.dart';
 import 'package:euvande/screen/login_screen.dart';
+import 'package:euvande/screen/otp_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/KeyConstants.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
-import 'package:localstorage/localstorage.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -52,7 +50,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       MaterialPageRoute(
           builder: (context) => Otp(
                 response: responseModel,
-                referenceId: responseModel.data.referenceId,
+                referenceId: responseModel.data!.referenceId.toInt(),
               verificationFor : REGISTER
               )),
     );
@@ -101,15 +99,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              SizedBox(height: 50,),
               Container(
                 width: 150.0,
-                height: 150.0,
+                height: 50.0,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                       fit: BoxFit.cover,
                       image: AssetImage("assets/logos/logo.png")),
                 ),
               ),
+              Text("Enter your information to create an account", style: TextStyle(color: Colors.black54, fontSize: 14,),),
+              SizedBox(height: 30,),
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
@@ -270,7 +271,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Already have account ?",
+                          "Already have account?",
                           style: TextStyle(color: Colors.black, fontSize: 16),
                         ),
                         SizedBox(

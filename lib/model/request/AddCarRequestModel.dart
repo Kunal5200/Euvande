@@ -69,24 +69,32 @@ class ContactInfo {
     required this.name,
     required this.phoneNo,
     required this.zipCode,
+    required this.countryCode,
+    required this.countryName,
   });
 
   final String name;
   final String phoneNo;
   final String zipCode;
+  final String countryCode;
+  final String countryName;
 
   factory ContactInfo.fromJson(Map<String, dynamic> json){
     return ContactInfo(
       name: json["name"] ?? 0,
-      phoneNo: json["phoneNO"] ?? "",
+      phoneNo: json["phoneNo"] ?? "",
       zipCode: json["zipCode"] ?? "",
+      countryCode: json["countryCode"] ?? "",
+      countryName: json["countryName"] ?? "",
     );
   }
 
   Map<String, dynamic> toJson() => {
     "name": name,
-    "phoneNO": phoneNo,
+    "phoneNo": phoneNo,
     "zipCode": zipCode,
+    "countryCode": countryCode,
+    "countryName": countryName,
   };
 
 }
