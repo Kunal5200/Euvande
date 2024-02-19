@@ -419,7 +419,7 @@ class _ProductSellVehicleImageUploadScreenState
         physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: 2,
         children: List.generate(imageListData.length, (index) {
-          return GestureDetector(
+          return GestureDetector( behavior: HitTestBehavior.translucent,
               onTap: () {
                 showOptions(categoryIndex, index, imageListData[index]["key"]!);
               },

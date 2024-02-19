@@ -8,6 +8,7 @@ import 'package:euvande/screen/change_password_screen.dart';
 import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/pending_product_list_screen.dart';
 import 'package:euvande/screen/profile_setting_screen.dart';
+import 'package:euvande/screen/shortlist_product_list_screen.dart';
 import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
@@ -120,7 +121,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(height: 10),
-          GestureDetector(
+          GestureDetector( behavior: HitTestBehavior.translucent,
             onTap: () {
               Navigator.push(
                 context,
@@ -129,14 +130,19 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
             },
             child: _buildMenuItem("My Cars", Icons.production_quantity_limits),
           ),
-          GestureDetector(
+          GestureDetector( behavior: HitTestBehavior.translucent,
             onTap: () {
-
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                    const ShortlistProductListScreen()),
+              );
             },
             child: _buildMenuItem("Shortlisted Vehicles", Icons.card_giftcard),
           ),
           Divider(),
-          GestureDetector(
+          GestureDetector( behavior: HitTestBehavior.translucent,
             onTap: () {
               showModalBottomSheet<void>(
                 isScrollControlled: true,
@@ -162,7 +168,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             ),
                           ),
                           SizedBox(height: 20,),
-                          GestureDetector(
+                          GestureDetector( behavior: HitTestBehavior.translucent,
                             onTap: () {
                               Navigator.pop(context);
                               _navigateUpdateProfileScreen(context);
@@ -192,7 +198,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                             ),
                           ),
                           SizedBox(height: 5,),
-                          GestureDetector(
+                          GestureDetector( behavior: HitTestBehavior.translucent,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -234,7 +240,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
             },
             child: _buildMenuItem("Profile Setting", Icons.settings),
           ),
-          GestureDetector(
+          GestureDetector( behavior: HitTestBehavior.translucent,
             onTap: () {
               Navigator.push(
                 context,

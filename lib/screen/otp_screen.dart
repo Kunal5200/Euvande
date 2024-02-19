@@ -331,6 +331,7 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
     passwordController.dispose();
     rePasswordController.dispose();
     textFieldFocusNode.dispose();
+    textFieldFocusNode1.dispose();
 
     super.dispose();
   }
@@ -513,7 +514,7 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
                                 suffixIcon: Padding(
                                   padding:
                                   const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                  child: GestureDetector(
+                                  child: GestureDetector( behavior: HitTestBehavior.translucent,
                                     onTap: _toggleObscured,
                                     child: Icon(
                                       _obscured
@@ -549,7 +550,7 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
                                 suffixIcon: Padding(
                                   padding:
                                   const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                  child: GestureDetector(
+                                  child: GestureDetector( behavior: HitTestBehavior.translucent,
                                     onTap: _toggleObscured1,
                                     child: Icon(
                                       _obscured1

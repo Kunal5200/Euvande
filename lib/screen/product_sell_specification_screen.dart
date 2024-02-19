@@ -5,6 +5,7 @@ import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ProductSellSpecificationScreen extends StatefulWidget {
   final int carId;
@@ -252,7 +253,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!
                           .data!.transmission.length, (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => setState(() {
                               selectedTransmissionIndex = index;
 
@@ -303,7 +304,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!
                           .data!.vehicleType.length, (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => {
                               setState(() {
                                 selectedVehicleTypeIndex = index;
@@ -355,7 +356,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!.data!.doors.length,
                       (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => setState(() {
                               selectedDoorsIndex = index;
                               addSpecificationRequestModel.doors =
@@ -405,7 +406,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!
                           .data!.driveType4Wd.length, (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => setState(() {
                               selectedDrive4x4Index = index;
                               addSpecificationRequestModel.driveType4Wd =
@@ -455,7 +456,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!.data!.seats.length,
                       (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => setState(() {
                               selectedSeatIndex = index;
 
@@ -507,7 +508,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!
                           .data!.interiorMaterial.length, (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => setState(() {
                               selectedVInteriorIndex = index;
                               addSpecificationRequestModel.interiorMaterial =
@@ -557,7 +558,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!
                           .data!.vatDeduction.length, (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => setState(() {
                               selectedVatIndex = index;
                               addSpecificationRequestModel.vatDeduction =
@@ -607,6 +608,9 @@ class _ProductSellSpecificationScreenState
                       children: [
                         TextFormField(
                           controller: powerController,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 15),
@@ -615,7 +619,7 @@ class _ProductSellSpecificationScreenState
                               borderSide: BorderSide(),
                             ),
                           ),
-                          keyboardType: TextInputType.name,
+                          keyboardType: TextInputType.number,
                         ),
                         SizedBox(
                           height: 10,
@@ -630,7 +634,6 @@ class _ProductSellSpecificationScreenState
                                 borderSide: BorderSide(),
                               ),
                             ),
-                            maxLength: 11,
                             keyboardType: TextInputType.name),
                         SizedBox(
                           height: 10,
@@ -651,7 +654,7 @@ class _ProductSellSpecificationScreenState
                   children: List.generate(
                       getDefaultSpecificationResponseModel!
                           .data!.equipments.length, (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                         onTap: () => setState(() {
                               selectedEquipmentIndex[index] =
                                   !selectedEquipmentIndex[index];

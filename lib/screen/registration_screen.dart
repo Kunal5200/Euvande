@@ -166,7 +166,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   prefixIcon: Icon(Icons.lock_rounded, size: 24),
                   suffixIcon: Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                    child: GestureDetector(
+                    child: GestureDetector( behavior: HitTestBehavior.translucent,
                       onTap: _toggleObscured,
                       child: Icon(
                         _obscured
@@ -256,7 +256,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               SizedBox(
                 height: 10,
               ),
-              GestureDetector(
+              GestureDetector( behavior: HitTestBehavior.translucent,
                 onTap: () => {
                   Navigator.pushReplacement(
                     context,

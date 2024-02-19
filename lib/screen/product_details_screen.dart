@@ -1,4 +1,5 @@
 import 'package:euvande/model/response/GetCarListResponseModel.dart';
+import 'package:euvande/screen/image_viewer_screen.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
@@ -12,13 +13,10 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
 
   @override
@@ -57,32 +55,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           scrollDirection: Axis.horizontal,
           itemCount: widget.doc.carImages.length,
           itemBuilder: (BuildContext context, int index) {
-            return Container(
-              width: 150.0,
-              height: 180.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.cover, image: NetworkImage(widget.doc.carImages[index])),
+            return GestureDetector( behavior: HitTestBehavior.translucent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ImageViewerScreen(widget.doc.carImages)),
+                );
+              },
+              child: Container(
+                width: 150.0,
+                height: 180.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(widget.doc.carImages[index])),
+                ),
               ),
             );
           }),
     );
-      // Row(
-      //   mainAxisAlignment: MainAxisAlignment.center,
-      //   children: <Widget>[
-      //
-      //     for (var i = 0; i < widget.doc.carImages.length; i++) ...[
-      //       Container(
-      //         width: 150.0,
-      //         height: 180.0,
-      //         decoration: BoxDecoration(
-      //           image: DecorationImage(
-      //               fit: BoxFit.cover, image: NetworkImage(items[i])),
-      //         ),
-      //       )
-      //     ]
-      //   ],
-      // ),
+    // Row(
+    //   mainAxisAlignment: MainAxisAlignment.center,
+    //   children: <Widget>[
+    //
+    //     for (var i = 0; i < widget.doc.carImages.length; i++) ...[
+    //       Container(
+    //         width: 150.0,
+    //         height: 180.0,
+    //         decoration: BoxDecoration(
+    //           image: DecorationImage(
+    //               fit: BoxFit.cover, image: NetworkImage(items[i])),
+    //         ),
+    //       )
+    //     ]
+    //   ],
+    // ),
     // );
   }
 
@@ -103,7 +112,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           Text(
-            "${widget.doc.odometer.isEmpty ? "N/A" : widget.doc.odometer} • ${widget.doc.variant == null ? "N/A" : widget.doc.variant!.fuelType}  • ${widget.doc.specification==null ? "N/A" : widget.doc.specification!.transmission}  • ${widget.doc.ownership.isEmpty ? "N/A" : widget.doc.ownership} ",
+            "${widget.doc.odometer.isEmpty ? "N/A" : widget.doc.odometer} • ${widget.doc.variant == null ? "N/A" : widget.doc.variant!.fuelType}  • ${widget.doc.specification == null ? "N/A" : widget.doc.specification!.transmission}  • ${widget.doc.ownership.isEmpty ? "N/A" : widget.doc.ownership} ",
             style: TextStyle(
               color: Colors.black45,
               fontSize: 12,
@@ -113,7 +122,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             height: 2,
           ),
           Text(
-            "€ ${widget.doc.price} " ,
+            "€ ${widget.doc.price} ",
             style: TextStyle(
                 color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -197,7 +206,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(null, "Launch Year", widget.doc.period!.year.toString()),
+          _buildInfoRow(
+              null, "Launch Year", widget.doc.period!.year.toString()),
           SizedBox(
             height: 5,
           ),
@@ -242,31 +252,38 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(null, "Transmission", widget.doc.specification!.transmission.toString()),
+          _buildInfoRow(null, "Transmission",
+              widget.doc.specification!.transmission.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Vehicle Type", widget.doc.specification!.vehicleType.toString()),
+          _buildInfoRow(null, "Vehicle Type",
+              widget.doc.specification!.vehicleType.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Doors", widget.doc.specification!.doors.toString()),
+          _buildInfoRow(
+              null, "Doors", widget.doc.specification!.doors.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Drive Type 4 X 4", widget.doc.specification!.driveType4Wd.toString()),
+          _buildInfoRow(null, "Drive Type 4 X 4",
+              widget.doc.specification!.driveType4Wd.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Seats", widget.doc.specification!.seats.toString()),
+          _buildInfoRow(
+              null, "Seats", widget.doc.specification!.seats.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Interior Material", widget.doc.specification!.interiorMaterial.toString()),
+          _buildInfoRow(null, "Interior Material",
+              widget.doc.specification!.interiorMaterial.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "VAT Deduction", widget.doc.specification!.vatDeduction.toString()),
+          _buildInfoRow(null, "VAT Deduction",
+              widget.doc.specification!.vatDeduction.toString()),
           SizedBox(
             height: 5,
           ),
@@ -287,7 +304,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Gallery Experiance",
+            "Gallery Experience",
             style: TextStyle(
                 color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
           ),
@@ -306,7 +323,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   height: 100.0,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        fit: BoxFit.cover, image: NetworkImage(widget.doc.carImages[index])),
+                        fit: BoxFit.cover,
+                        image: NetworkImage(widget.doc.carImages[index])),
                   ),
                 ),
               );

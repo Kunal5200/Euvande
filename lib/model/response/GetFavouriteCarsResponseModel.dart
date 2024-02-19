@@ -1,14 +1,15 @@
 // To parse this JSON data, do
 //
-//     final getCarListResponseModel = getCarListResponseModelFromJson(jsonString);
+//     final getFavouriteCarsResponseModel = getFavouriteCarsResponseModelFromJson(jsonString);
 
 import 'dart:convert';
 
-GetCarListResponseModel getCarListResponseModelFromJson(String str) => GetCarListResponseModel.fromJson(json.decode(str));
+GetFavouriteCarsResponseModel getFavouriteCarsResponseModelFromJson(String str) => GetFavouriteCarsResponseModel.fromJson(json.decode(str));
 
-String getCarListResponseModelToJson(GetCarListResponseModel data) => json.encode(data.toJson());
-class GetCarListResponseModel {
-  GetCarListResponseModel({
+String getFavouriteCarsResponseModelToJson(GetFavouriteCarsResponseModel data) => json.encode(data.toJson());
+
+class GetFavouriteCarsResponseModel {
+  GetFavouriteCarsResponseModel({
     required this.message,
     required this.data,
     required this.statusCode,
@@ -18,8 +19,8 @@ class GetCarListResponseModel {
   final Data? data;
   final num statusCode;
 
-  factory GetCarListResponseModel.fromJson(Map<String, dynamic> json){
-    return GetCarListResponseModel(
+  factory GetFavouriteCarsResponseModel.fromJson(Map<String, dynamic> json){
+    return GetFavouriteCarsResponseModel(
       message: json["message"] ?? "",
       data: json["data"] == null ? null : Data.fromJson(json["data"]),
       statusCode: json["statusCode"] ?? 0,
@@ -94,8 +95,8 @@ class Doc {
     required this.specification,
     required this.period,
     required this.media,
+    required this.favoriteCars,
     required this.carImages,
-    required this.favourite,
   });
 
   final int id;
@@ -113,8 +114,8 @@ class Doc {
   final Specification? specification;
   final Period? period;
   final Media? media;
+  final List<FavoriteCar> favoriteCars;
   final List<String> carImages;
-  bool favourite;
 
   factory Doc.fromJson(Map<String, dynamic> json){
     return Doc(
@@ -133,8 +134,8 @@ class Doc {
       specification: json["specification"] == null ? null : Specification.fromJson(json["specification"]),
       period: json["period"] == null ? null : Period.fromJson(json["period"]),
       media: json["media"] == null ? null : Media.fromJson(json["media"]),
+      favoriteCars: json["favoriteCars"] == null ? [] : List<FavoriteCar>.from(json["favoriteCars"]!.map((x) => FavoriteCar.fromJson(x))),
       carImages: json["carImages"] == null ? [] : List<String>.from(json["carImages"]!.map((x) => x)),
-      favourite: json["favourite"] ?? false ,
     );
   }
 
@@ -154,8 +155,27 @@ class Doc {
     "specification": specification?.toJson(),
     "period": period?.toJson(),
     "media": media?.toJson(),
+    "favoriteCars": favoriteCars.map((x) => x?.toJson()).toList(),
     "carImages": carImages.map((x) => x).toList(),
-    "favourite": favourite,
+  };
+
+}
+
+class FavoriteCar {
+  FavoriteCar({
+    required this.id,
+  });
+
+  final int id;
+
+  factory FavoriteCar.fromJson(Map<String, dynamic> json){
+    return FavoriteCar(
+      id: json["id"] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
   };
 
 }
@@ -219,80 +239,17 @@ class Images {
     required this.frontView,
     required this.frontLeft,
     required this.frontRight,
-    required this.rearView,
-    required this.rearLeft,
-    required this.headlamp,
-    required this.engine,
-    required this.driverDoor,
-    required this.driverSeat,
-    required this.passengerSeat,
-    required this.instrumentPanel,
-    required this.dashboard,
-    required this.rearPanelOfCenterConsole,
-    required this.rearSeat,
-    required this.headlining,
-    required this.frontLeftWheel,
-    required this.backLeftWheel,
-    required this.backRightWheel,
-    required this.frontRightWheel,
-    required this.frontLeftTyre,
-    required this.backLeftTyre,
-    required this.backRightTyre,
-    required this.rearRight,
-    required this.frontRightTyre,
   });
 
   final String frontView;
   final String frontLeft;
   final String frontRight;
-  final String rearView;
-  final String rearLeft;
-  final String headlamp;
-  final String engine;
-  final String driverDoor;
-  final String driverSeat;
-  final String passengerSeat;
-  final String instrumentPanel;
-  final String dashboard;
-  final String rearPanelOfCenterConsole;
-  final String rearSeat;
-  final String headlining;
-  final String frontLeftWheel;
-  final String backLeftWheel;
-  final String backRightWheel;
-  final String frontRightWheel;
-  final String frontLeftTyre;
-  final String backLeftTyre;
-  final String backRightTyre;
-  final String rearRight;
-  final String frontRightTyre;
 
   factory Images.fromJson(Map<String, dynamic> json){
     return Images(
       frontView: json["frontView"] ?? "",
       frontLeft: json["frontLeft"] ?? "",
       frontRight: json["frontRight"] ?? "",
-      rearView: json["rearView"] ?? "",
-      rearLeft: json["rearLeft"] ?? "",
-      headlamp: json["headlamp"] ?? "",
-      engine: json["engine"] ?? "",
-      driverDoor: json["driverDoor"] ?? "",
-      driverSeat: json["driverSeat"] ?? "",
-      passengerSeat: json["passengerSeat"] ?? "",
-      instrumentPanel: json["instrumentPanel"] ?? "",
-      dashboard: json["dashboard"] ?? "",
-      rearPanelOfCenterConsole: json["rearPanelOfCenterConsole"] ?? "",
-      rearSeat: json["rearSeat"] ?? "",
-      headlining: json["Headlining"] ?? "",
-      frontLeftWheel: json["frontLeftWheel"] ?? "",
-      backLeftWheel: json["backLeftWheel"] ?? "",
-      backRightWheel: json["backRightWheel"] ?? "",
-      frontRightWheel: json["frontRightWheel"] ?? "",
-      frontLeftTyre: json["frontLeftTyre"] ?? "",
-      backLeftTyre: json["backLeftTyre"] ?? "",
-      backRightTyre: json["backRightTyre"] ?? "",
-      rearRight: json["rearRight"] ?? "",
-      frontRightTyre: json["frontRightTyre"] ?? "",
     );
   }
 
@@ -300,27 +257,6 @@ class Images {
     "frontView": frontView,
     "frontLeft": frontLeft,
     "frontRight": frontRight,
-    "rearView": rearView,
-    "rearLeft": rearLeft,
-    "headlamp": headlamp,
-    "engine": engine,
-    "driverDoor": driverDoor,
-    "driverSeat": driverSeat,
-    "passengerSeat": passengerSeat,
-    "instrumentPanel": instrumentPanel,
-    "dashboard": dashboard,
-    "rearPanelOfCenterConsole": rearPanelOfCenterConsole,
-    "rearSeat": rearSeat,
-    "Headlining": headlining,
-    "frontLeftWheel": frontLeftWheel,
-    "backLeftWheel": backLeftWheel,
-    "backRightWheel": backRightWheel,
-    "frontRightWheel": frontRightWheel,
-    "frontLeftTyre": frontLeftTyre,
-    "backLeftTyre": backLeftTyre,
-    "backRightTyre": backRightTyre,
-    "rearRight": rearRight,
-    "frontRightTyre": frontRightTyre,
   };
 
 }
@@ -381,15 +317,15 @@ class Seller {
 
   final String name;
   final String email;
-  final String phoneNo;
-  final String countryCode;
+  final dynamic phoneNo;
+  final dynamic countryCode;
 
   factory Seller.fromJson(Map<String, dynamic> json){
     return Seller(
       name: json["name"] ?? "",
       email: json["email"] ?? "",
-      phoneNo: json["phoneNo"] ?? "",
-      countryCode: json["countryCode"] ?? "",
+      phoneNo: json["phoneNo"],
+      countryCode: json["countryCode"],
     );
   }
 
@@ -418,30 +354,30 @@ class Specification {
   });
 
   final int id;
-  final dynamic transmission;
+  final String transmission;
   final String vehicleType;
   final String driveType4Wd;
   final String doors;
   final num seats;
   final String interiorMaterial;
   final String vatDeduction;
-  final List<String> equipments;
+  final dynamic equipments;
   final String power;
-  final String color;
+  final dynamic color;
 
   factory Specification.fromJson(Map<String, dynamic> json){
     return Specification(
       id: json["id"] ?? 0,
-      transmission: json["transmission"],
+      transmission: json["transmission"] ?? "",
       vehicleType: json["vehicleType"] ?? "",
       driveType4Wd: json["driveType4WD"] ?? "",
       doors: json["doors"] ?? "",
       seats: json["seats"] ?? 0,
       interiorMaterial: json["interiorMaterial"] ?? "",
       vatDeduction: json["vatDeduction"] ?? "",
-      equipments: json["equipments"] == null ? [] : List<String>.from(json["equipments"]!.map((x) => x)),
+      equipments: json["equipments"],
       power: json["power"] ?? "",
-      color: json["color"] ?? "",
+      color: json["color"],
     );
   }
 
@@ -454,7 +390,7 @@ class Specification {
     "seats": seats,
     "interiorMaterial": interiorMaterial,
     "vatDeduction": vatDeduction,
-    "equipments": equipments.map((x) => x).toList(),
+    "equipments": equipments,
     "power": power,
     "color": color,
   };

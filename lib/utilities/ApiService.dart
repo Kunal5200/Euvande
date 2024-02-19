@@ -6,6 +6,7 @@ import 'package:euvande/model/request/AddCarRequestModel.dart';
 import 'package:euvande/model/request/AddSpecificationRequestModel.dart';
 import 'package:euvande/model/request/ChangePasswordRequestModel.dart';
 import 'package:euvande/model/request/EditAddressRequestModel.dart';
+import 'package:euvande/model/request/FavoriteRequestModel.dart';
 import 'package:euvande/model/request/GetModelRequestModel.dart';
 import 'package:euvande/model/request/GetPeriodByMakeRequestModel.dart';
 import 'package:euvande/model/request/GetVariantByModelRequestModel.dart';
@@ -20,10 +21,12 @@ import 'package:euvande/model/response/AddSpecificationResponseModel.dart';
 import 'package:euvande/model/response/ChangePasswordResponseModel.dart';
 import 'package:euvande/model/response/DeleteCarResponseModel.dart';
 import 'package:euvande/model/response/EditAddressResponseModel.dart';
+import 'package:euvande/model/response/FavoriteResponseModel.dart';
 import 'package:euvande/model/response/GetAddressResponseModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/model/response/GetCarListResponseModel.dart';
 import 'package:euvande/model/response/GetDefaultSpecificationResponseModel.dart';
+import 'package:euvande/model/response/GetFavouriteCarsResponseModel.dart';
 import 'package:euvande/model/response/GetModelResponseModel.dart';
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
 import 'package:euvande/model/response/GetPeriodByMakeResponseModel.dart';
@@ -41,6 +44,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 
 class ApiService {
+
   final option = Options(responseType: ResponseType.json, headers: {
     Headers.contentTypeHeader: Headers.jsonContentType,
     // "Authorization":"Bearer ${token}",
@@ -149,6 +153,18 @@ class ApiService {
   Future<GetAllMakeResponseModel> getAllMake() async {
     Response response = await dio
         .get(ApiConstants.baseUrl + ApiConstants.getAllMake, options: option);
+
+    if (response.statusCode == 200) {
+      return GetAllMakeResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
+  Future<GetAllMakeResponseModel> getAllMakePublic() async {
+    Response response = await dio
+        .get(ApiConstants.baseUrl + ApiConstants.getAllMakePublic, options: option);
 
     if (response.statusCode == 200) {
       return GetAllMakeResponseModel.fromJson(response.data);
@@ -405,6 +421,7 @@ class ApiService {
           "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
     }
   }
+
   Future<GetCarListResponseModel> getCarList() async {
     Response response = await dio.post(
       ApiConstants.baseUrl + ApiConstants.getCarList,
@@ -418,4 +435,36 @@ class ApiService {
           "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
     }
   }
+
+  Future<GetFavouriteCarsResponseModel> getFavouriteCars() async {
+    Response response = await dio.get(
+      ApiConstants.baseUrl + ApiConstants.getFavouriteCars,
+      options: option,
+    );
+
+    if (response.statusCode == 200) {
+      return GetFavouriteCarsResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
+  Future<FavoriteResponseModel> favorite(FavoriteRequestModel favoriteRequestModel)
+  async {
+    Response response = await dio.post(
+      ApiConstants.baseUrl +
+          ApiConstants.favorite,
+      data: favoriteRequestModel,
+      options: option,
+    );
+
+    if (response.statusCode == 200) {
+      return FavoriteResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
 }

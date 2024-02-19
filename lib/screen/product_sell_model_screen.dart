@@ -139,7 +139,7 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
               itemBuilder: (BuildContext context, int index) {
                 return Container(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: GestureDetector(
+                  child: GestureDetector( behavior: HitTestBehavior.translucent,
                     onTap: () {
                       widget.onNext(getModelResponseModel!.data[index]);
                     },

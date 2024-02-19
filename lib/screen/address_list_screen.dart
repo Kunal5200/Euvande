@@ -70,7 +70,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
                                   ),
-                                  child: GestureDetector(
+                                  child: GestureDetector( behavior: HitTestBehavior.translucent,
                                     onTap: () {},
                                     child: Column(
                                       crossAxisAlignment:
@@ -245,7 +245,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                   ),
                                 );
                               }),
-                          GestureDetector(
+                          GestureDetector( behavior: HitTestBehavior.translucent,
                             onTap: () {
                               _navigateAddressScreen(context, null);
                             },

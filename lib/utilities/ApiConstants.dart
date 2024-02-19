@@ -20,6 +20,8 @@ class ApiConstants {
   static String updateUserDetail = authenticationController + '/api/user/updateUserDetail';
   static String getUserDetail = authenticationController + '/api/user/getUserDetail';
   static String getAllMake = vehicleController + '/api/make/getAllMake';
+  static String getAllMakePublic = vehicleController + '/api/make/public/getA'
+      'llMake';
   static String getPeriodByMake = vehicleController + '/api/period/getPeriodByMake';
   static String getModel = vehicleController + '/api/model/getModelByYear';
   static String getVariantByModel = vehicleController + '/api/variant/getVariantByModel';
@@ -31,5 +33,7 @@ class ApiConstants {
   static String getDefaultSpecification = vehicleController + '/api/carSpecification/getDefaultSpecification';
   static String addSpecification = vehicleController + '/api/cars/addSpecification';
   static String getCarList = vehicleController + '/api/newCars/getCarList?page=1&&pageSize=100000';
+  static String getFavouriteCars = vehicleController + '/api/favouriteCar/getFavouriteCars';
+  static String favorite = vehicleController + '/api/favouriteCar/favourite';
 
 }

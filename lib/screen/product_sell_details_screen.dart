@@ -4,6 +4,7 @@ import 'package:euvande/model/response/AddCarResponseModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
 import 'package:euvande/model/response/SendForApprovalResponseModel.dart';
+import 'package:euvande/screen/image_viewer_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
@@ -19,7 +20,6 @@ class ProductSellDetailsScreen extends StatefulWidget {
 }
 
 class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
-
   bool isPendingCarLoading = true;
   bool isPriceAdded = false;
   GetAllMakeResponseModel? getAllMakeResponseModel;
@@ -51,9 +51,9 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
                     children: [
                       _buildProductOverviewSection(),
                       _buildProductGallerySection(),
-                      !isPriceAdded ?
-                      _buildAddPriceSection() :
-                      _buildSubmitButtonSection(),
+                      !isPriceAdded
+                          ? _buildAddPriceSection()
+                          : _buildSubmitButtonSection(),
                     ],
                   ),
           ),
@@ -89,70 +89,116 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(null, "Fuel Type", ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].variant!.fuelType),
+          _buildInfoRow(
+              null,
+              "Fuel Type",
+              ProductSellDashboardScreen
+                  .getPendingCarsResponseModel!.data[0].variant!.fuelType),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Vehicle Type", ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.vehicleType.toString()),
+          _buildInfoRow(
+              null,
+              "Vehicle Type",
+              ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                  .specification!.vehicleType
+                  .toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Doors", ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.doors.toString()),
+          _buildInfoRow(
+              null,
+              "Doors",
+              ProductSellDashboardScreen
+                  .getPendingCarsResponseModel!.data[0].specification!.doors
+                  .toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Drive Type 4X4", ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.driveType4Wd.toString()),
+          _buildInfoRow(
+              null,
+              "Drive Type 4X4",
+              ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                  .specification!.driveType4Wd
+                  .toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Seats", ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.seats.toString()),
+          _buildInfoRow(
+              null,
+              "Seats",
+              ProductSellDashboardScreen
+                  .getPendingCarsResponseModel!.data[0].specification!.seats
+                  .toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Interior Material", ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.interiorMaterial.toString()),
+          _buildInfoRow(
+              null,
+              "Interior Material",
+              ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                  .specification!.interiorMaterial
+                  .toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "POSSIBILITY OF VAT DEDUCTION", ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].specification!.vatDeduction.toString()),
+          _buildInfoRow(
+              null,
+              "POSSIBILITY OF VAT DEDUCTION",
+              ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                  .specification!.vatDeduction
+                  .toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "KMS Driven", "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].odometer}"),
-
+          _buildInfoRow(null, "KMS Driven",
+              "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].odometer}"),
         ],
       ),
     );
   }
 
   Widget _buildProductGallerySection() {
-    return Container(
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      alignment: Alignment.centerLeft,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1, color: Colors.black12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Images",
-            style: TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          GridView.count(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: 3,
-            // Generate 100 widgets that display their index in the List.
-            children: List.generate(
-                ProductSellDashboardScreen.getPendingCarsResponseModel!
-                    .data[0].carImages.length, (index) {
-              return Center(
-                child: Container(
+    return GestureDetector( behavior: HitTestBehavior.translucent,
+      onTap: () {
+        print("object");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ImageViewerScreen(
+                  ProductSellDashboardScreen
+                      .getPendingCarsResponseModel!
+                      .data[0]
+                      .carImages)),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(15),
+        margin: EdgeInsets.all(10),
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(width: 1, color: Colors.black12)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Images",
+              style: TextStyle(
+                  color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            GridView.count(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              crossAxisCount: 3,
+              // Generate 100 widgets that display their index in the List.
+              children: List.generate(
+                  ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
+                      .carImages.length, (index) {
+                return Container(
                   width: 100.0,
                   height: 100.0,
                   decoration: BoxDecoration(
@@ -163,11 +209,11 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
                             .data[0]
                             .carImages[index])),
                   ),
-                ),
-              );
-            }),
-          )
-        ],
+                );
+              }),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -206,15 +252,15 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
         child: TextField(
           controller: cityController,
           decoration: InputDecoration(
-            contentPadding:
-            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             labelText: 'Enter Expected Price',
             border: OutlineInputBorder(
               borderSide: BorderSide(),
             ),
             prefixIcon: Icon(Icons.euro, size: 24),
           ),
-          keyboardType: TextInputType.numberWithOptions(signed: false, decimal: false),
+          keyboardType:
+              TextInputType.numberWithOptions(signed: false, decimal: false),
         ),
       ),
       Container(
@@ -231,7 +277,8 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
                 content: Text("Please enter expected price of your car"),
               ));
             } else {
-              ProductSellJourneyScreen.addCarRequestModel.price = int.parse(cityController.text);
+              ProductSellJourneyScreen.addCarRequestModel.price =
+                  int.parse(cityController.text);
               callAddCarApi(ProductSellJourneyScreen.addCarRequestModel, 6);
             }
           },
@@ -245,6 +292,11 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
 
   Widget _buildSubmitButtonSection() {
     return Column(children: [
+      Text("✓✓ You have quoted €${ProductSellJourneyScreen.addCarRequestModel
+          .price} price for your car", style: TextStyle(fontWeight: FontWeight
+          .bold,
+          color: Colors.black),),
+      SizedBox(height: 20,),
       Container(
         padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         child: ElevatedButton(
@@ -258,7 +310,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
           },
         ),
       ),
-      GestureDetector(
+      GestureDetector( behavior: HitTestBehavior.translucent,
         onTap: () {
           Navigator.pop(context);
         },
@@ -267,7 +319,9 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
           child: Text(
             "Edit Details",
             style: TextStyle(
-                color: Colors.black45, fontSize: 12, fontWeight: FontWeight.bold),
+                color: Colors.black45,
+                fontSize: 12,
+                fontWeight: FontWeight.bold),
           ),
         ),
       ),
@@ -313,26 +367,26 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
   }
 
   void callAddCarApi(AddCarRequestModel addCarRequestModel, indexNext) {
-    addCarRequestModel.id = ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].id;
+    addCarRequestModel.id =
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].id;
     setState(() {
       showLoaderDialog(context);
     });
 
     Future<AddCarResponseModel> response =
-    ApiService(context).addCar(addCarRequestModel);
+        ApiService(context).addCar(addCarRequestModel);
     response
         .then((value) => {
-    setState(() {
-   isPriceAdded = true;
-    }),
-      Navigator.pop(context),
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(value.message),
-      )),
-    })
+              setState(() {
+                isPriceAdded = true;
+              }),
+              Navigator.pop(context),
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content: Text(value.message),
+              // )),
+            })
         .catchError((onError) {
       Navigator.pop(context);
-
     });
   }
 
@@ -341,23 +395,24 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
       showLoaderDialog(context);
     });
 
-    Future<SendForApprovalResponseModel> response =
-    ApiService(context).sendForApproval(ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].id.toString());
+    Future<SendForApprovalResponseModel> response = ApiService(context)
+        .sendForApproval(ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[0].id
+            .toString());
     response
         .then((value) => {
-      Navigator.pop(context),
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const MyHomePage(title: "")),
-          ModalRoute.withName("/MyHomePage")),
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(value.message),
-      )),
-    })
+              Navigator.pop(context),
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MyHomePage(title: "")),
+                  ModalRoute.withName("/MyHomePage")),
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(value.message),
+              )),
+            })
         .catchError((onError) {
       Navigator.pop(context);
-
     });
   }
 

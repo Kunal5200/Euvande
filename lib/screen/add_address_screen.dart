@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:euvande/model/request/AddAddressRequestModel.dart';
 import 'package:euvande/model/request/EditAddressRequestModel.dart';
 import 'package:euvande/model/response/AddAddressResponseModel.dart';
@@ -33,8 +35,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       TextEditingController(text: "123456");
   final TextEditingController cityController =
       TextEditingController(text: "sdaf");
-  final TextEditingController countryController =
-      TextEditingController(text: "sdfas");
+
+  dynamic _currentSelectedValue = null;
+  dynamic countries = null;
 
   var isPrimaryChecked = true;
 
@@ -45,7 +48,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     houseNoController.dispose();
     pincodeController.dispose();
     cityController.dispose();
-    countryController.dispose();
 
     super.dispose();
   }
@@ -55,13 +57,39 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     // TODO: implement initState
     super.initState();
 
+    Future<dynamic> country = loadCountry();
+    country.then((value) => {
+          print("jsonResult" + value[0]["country_code"]),
+          setState(() {
+            countries = value;
+            if (widget.getAddressData != null) {
+              for (var data in countries) {
+                if (data["country_name"].toString() ==
+                    widget.getAddressData!.country) {
+                  _currentSelectedValue = data;
+                  print(data);
+                }
+              }
+            }else{
+              _currentSelectedValue = countries[0];
+            }
+          }),
+        });
+
     if (widget.getAddressData != null) {
       streetController.text = widget.getAddressData!.street;
       houseNoController.text = widget.getAddressData!.houseNo;
       pincodeController.text = widget.getAddressData!.postalCode;
       cityController.text = widget.getAddressData!.city;
-      countryController.text = widget.getAddressData!.country;
     }
+  }
+
+  Future<dynamic> loadCountry() async {
+    String data = await DefaultAssetBundle.of(context)
+        .loadString("assets/json/country.json");
+    var jsonResult = jsonDecode(data);
+
+    return jsonResult;
   }
 
   @override
@@ -131,9 +159,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   TextFormField(
                     enabled: !isDataLoading,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(6),
-                    ],
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     controller: pincodeController,
                     decoration: InputDecoration(
                       contentPadding:
@@ -174,23 +200,41 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   SizedBox(
                     height: 15,
                   ),
-                  TextFormField(
-                    enabled: !isDataLoading,
-                    controller: countryController,
+                  InputDecorator(
                     decoration: InputDecoration(
                       contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      labelText: 'Country',
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      labelText: 'Choose a country',
                       border: OutlineInputBorder(
                         borderSide: BorderSide(),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'This field is required';
-                      }
-                      return null;
-                    },
+                    isEmpty: _currentSelectedValue == null,
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<dynamic>(
+                        value: _currentSelectedValue,
+                        isDense: true,
+                        onChanged: (value) {
+                          setState(() {
+                            _currentSelectedValue = value;
+                          });
+                        },
+                        items: countries != null
+                            ? countries
+                                .map<DropdownMenuItem<dynamic>>(
+                                    (value) => new DropdownMenuItem<dynamic>(
+                                          value: value,
+                                          child: new Text(
+                                            value["country_name"] +
+                                                " " +
+                                                value["flag"],
+                                            style: TextStyle(fontSize: 14),
+                                          ),
+                                        ))
+                                .toList()
+                            : null,
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 15,
@@ -213,9 +257,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           );
                         },
                       ).toList()),
-                  SizedBox(
-                    height: 15,
-                  ),
+
                   Row(
                     children: [
                       Checkbox(
@@ -230,7 +272,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         },
                       ),
                       const Text(
-                        "This is primary ?",
+                        "This is primary?",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -274,7 +316,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     AddAddressRequestModel addAddressRequestModel = AddAddressRequestModel(
         addressType: _value == 0 ? 'home' : 'office',
         city: cityController.text,
-        country: countryController.text,
+        country: _currentSelectedValue["country_name"],
         houseNo: houseNoController.text,
         isDefault: isPrimaryChecked,
         postalCode: pincodeController.text,
@@ -307,7 +349,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         id: widget.getAddressData!.id,
         addressType: _value == 0 ? 'home' : 'office',
         city: cityController.text,
-        country: countryController.text,
+        country: _currentSelectedValue["country_name"],
         houseNo: houseNoController.text,
         isDefault: isPrimaryChecked,
         postalCode: pincodeController.text,

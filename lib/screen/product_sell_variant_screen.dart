@@ -4,6 +4,7 @@ import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class ProductSellVariantScreen extends StatefulWidget {
   const ProductSellVariantScreen({super.key, required this.onNext});
@@ -41,6 +42,26 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
   void initState() {
     super.initState();
     callGetVariantByModelApi("Petrol", ProductSellJourneyScreen.addCarRequestModel.modelId!.toInt());
+  }
+
+  Widget _buildNoData() {
+    return Container(
+        height: 300,
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            SizedBox(height: 50,),
+            Text("Sorry, variant not found", style: TextStyle(fontSize: 18),),
+            SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.asset(
+                  'assets/lottie/nodata.json',
+                )),
+          ],
+        )
+    );
   }
 
   @override
@@ -147,7 +168,7 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
   }
 
   Widget _buildList() {
-    return Container(
+    return getVariantByModelResponseModel!.data.length ==0 ? _buildNoData() :Container(
       padding: EdgeInsets.symmetric(horizontal: 20),
       height: 450,
       child: ListView.builder(
@@ -156,7 +177,7 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
           itemBuilder: (BuildContext context, int index) {
             return Container(
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: GestureDetector(
+              child: GestureDetector( behavior: HitTestBehavior.translucent,
                 onTap: () {
 
                   widget.onNext(getVariantByModelResponseModel!.data[index]);

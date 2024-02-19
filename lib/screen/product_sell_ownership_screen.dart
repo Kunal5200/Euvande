@@ -76,7 +76,7 @@ class _ProductSellOwnerShipScreenState
               padding: const EdgeInsets.all(8),
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
-                return GestureDetector(
+                return GestureDetector( behavior: HitTestBehavior.translucent,
                   onTap: () {
                     widget.onNext(items[index]);
                   },

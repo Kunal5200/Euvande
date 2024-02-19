@@ -142,7 +142,7 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
                   // Generate 100 widgets that display their index in the List.
                   children: List.generate(getAllMakeResponseModel!.data.length,
                       (index) {
-                    return GestureDetector(
+                    return GestureDetector( behavior: HitTestBehavior.translucent,
                       onTap: () {
                         widget.onNext(getAllMakeResponseModel!.data[index]);
                       },

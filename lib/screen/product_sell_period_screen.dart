@@ -120,7 +120,7 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
                         padding: EdgeInsets.symmetric(vertical: 5),
-                        child: GestureDetector(
+                        child: GestureDetector( behavior: HitTestBehavior.translucent,
                           onTap: () {
                             widget.onNext(
                                 getPeriodByMakeResponseModel!.data[index]);

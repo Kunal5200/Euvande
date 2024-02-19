@@ -1,32 +1,36 @@
-import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
-import 'package:euvande/screen/pending_product_details_screen.dart';
+import 'dart:convert';
+
+import 'package:euvande/model/response/GetFavouriteCarsResponseModel.dart';
+import 'package:euvande/model/response/GetCarListResponseModel.dart' as
+car;
+import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:flutter/material.dart';
 
-class PendingProductListScreen extends StatefulWidget {
-  const PendingProductListScreen({super.key});
+class ShortlistProductListScreen extends StatefulWidget {
+  const ShortlistProductListScreen({super.key});
 
   @override
-  State<PendingProductListScreen> createState() => _PendingProductListScreenState();
+  State<ShortlistProductListScreen> createState() => _ShortlistProductListScreenState();
 }
 
-class _PendingProductListScreenState extends State<PendingProductListScreen> {
+class _ShortlistProductListScreenState extends State<ShortlistProductListScreen> {
   bool isDataLoading = true;
-  GetPendingCarsResponseModel? getPendingCarsResponseModel;
+  GetFavouriteCarsResponseModel? getCarListResponseModel;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    callGetPendingCarsApi();
+    getFavouriteCars();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Pending For Approval"),
+          title: Text("Shortlisted vehicles"),
         ),
         body: Container(
           child: SingleChildScrollView(
@@ -45,9 +49,10 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                           Container(
                             child: ListView.builder(
                                 shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
                                 padding: const EdgeInsets.all(8),
-                                itemCount: getPendingCarsResponseModel!
-                                    .data.length,
+                                itemCount:
+                                    getCarListResponseModel!.data!.docs.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   return Container(
                                     padding: EdgeInsets.symmetric(
@@ -69,10 +74,17 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                     ),
                                     child: GestureDetector( behavior: HitTestBehavior.translucent,
                                       onTap: () {
+
+                                      dynamic data = getCarListResponseModel!
+                                          .data!.docs[index].toJson();
+
+                                      car.Doc doc =  car.Doc.fromJson(data);
+
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>  PendingProductDetailsScreen(getPendingCarsResponseModel!.data[index])),
+                                          MaterialPageRoute(builder:
+                                              (context) =>
+                                                  ProductDetailsScreen(doc)),
                                         );
                                       },
                                       child: Row(
@@ -84,10 +96,10 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                               image: DecorationImage(
                                                   fit: BoxFit.cover,
                                                   image:
-                                                      getPendingCarsResponseModel!.data[index].carImages.length>0 ?
-                                                      NetworkImage(getPendingCarsResponseModel!.data[index].carImages[0]) as ImageProvider:
-                                                      AssetImage(
-                                                          "assets/images/mercedes/1.jpg")),
+                                                  getCarListResponseModel!.data!.docs[index].carImages.isNotEmpty ?
+                                                  NetworkImage(getCarListResponseModel!.data!.docs[index].carImages[0]) as ImageProvider:
+                                                  AssetImage(
+                                                      "assets/images/mercedes/1.jpg")),
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(8.0)),
                                               color: Colors.white,
@@ -104,7 +116,7 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                             children: [
                                               Text(
                                                 // "2015 Mercedes Maybach S-Class",
-                                                "${getPendingCarsResponseModel!.data[index].period!.year}  ${getPendingCarsResponseModel!.data[index].make!.makeName} ${getPendingCarsResponseModel!.data[index].model!.modelName} ${getPendingCarsResponseModel!.data[index].variant!.fuelType}",
+                                                "${getCarListResponseModel!.data!.docs[index].make!.makeName} ${getCarListResponseModel!.data!.docs[index].model!.modelName}",
                                                 style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 12,
@@ -113,7 +125,7 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                               ),
                                               Text(
                                                 // "50,000 km • CNG • Manual",
-                                                "${getPendingCarsResponseModel!.data[index].variant!.fuelType} »  ${getPendingCarsResponseModel!.data[index].ownership} Owner",
+                                                "${getCarListResponseModel!.data!.docs[index].odometer.isNotEmpty ? getCarListResponseModel!.data!.docs[index].odometer  : "" } ${getCarListResponseModel!.data!.docs[index].specification != null ?   " » " +  getCarListResponseModel!.data!.docs[index].specification!.vehicleType:""}",
                                                 style: TextStyle(
                                                     color: Colors.black54,
                                                     fontSize: 12,
@@ -122,10 +134,10 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                               ),
                                               Text(
                                                 // "€ 47899",
-                                                "€ ${getPendingCarsResponseModel!.data[index].price}",
+                                                "${getCarListResponseModel!.data!.docs[index].specification == null ? "N/A": getCarListResponseModel!.data!.docs[index].specification!.transmission} »  ${getCarListResponseModel!.data!.docs[index].ownership +"Owner"}",
                                                 style: TextStyle(
                                                     color: Colors.black,
-                                                    fontSize: 18,
+                                                    fontSize: 12,
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
@@ -134,19 +146,29 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                               ),
                                               Row(
                                                 children: [
-                                                  Icon(
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      // callFavoriteApi(index);
+                                                    },
+                                                    child: Icon(
+                                                      // getCarListResponseModel!
+                                                      //     .data!
+                                                      //     .docs[index]
+                                                      //     .favourite
+                                                      //     ? Icons.favorite
+                                                      //     :
                                                     Icons
-                                                        .favorite_border_outlined,
-                                                    size: 15,
+                                                          .favorite_border_outlined,
+                                                      size: 15,
+                                                    ),
                                                   ),
                                                   Text(
                                                     "                                   View Details >",
-                                                    // "${getPendingCarsResponseModel!.data[index].variant!.fuelType} »  ${getPendingCarsResponseModel!.data[index].ownership} Owner",
+                                                    // "${getCarListResponseModel!.data!.docs[index].variant!.fuelType} »  ${getCarListResponseModel!.data!.docs[index].ownership} Owner",
                                                     style: TextStyle(
                                                         color: Colors.blue,
                                                         fontSize: 12,
-                                                        fontStyle:
-                                                            FontStyle.italic,
+                                                        fontStyle: FontStyle.italic,
                                                         fontWeight:
                                                             FontWeight.bold),
                                                   ),
@@ -175,19 +197,18 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
     );
   }
 
-  void callGetPendingCarsApi() {
+  void getFavouriteCars() {
     setState(() {
       isDataLoading = true;
     });
 
-    Future<GetPendingCarsResponseModel> response =
-        ApiService(context).getPendingCars("Pending");
+    Future<GetFavouriteCarsResponseModel> response = ApiService(context).getFavouriteCars();
     response
         .then((value) => {
-      getPendingCarsResponseModel = value,
               setState(() {
                 isDataLoading = false;
               }),
+              getCarListResponseModel = value,
             })
         .catchError((onError) {
       setState(() {
@@ -195,4 +216,27 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
       });
     });
   }
+
+  // void callFavoriteApi(int index) {
+  //   FavoriteRequestModel favoriteRequestModel = FavoriteRequestModel(
+  //       carId: getCarListResponseModel!.data!.docs[index].id,
+  //       favourite: !getCarListResponseModel!.data!.docs[index].favourite);
+  //
+  //   Future<FavoriteResponseModel> response =
+  //   ApiService(context).favorite(favoriteRequestModel);
+  //   response
+  //       .then((value) => {
+  //     if (value.statusCode == 200)
+  //       {
+  //         setState(() {
+  //           getCarListResponseModel!.data!.docs[index].favourite =
+  //           !getCarListResponseModel!.data!.docs[index].favourite;
+  //         })
+  //       },
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text(value.message),
+  //     )),
+  //   })
+  //       .catchError((onError) {});
+  // }
 }

@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       ),
       builder: (context, child) {
         // this is the key
-        return GestureDetector(
+        return GestureDetector( behavior: HitTestBehavior.translucent,
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: child,
         );

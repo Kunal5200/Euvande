@@ -6,6 +6,7 @@ import 'package:euvande/model/response/UpdateProfileResponseModel.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ProfileSettingScreen extends StatefulWidget {
   final Key? key;
@@ -24,6 +25,7 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
   dynamic _currentSelectedValue = null;
   dynamic countries = null;
 
+  GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
@@ -60,6 +62,7 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
       body: Container(
         padding: EdgeInsets.symmetric(),
         child: Form(
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
@@ -94,6 +97,12 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
               prefixIcon: Icon(Icons.person, size: 24),
             ),
             keyboardType: TextInputType.emailAddress,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'This field is required';
+              }
+              return null;
+            },
           ),
           SizedBox(height: 15),
           InputDecorator(
@@ -135,6 +144,9 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
           SizedBox(height: 15),
           TextFormField(
             controller: phoneNumberController,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly
+            ],
             decoration: InputDecoration(
               labelText: 'Phone number*',
               border: OutlineInputBorder(
@@ -143,6 +155,12 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
               prefixIcon: Icon(Icons.phone, size: 24),
             ),
             keyboardType: TextInputType.phone, // Use TextInputType.phone
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'This field is required';
+              }
+              return null;
+            },
           ),
           SizedBox(height: 15),
           TextFormField(
@@ -156,6 +174,12 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
               prefixIcon: Icon(Icons.email, size: 24),
             ),
             keyboardType: TextInputType.emailAddress,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'This field is required';
+              }
+              return null;
+            },
           ),
           SizedBox(height: 15),
           Container(
@@ -166,7 +190,9 @@ class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
               onPressed: () {
-                callUpdateProfileApi();
+                if (_formKey.currentState!.validate()) {
+                  callUpdateProfileApi();
+                }
               },
             ),
           ),

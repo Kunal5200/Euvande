@@ -329,9 +329,9 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
               _tabController.index =
                   (tabItems.length == 9 ? indexNext : indexNext + 1),
       currentIndex = _tabController.index,
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(value.message),
-              )),
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content: Text(value.message),
+              // )),
             })
         .catchError((onError) {
       Navigator.pop(context);

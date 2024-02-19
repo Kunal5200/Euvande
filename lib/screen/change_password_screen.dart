@@ -127,7 +127,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           prefixIcon: Icon(Icons.lock_rounded, size: 24),
                           suffixIcon: Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                            child: GestureDetector(
+                            child: GestureDetector( behavior: HitTestBehavior.translucent,
                               onTap: _toggleObscured,
                               child: Icon(
                                 _obscured
@@ -160,7 +160,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           prefixIcon: Icon(Icons.lock_rounded, size: 24),
                           suffixIcon: Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                            child: GestureDetector(
+                            child: GestureDetector( behavior: HitTestBehavior.translucent,
                               onTap: _toggleObscured1,
                               child: Icon(
                                 _obscured1
@@ -193,7 +193,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           prefixIcon: Icon(Icons.lock_rounded, size: 24),
                           suffixIcon: Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                            child: GestureDetector(
+                            child: GestureDetector( behavior: HitTestBehavior.translucent,
                               onTap: _toggleObscured2,
                               child: Icon(
                                 _obscured2

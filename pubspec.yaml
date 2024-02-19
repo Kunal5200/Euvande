@@ -46,6 +46,7 @@ dependencies:
   localstorage: ^4.0.1+4
   shared_preferences: ^2.2.2
   encrypt: ^5.0.3
+  photo_view: ^0.14.0
 
 dev_dependencies:
   flutter_test:

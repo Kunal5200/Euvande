@@ -123,8 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           prefixIcon: Icon(Icons.lock_rounded, size: 24),
                           suffixIcon: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                            child: GestureDetector(
+                            padding: EdgeInsets.only(right: 4),
+                            child: GestureDetector( behavior: HitTestBehavior.translucent,
                               onTap: _toggleObscured,
                               child: Icon(
                                 _obscured
@@ -138,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 15,
                     ),
-                    GestureDetector(
+                    GestureDetector( behavior: HitTestBehavior.translucent,
                       onTap: () => {
                         showModalBottomSheet<void>(
                           isScrollControlled: true,
@@ -265,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    GestureDetector(
+                    GestureDetector( behavior: HitTestBehavior.translucent,
                       onTap: () => {
                         Navigator.pushReplacement(
                           context,

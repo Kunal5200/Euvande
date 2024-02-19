@@ -207,7 +207,7 @@ class _ProductSellDashboardScreenState
                 );
               },
             ),
-            GestureDetector(
+            GestureDetector( behavior: HitTestBehavior.translucent,
               onTap: () {
                 callDeleteCarAPI(ProductSellDashboardScreen
                     .getPendingCarsResponseModel!.data[0].id);
@@ -253,7 +253,7 @@ class _ProductSellDashboardScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Enter your card vehicle identification number",
+            "Enter your car vehicle identification number",
             style: TextStyle(
                 color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
           ),
@@ -336,6 +336,8 @@ class _ProductSellDashboardScreenState
                       ),
                       child: InkWell(
                         onTap: () {
+                          ProductSellDashboardScreen.getPendingCarsResponseModel
+                          = null;
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -370,7 +372,7 @@ class _ProductSellDashboardScreenState
                         ),
                       ),
                     )
-                  : GestureDetector(
+                  : GestureDetector( behavior: HitTestBehavior.translucent,
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
