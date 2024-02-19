@@ -39,9 +39,14 @@ dependencies:
   lottie: ^2.7.0
   scrollable_list_tabview: ^0.2.0-nullsafety
   csc_picker: ^0.2.7
-  image_picker: ^1.0.4
+  image_picker: ^1.0.7
   video_player: ^2.8.1
   extended_image: ^8.2.0
+  dio: ^5.4.0
+  localstorage: ^4.0.1+4
+  shared_preferences: ^2.2.2
+  encrypt: ^5.0.3
+  photo_view: ^0.14.0
 
 dev_dependencies:
   flutter_test:
@@ -106,8 +111,20 @@ flutter:
     #Icons Register
     - assets/icons/
 
+    #Icons Register
+    - assets/lottie/
+
+    #JSON Register
+    - assets/json/
+
     #Images Register
     - assets/images/
+    - assets/images/exterior/
+    - assets/images/interior/
+    - assets/images/wheel/
+    - assets/images/bmw/
+    - assets/images/mercedes/
+    - assets/images/rangerover/
 
 
   fonts:

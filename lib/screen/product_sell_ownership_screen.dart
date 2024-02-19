@@ -1,10 +1,11 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/constants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellOwnerShipScreen extends StatefulWidget {
-  const ProductSellOwnerShipScreen({super.key});
+  const ProductSellOwnerShipScreen({super.key, required this.onNext});
+
+  final TabChangeCallback onNext;
 
   @override
   State<ProductSellOwnerShipScreen> createState() =>
@@ -23,6 +24,13 @@ class _ProductSellOwnerShipScreenState
   ];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return  Container(
       child: SingleChildScrollView(
@@ -39,25 +47,6 @@ class _ProductSellOwnerShipScreenState
     );
   }
 
-  Widget _buildSearch() {
-    return TextField(
-      style: TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Color(0xffebebeb),
-        prefixIcon: Icon(Icons.search_outlined),
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        hintText: "Search",
-        hintStyle: TextStyle(fontSize: 14),
-        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-        border: OutlineInputBorder(
-          // borderSide: BorderSide.none
-        ),
-      ),
-      keyboardType: TextInputType.name,
-    );
-  }
-
   Widget _buildTitleSection() {
     return Container(
       alignment: Alignment.centerLeft,
@@ -66,7 +55,7 @@ class _ProductSellOwnerShipScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Select Car Ownership",
+            "Select car ownership",
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
         ],
@@ -87,15 +76,30 @@ class _ProductSellOwnerShipScreenState
               padding: const EdgeInsets.all(8),
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("  "+items[index] + " Owenership", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      SizedBox(height: 5,),
-                      Divider(thickness: 0.5, color: Colors.black26,),
-                    ],
+                return GestureDetector( behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    widget.onNext(items[index]);
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("  "+items[index] + " Ownership ${(ProductSellDashboardScreen
+                            .getPendingCarsResponseModel != null &&
+                            ProductSellDashboardScreen
+                                .getPendingCarsResponseModel!.data.length > 0
+                            && ProductSellDashboardScreen
+                                .getPendingCarsResponseModel!.data[0]
+                                .ownership.toLowerCase() == items[index].toLowerCase()) ?
+                        " ✓" : ""}",
+                          style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                        SizedBox(height: 5,),
+                        Divider(thickness: 0.5, color: Colors.black26,),
+                      ],
+                    ),
                   ),
                 );
               }

@@ -1,9 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/screen/image_screen.dart';
-import 'package:euvande/screen/product_auction_dashboard_screen.dart';
+import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
+import 'package:euvande/model/response/GetCarListResponseModel.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/screen/product_sell_journey_screen.dart';
+import 'package:euvande/screen/used_product_list_screen.dart';
+import 'package:euvande/utilities/ApiService.dart';
+import 'package:euvande/utilities/ProductItemList.dart';
+import 'package:euvande/utilities/TitleDescriptionItemList.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -14,6 +18,9 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  List<ProductItemList> productItemList = [];
+  List<TitleDescription> howWorksItemList = [];
+
   final items = [
     Container(
       margin: EdgeInsets.all(6.0),
@@ -49,64 +56,121 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     ),
   ];
+  bool isDataLoading = true;
+  bool isBrandLoading = true;
+  GetAllMakeResponseModel? getAllMakeResponseModel;
+  GetCarListResponseModel? getCarListResponseModel;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    productItemList.add(ProductItemList(
+        productName: "Mercedes Maybach S",
+        productStartPrice: "€ 47899 - € 5000",
+        productMaxPrice: "",
+        productImageURLs: "assets/images/mercedes/1.jpg"));
+
+    productItemList.add(ProductItemList(
+        productName: "BMW i5",
+        productStartPrice: "€ 47899 - € 5000",
+        productMaxPrice: "",
+        productImageURLs: "assets/images/bmw/1.jpg"));
+
+    productItemList.add(ProductItemList(
+        productName: "Range Rover",
+        productStartPrice: "€ 47899 - € 5000",
+        productMaxPrice: "",
+        productImageURLs: "assets/images/rangerover/1.jpg"));
+
+    howWorksItemList.add(TitleDescription(
+        title: "European Dreams, Driven Reality.",
+        description:
+            "Turn your European dreams into reality with the perfect car. Explore iconic destinations, scenic routes, and cityscapes on your terms. Your dream ride awaits.",
+        imageURLs: 'assets/images/placeholder.webp'));
+    howWorksItemList.add(TitleDescription(
+        title: "Expert Eyes, Thorough Inspection.",
+        description:
+            "Our expert eyes ensure a meticulous inspection, guaranteeing your peace of mind.",
+        imageURLs: 'assets/images/placeholder.webp'));
+    howWorksItemList.add(TitleDescription(
+        title: "Delivered to Your Doorstep.",
+        description:
+            "Experience seamless convenience with our direct-to-your-door delivery service – your dream car, delivered effortlessly to your home.",
+        imageURLs: 'assets/images/placeholder.webp'));
+
+    callGetCarListApi();
+    callGetAllMakeApi();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-          child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(
-              // horizontal: 40.0,
-              // vertical: 120.0,
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.symmetric(
+            // horizontal: 40.0,
+            // vertical: 120.0,
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _buildSearch(),
-                _buildCarouselSlider(),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  _buildSellPurchase(
-                          () =>
-                      {
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _buildSearch(),
+            _buildCarouselSlider(),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              _buildSellPurchase(
+                  () => {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ProductAuctionDashboardScreen()),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const UsedProductListScreen()),
                         )
                       },
-                      AssetImage("assets/icons/car.png"),
-                      "Buy Used Car",
-                      "pre-owned car for sale →",
-                      Colors.green[100]),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  _buildSellPurchase(() => {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProductSellDashboardScreen()),
-                  )
-                  }, AssetImage("assets/icons/car.png"),
-                      "Sell Car", "from your home", Colors.blue[100])
-                ]),
-                SizedBox(
-                  height: 10,
-                ),
-                _buildPopularProductList(),
-                _buildUsedProductList(),
-              ],
+                  AssetImage("assets/icons/car.png"),
+                  "Buy Used Car",
+                  "pre-owned car for sale →",
+                  Colors.green[100]),
+              SizedBox(
+                width: 10,
+              ),
+              _buildSellPurchase(
+                  () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProductSellDashboardScreen()),
+                        )
+                      },
+                  AssetImage("assets/icons/car.png"),
+                  "Sell Car",
+                  "from your home",
+                  Colors.blue[100])
+            ]),
+            SizedBox(
+              height: 10,
             ),
-          ),
-        ));
+            _buildHowWorksList(),
+            isDataLoading ? _showLoader() : _buildPopularProductList(),
+            isDataLoading ? _showLoader() : _buildUsedProductList(),
+            isBrandLoading ? _showLoader() : _buildBrandsSection(),
+          ],
+        ),
+      ),
+    ));
   }
 
   Widget _buildSearch() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
-        // border: Border.all(
-        //   // color: Colors.black12,
-        // ),
+          // border: Border.all(
+          //   // color: Colors.black12,
+          // ),
           color: Colors.black12,
           borderRadius: BorderRadius.all(Radius.circular(25))),
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -145,6 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildSellPurchase(var onTap, AssetImage logo, String title,
       String subTitle, Color? bgColor) {
     return GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: onTap,
         child: Row(
           children: [
@@ -153,10 +218,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(5),
                 color: bgColor,
               ),
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width / 2 - 25,
+              width: MediaQuery.of(context).size.width / 2 - 25,
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Column(
                 children: [
@@ -201,22 +263,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           Container(
-            alignment: Alignment.centerLeft,
-            height: 180,
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              // This next line does the trick.
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-              ],
-            ),
-          ),
-
+              alignment: Alignment.centerLeft,
+              height: 200,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: getCarListResponseModel!.data!.docs.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildProductItem(getCarListResponseModel!.data!
+                        .docs[index]);
+                  })),
         ],
       ),
     );
@@ -238,37 +295,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           Container(
-            alignment: Alignment.centerLeft,
-            height: 180,
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              // This next line does the trick.
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-                _buildProductItem(),
-              ],
-            ),
-          ),
+              alignment: Alignment.centerLeft,
+              height: 200,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: getCarListResponseModel!.data!.docs.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildProductItem(getCarListResponseModel!.data!
+                        .docs[index]);
+                  })),
         ],
       ),
     );
   }
 
-  Widget _buildProductItem() {
+  Widget _buildProductItem(Doc doc) {
     return GestureDetector(
-      onTap: () =>
-      {
+      behavior: HitTestBehavior.translucent,
+      onTap: () => {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ProductDetailsScreen()),
+          MaterialPageRoute(builder: (context) => ProductDetailsScreen(doc)),
         )
       },
       child: Container(
-        width: 170,
+        width: 180,
         // padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,23 +332,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: BoxDecoration(
                 image: DecorationImage(
                     fit: BoxFit.cover,
-                    image: AssetImage("assets/images/imgCar1.png")),
+                    image:doc.carImages.isNotEmpty ?
+                    NetworkImage(doc.carImages[0]) as ImageProvider:
+                    AssetImage(
+                        "assets/images/mercedes/1.jpg")
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                color: Colors.redAccent,
+                color: Colors.white,
               ),
             ),
             SizedBox(
               height: 10,
             ),
             Text(
-              "Mercedes Maybach S",
+              " ${doc.make!.makeName} ${doc.model!.modelName}",
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                 ),
+                color: Colors.black,
+                fontSize: 12,
+              ),
             ),
             Text(
-              "€ 1.25 - €2.45 lakh",
+              " € ${doc.price}",
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 16,
@@ -305,7 +362,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               height: 2,
             ),
             Text(
-              "Click to check",
+              " Click to check",
               style: TextStyle(
                 color: Colors.blueAccent[200],
                 fontSize: 12,
@@ -316,4 +373,234 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+  Widget _buildHowWorksItem(TitleDescription itemList) {
+    return Container(
+      // padding: EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 150.0,
+            height: 75.0,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  fit: BoxFit.cover, image: AssetImage(itemList.imageURLs)),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            itemList.title,
+            style: TextStyle(
+                color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            itemList.description,
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHowWorksList() {
+    return Container(
+      color: Color(0xFFF5F7FB),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
+            child: Text(
+              "How does it work",
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+          ),
+          Container(
+              padding: EdgeInsets.symmetric(horizontal: 50),
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: [
+                  _buildHowWorksItem(howWorksItemList[1]),
+                  _buildHowWorksItem(howWorksItemList[0]),
+                  _buildHowWorksItem(howWorksItemList[2]),
+                ],
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBrandsSection() {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
+            child: Text(
+              "Popular brands",
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: GridView.count(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              // Create a grid with 2 columns. If you change the scrollDirection to
+              // horizontal, this produces 2 rows.
+              crossAxisCount: 4,
+              // Generate 100 widgets that display their index in the List.
+              children: List.generate(
+                  getAllMakeResponseModel!.data.length > 11
+                      ? 12
+                      : getAllMakeResponseModel!.data.length, (index) {
+                return index < 11
+                    ? Container(
+                  margin: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      ProductSellDashboardScreen.getPendingCarsResponseModel
+                      = null;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProductSellJourneyScreen(
+                                getAllMakeResponseModel!.data[index])),
+                      );
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 40.0,
+                          height: 35.0,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image: NetworkImage(getAllMakeResponseModel!
+                                    .data[index].logo)),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          getAllMakeResponseModel!.data[index].makeName,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                    : GestureDetector( behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ProductSellJourneyScreen(null)),
+                      );
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "View All\nBrands",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ));
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _showLoader() {
+    return Center(
+      heightFactor: 12,
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  void callGetCarListApi() {
+    setState(() {
+      isDataLoading = true;
+    });
+
+    Future<GetCarListResponseModel> response = ApiService(context).getCarList();
+    response
+        .then((value) => {
+              setState(() {
+                isDataLoading = false;
+              }),
+              getCarListResponseModel = value,
+            })
+        .catchError((onError) {
+      setState(() {
+        isDataLoading = false;
+      });
+    });
+  }
+
+  void callGetAllMakeApi() {
+    setState(() {
+      isBrandLoading = true;
+    });
+
+    Future<GetAllMakeResponseModel> response = ApiService(context).getAllMakePublic();
+    response
+        .then((value) => {
+      setState(() {
+        isBrandLoading = false;
+      }),
+      getAllMakeResponseModel = value,
+    })
+        .catchError((onError) {
+      setState(() {
+        isBrandLoading = false;
+      });
+    });
+  }
+
 }

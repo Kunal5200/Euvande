@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter/material.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});

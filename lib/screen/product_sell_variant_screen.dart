@@ -1,11 +1,15 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/model/request/GetVariantByModelRequestModel.dart';
+import 'package:euvande/model/response/GetVariantByModelResponseModel.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:flutter/material.dart';
-import 'package:scrollable_list_tabview/scrollable_list_tabview.dart';
+import 'package:lottie/lottie.dart';
 
 class ProductSellVariantScreen extends StatefulWidget {
-  const ProductSellVariantScreen({super.key});
+  const ProductSellVariantScreen({super.key, required this.onNext});
+
+  final TabChangeCallback onNext;
 
   @override
   State<ProductSellVariantScreen> createState() =>
@@ -13,25 +17,58 @@ class ProductSellVariantScreen extends StatefulWidget {
 }
 
 class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
-  final data = {
-    "Petrol": [
-      "Item 1 (A)",
-      "Item 2 (A)",
-      "Item 3 (A)",
-      "Item 4 (A)",
-    ],
-    "Diesel": [
-      "Item 1 (B)",
-      "Item 2 (B)",
-    ],
-  };
+  bool isDataLoading = true;
+
+  final List<bool> _selectedTransmission = <bool>[
+    true,
+    false,
+    false,
+    false,
+    false,
+    false
+  ];
+  List<Widget> transmissionTypes = <Widget>[
+    Text('Petrol'),
+    Text('Diesel'),
+    Text('CNG'),
+    Text('LNG'),
+    Text('FCV'),
+    Text('EV')
+  ];
+
+  GetVariantByModelResponseModel? getVariantByModelResponseModel;
+
+  @override
+  void initState() {
+    super.initState();
+    callGetVariantByModelApi("Petrol", ProductSellJourneyScreen.addCarRequestModel.modelId!.toInt());
+  }
+
+  Widget _buildNoData() {
+    return Container(
+        height: 300,
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            SizedBox(height: 50,),
+            Text("Sorry, variant not found", style: TextStyle(fontSize: 18),),
+            SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.asset(
+                  'assets/lottie/nodata.json',
+                )),
+          ],
+        )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
         child: Column(
           children: [
             _buildTitleSection(),
@@ -39,9 +76,17 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
               height: 10,
             ),
             _buildCategory(),
+            isDataLoading ? _showLoader() : _buildList(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _showLoader() {
+    return Center(
+      heightFactor: 12,
+      child: CircularProgressIndicator(),
     );
   }
 
@@ -49,6 +94,7 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
     return Container(
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -63,32 +109,109 @@ class _ProductSellVariantScreenState extends State<ProductSellVariantScreen> {
 
   Widget _buildCategory() {
     return Container(
-      height: 530,
-      child: ScrollableListTabView(
-        tabHeight: 48,
-        tabs: [
-          ScrollableListTab(
-              tab: ListTab(label: Text('Petrol')),
-              body: ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 3,
-                itemBuilder: (_, index) => ListTile(
-
-                  title: Text('xDrive', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              )),
-          ScrollableListTab(
-              tab: ListTab(label: Text('Other')),
-              body: ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 5,
-                itemBuilder: (_, index) => ListTile(
-                  title: Text('xDrive BSVI', style: TextStyle(fontWeight: FontWeight.bold),),                ),
-              )),
+      child: Column(
+        children: [
+          SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            scrollDirection: Axis.horizontal,
+            child: ToggleButtons(
+              direction: Axis.horizontal,
+              onPressed: (int index) {
+                callGetVariantByModelApi((transmissionTypes[index] as Text).data!, ProductSellJourneyScreen.addCarRequestModel.modelId!.toInt());
+                setState(() {
+                  // The button that is tapped is set to true, and the others to false.
+                  for (int i = 0; i < _selectedTransmission.length; i++) {
+                    _selectedTransmission[i] = i == index;
+                  }
+                });
+              },
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              selectedBorderColor: Colors.black,
+              selectedColor: Colors.black,
+              // fillColor: Colors.black26,
+              color: Colors.black,
+              constraints: const BoxConstraints(
+                minHeight: 40.0,
+                minWidth: 80.0,
+              ),
+              isSelected: _selectedTransmission,
+              children: transmissionTypes,
+            ),
+          )
         ],
       ),
     );
   }
+
+  void callGetVariantByModelApi(String fuelType, int modelId) {
+
+    GetVariantByModelRequestModel getVariantByModelRequestModel =
+        GetVariantByModelRequestModel(fuelType: fuelType, modelId: modelId);
+    setState(() {
+      isDataLoading = true;
+    });
+
+    Future<GetVariantByModelResponseModel> response =
+        ApiService(context).getVariantByModel(getVariantByModelRequestModel);
+    response
+        .then((value) => {
+              setState(() {
+                isDataLoading = false;
+              }),
+              getVariantByModelResponseModel = value,
+            })
+        .catchError((onError) {
+      setState(() {
+        isDataLoading = false;
+      });
+    });
+  }
+
+  Widget _buildList() {
+    return getVariantByModelResponseModel!.data.length ==0 ? _buildNoData() :Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      height: 450,
+      child: ListView.builder(
+          padding: const EdgeInsets.all(8),
+          itemCount: getVariantByModelResponseModel!.data.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 5),
+              child: GestureDetector( behavior: HitTestBehavior.translucent,
+                onTap: () {
+
+                  widget.onNext(getVariantByModelResponseModel!.data[index]);
+                },
+                child: Container(
+            color: Colors.transparent,
+            child:Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      " ${getVariantByModelResponseModel!.data[index]
+                          .variantName} ${(ProductSellDashboardScreen
+                          .getPendingCarsResponseModel != null &&
+                          ProductSellDashboardScreen
+                              .getPendingCarsResponseModel!.data.length > 0
+                          && ProductSellDashboardScreen
+                              .getPendingCarsResponseModel!.data[0].variant!
+                              .id == getVariantByModelResponseModel!.data[index].id) ? " ✓" : ""}",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Divider(
+                      thickness: 0.5,
+                      color: Colors.black26,
+                    ),
+                  ],
+                )),
+              ),
+            );
+          }),
+    );
+  }
+
 }

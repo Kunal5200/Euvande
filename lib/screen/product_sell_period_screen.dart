@@ -1,55 +1,75 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/model/request/GetPeriodByMakeRequestModel.dart';
+import 'package:euvande/model/response/GetPeriodByMakeResponseModel.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 
 class ProductSellPeriodScreen extends StatefulWidget {
-  const ProductSellPeriodScreen({super.key});
+  const ProductSellPeriodScreen({super.key, required this.onNext});
+
+  final TabChangeCallback onNext;
 
   @override
   State<ProductSellPeriodScreen> createState() =>
       _ProductSellPeriodScreenState();
 }
 
-class _ProductSellPeriodScreenState
-    extends State<ProductSellPeriodScreen> {
+class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
+  bool isDataLoading = true;
+  GetPeriodByMakeResponseModel? getPeriodByMakeResponseModel;
+  List<GetPeriodByMakeData> originalData = [];
 
-  final yearItems = [
-    "2022",
-    "2021",
-    "2020",
-    "2019",
-    "2018",
-    "2017",
-    "2016",
-    "2015",
-    "2014",
-    "2013",
-    "2012",
-    "2011",
-    "2010",
-  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    callGetPeriodByMakeApi();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       child: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
             _buildTitleSection(),
-            SizedBox(height: 10,),
-            _buildSearch(),
-            _buildYearListSection(),
+            SizedBox(
+              height: 10,
+            ),
+            isDataLoading ? _showLoader() : _buildYearListSection(),
           ],
         ),
       ),
     );
   }
 
+  onSearchTextChanged(String text) async {
+    setState(() {
+      getPeriodByMakeResponseModel!.data.clear();
+
+      if (text.trim().isEmpty) {
+        getPeriodByMakeResponseModel!.data.addAll(originalData);
+      } else {
+        originalData.forEach((data) {
+          if (data.year.toString().contains(text))
+            getPeriodByMakeResponseModel!.data.add(data);
+        });
+      }
+    });
+  }
+
   Widget _buildSearch() {
     return TextField(
+      keyboardType: TextInputType.number,
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.digitsOnly
+      ],
+      onChanged: onSearchTextChanged,
       style: TextStyle(fontSize: 14),
       decoration: InputDecoration(
         filled: true,
@@ -60,10 +80,9 @@ class _ProductSellPeriodScreenState
         hintStyle: TextStyle(fontSize: 14),
         contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
         border: OutlineInputBorder(
-          // borderSide: BorderSide.none
-        ),
+            // borderSide: BorderSide.none
+            ),
       ),
-      keyboardType: TextInputType.name,
     );
   }
 
@@ -87,31 +106,104 @@ class _ProductSellPeriodScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildSearch(),
         SizedBox(
           height: 10,
         ),
-        Container(
-          height: 450,
-          child:  ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: yearItems.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("  "+yearItems[index], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      SizedBox(height: 5,),
-                      Divider(thickness: 0.5, color: Colors.black26,),
-                    ],
-                  ),
-                );
-              }
-          ),
-        )
+        getPeriodByMakeResponseModel!.data.length == 0
+            ? _buildNoData()
+            : Container(
+                height: 450,
+                child: ListView.builder(
+                    padding: const EdgeInsets.all(8),
+                    itemCount: getPeriodByMakeResponseModel!.data.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        child: GestureDetector( behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            widget.onNext(
+                                getPeriodByMakeResponseModel!.data[index]);
+                          },
+                          child: Container(
+                            color: Colors.transparent,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "  ${getPeriodByMakeResponseModel!.data[index].year} ${(ProductSellDashboardScreen.getPendingCarsResponseModel != null && ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length > 0 && ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].period!.id == getPeriodByMakeResponseModel!.data[index].id) ? " ✓" : ""}",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Divider(
+                                  thickness: 0.5,
+                                  color: Colors.black26,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+              )
       ],
     );
   }
 
+  Widget _showLoader() {
+    return Center(
+      heightFactor: 12,
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildNoData() {
+    return Container(
+        height: 300,
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            SizedBox(height: 50,),
+            Text("Sorry, period not found", style: TextStyle(fontSize: 18),),
+            SizedBox(
+                height: 200,
+                width: 200,
+                child: Lottie.asset(
+                  'assets/lottie/nodata.json',
+                )),
+          ],
+        )
+    );
+  }
+
+  void callGetPeriodByMakeApi() {
+    GetPeriodByMakeRequestModel getPeriodByMakeRequestModel =
+        GetPeriodByMakeRequestModel(
+            makeId:
+                ProductSellJourneyScreen.addCarRequestModel.makeId!.toInt());
+    setState(() {
+      isDataLoading = true;
+    });
+
+    Future<GetPeriodByMakeResponseModel> response =
+        ApiService(context).getPeriodByMake(getPeriodByMakeRequestModel);
+    response
+        .then((value) => {
+              getPeriodByMakeResponseModel = value,
+              originalData.addAll(value.data),
+              setState(() {
+                isDataLoading = false;
+              }),
+            })
+        .catchError((onError) {
+      setState(() {
+        isDataLoading = false;
+      });
+    });
+  }
 }

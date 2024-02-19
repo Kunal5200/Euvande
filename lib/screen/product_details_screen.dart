@@ -1,26 +1,23 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/utilities/constants.dart';
+import 'package:euvande/model/response/GetCarListResponseModel.dart';
+import 'package:euvande/screen/image_viewer_screen.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({super.key});
+  final Doc doc;
+
+  const ProductDetailsScreen(this.doc, {super.key});
 
   @override
-  State<ProductDetailsScreen> createState() =>
-      _ProductDetailsScreenState();
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
-class _ProductDetailsScreenState
-    extends State<ProductDetailsScreen> {
-  bool _rememberMe = false;
-  final items = [
-    "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-left-view-121.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-view-118.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/rear-view-119.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/grille-97.jpg",
-  "https://stimg.cardekho.com/images/carexteriorimages/930x620/BMW/M5/8490/1625142409938/front-fog-lamp-41.jpg",
-
-  ];
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +36,7 @@ class _ProductDetailsScreenState
               children: [
                 _buildImageList(),
                 _buildProductSection(),
-                _buildProductDetailsTitleSection(),
+                // _buildProductDetailsTitleSection(),
                 _buildProductOverviewSection(),
                 _buildProductSpecificationSection(),
                 _buildProductGallerySection(),
@@ -50,24 +47,52 @@ class _ProductDetailsScreenState
   }
 
   Widget _buildImageList() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          for (var i = 0; i < items.length; i++) ...[
-            Container(
-              width: 150.0,
-              height: 180.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.cover, image: NetworkImage(items[i])),
+    return Container(
+      height: 180,
+      child: ListView.builder(
+          // physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: widget.doc.carImages.length,
+          itemBuilder: (BuildContext context, int index) {
+            return GestureDetector( behavior: HitTestBehavior.translucent,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ImageViewerScreen(widget.doc.carImages)),
+                );
+              },
+              child: Container(
+                width: 150.0,
+                height: 180.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(widget.doc.carImages[index])),
+                ),
               ),
-            )
-          ]
-        ],
-      ),
+            );
+          }),
     );
+    // Row(
+    //   mainAxisAlignment: MainAxisAlignment.center,
+    //   children: <Widget>[
+    //
+    //     for (var i = 0; i < widget.doc.carImages.length; i++) ...[
+    //       Container(
+    //         width: 150.0,
+    //         height: 180.0,
+    //         decoration: BoxDecoration(
+    //           image: DecorationImage(
+    //               fit: BoxFit.cover, image: NetworkImage(items[i])),
+    //         ),
+    //       )
+    //     ]
+    //   ],
+    // ),
+    // );
   }
 
   Widget _buildProductSection() {
@@ -82,12 +107,12 @@ class _ProductDetailsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Mercedes Maybach S",
+            widget.doc.make == null ? "N/A" : widget.doc.make!.makeName,
             style: TextStyle(
                 color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           Text(
-            "1,000 kms • petrol • automatic • first owner",
+            "${widget.doc.odometer.isEmpty ? "N/A" : widget.doc.odometer} • ${widget.doc.variant == null ? "N/A" : widget.doc.variant!.fuelType}  • ${widget.doc.specification == null ? "N/A" : widget.doc.specification!.transmission}  • ${widget.doc.ownership.isEmpty ? "N/A" : widget.doc.ownership} ",
             style: TextStyle(
               color: Colors.black45,
               fontSize: 12,
@@ -97,7 +122,7 @@ class _ProductDetailsScreenState
             height: 2,
           ),
           Text(
-            "€ 1.25 - €2.45 lakh",
+            "€ ${widget.doc.price} ",
             style: TextStyle(
                 color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -112,7 +137,7 @@ class _ProductDetailsScreenState
             ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Sending Message"),
+                content: Text("Coming Soon..."),
               ));
             },
           ),
@@ -181,24 +206,28 @@ class _ProductDetailsScreenState
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(Icons.calendar_today, "Registration Year", "2023"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(Icons.shield, "Insurance Validity", "Comprehensive"),
-          SizedBox(
-            height: 5,
-          ),
-          _buildInfoRow(Icons.water_drop, "Fuel Type", "Petrol"),
-          SizedBox(
-            height: 5,
-          ),
           _buildInfoRow(
-              Icons.airline_seat_recline_extra_rounded, "Seats", "5 Seats"),
+              null, "Launch Year", widget.doc.period!.year.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(Icons.electric_meter, "KMS Driven", "1,000 Kms"),
+          _buildInfoRow(null, "Model", widget.doc.model!.modelName),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "Variant", widget.doc.variant!.variantName),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "Fuel Type", widget.doc.variant!.fuelType),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "KMS Driven", widget.doc.odometer),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "Ownership", widget.doc.ownership),
         ],
       ),
     );
@@ -223,23 +252,41 @@ class _ProductDetailsScreenState
           SizedBox(
             height: 10,
           ),
-          _buildInfoRow(null, "Registration Year", "2023"),
+          _buildInfoRow(null, "Transmission",
+              widget.doc.specification!.transmission.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Insurance Validity", "Comprehensive"),
+          _buildInfoRow(null, "Vehicle Type",
+              widget.doc.specification!.vehicleType.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Fuel Type", "Petrol"),
+          _buildInfoRow(
+              null, "Doors", widget.doc.specification!.doors.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "Seats", "5 Seats"),
+          _buildInfoRow(null, "Drive Type 4 X 4",
+              widget.doc.specification!.driveType4Wd.toString()),
           SizedBox(
             height: 5,
           ),
-          _buildInfoRow(null, "KMS Driven", "1,000 Kms"),
+          _buildInfoRow(
+              null, "Seats", widget.doc.specification!.seats.toString()),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "Interior Material",
+              widget.doc.specification!.interiorMaterial.toString()),
+          SizedBox(
+            height: 5,
+          ),
+          _buildInfoRow(null, "VAT Deduction",
+              widget.doc.specification!.vatDeduction.toString()),
+          SizedBox(
+            height: 5,
+          ),
         ],
       ),
     );
@@ -247,7 +294,6 @@ class _ProductDetailsScreenState
 
   Widget _buildProductGallerySection() {
     return Container(
-      height: 300,
       padding: EdgeInsets.all(15),
       margin: EdgeInsets.all(10),
       alignment: Alignment.centerLeft,
@@ -258,33 +304,32 @@ class _ProductDetailsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Gallery Experiance",
+            "Gallery Experience",
             style: TextStyle(
                 color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           SizedBox(
             height: 10,
           ),
-          Expanded(
-              child: GridView.count(
-                // Create a grid with 2 columns. If you change the scrollDirection to
-                // horizontal, this produces 2 rows.
-                crossAxisCount: 3,
-                // Generate 100 widgets that display their index in the List.
-                children: List.generate(items.length, (index) {
-                  return Center(
-                    child:
-                    Container(
-                      width: 100.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover, image: NetworkImage(items[index])),
-                      ),
-                    ),
-                  );
-                }),
-              ),),
+          GridView.count(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisCount: 3,
+            // Generate 100 widgets that display their index in the List.
+            children: List.generate(widget.doc.carImages.length, (index) {
+              return Center(
+                child: Container(
+                  width: 100.0,
+                  height: 100.0,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(widget.doc.carImages[index])),
+                  ),
+                ),
+              );
+            }),
+          )
         ],
       ),
     );

@@ -1,19 +1,18 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
-import 'package:euvande/utilities/constants.dart';
 import 'package:flutter/material.dart';
 
 class ProductSellOdometerScreen extends StatefulWidget {
-  const ProductSellOdometerScreen({super.key});
+  const ProductSellOdometerScreen({super.key, required this.onNext});
+
+  final TabChangeCallback onNext;
 
   @override
   State<ProductSellOdometerScreen> createState() =>
       _ProductSellOdometerScreenState();
 }
 
-class _ProductSellOdometerScreenState
-    extends State<ProductSellOdometerScreen> {
-
+class _ProductSellOdometerScreenState extends State<ProductSellOdometerScreen> {
   final items = [
     "0-10000",
     "10000-20000",
@@ -30,14 +29,16 @@ class _ProductSellOdometerScreenState
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       child: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
             _buildTitleSection(),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             _buildYearListSection(),
           ],
         ),
@@ -57,8 +58,8 @@ class _ProductSellOdometerScreenState
         hintStyle: TextStyle(fontSize: 14),
         contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
         border: OutlineInputBorder(
-          // borderSide: BorderSide.none
-        ),
+            // borderSide: BorderSide.none
+            ),
       ),
       keyboardType: TextInputType.name,
     );
@@ -72,7 +73,7 @@ class _ProductSellOdometerScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Select Car Kilometers Driven",
+            "Select car kilometers driven",
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
         ],
@@ -89,26 +90,46 @@ class _ProductSellOdometerScreenState
         ),
         Container(
           height: 450,
-          child:  ListView.builder(
+          child: ListView.builder(
               padding: const EdgeInsets.all(8),
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("  "+items[index] + " Kilometers", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                      SizedBox(height: 5,),
-                      Divider(thickness: 0.5, color: Colors.black26,),
-                    ],
-                  ),
-                );
-              }
-          ),
+                return GestureDetector( behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      widget.onNext(items[index]);
+                    },
+                    child: Container(
+                      color: Colors.transparent,
+                      padding: EdgeInsets.symmetric(vertical: 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "  " + items[index] + " Kilometers ${(ProductSellDashboardScreen
+                                .getPendingCarsResponseModel != null &&
+                                ProductSellDashboardScreen
+                                    .getPendingCarsResponseModel!.data.length > 0
+                                && ProductSellDashboardScreen
+                                    .getPendingCarsResponseModel!.data[0]
+                                    .odometer.toLowerCase() == items[index]
+                                    .toLowerCase()) ?
+                            " ✓" : ""}",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Divider(
+                            thickness: 0.5,
+                            color: Colors.black26,
+                          ),
+                        ],
+                      ),
+                    ));
+              }),
         )
       ],
     );
   }
-
 }
