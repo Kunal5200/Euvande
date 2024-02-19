@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
                 background: Color(0xfffafcff),
                 primary: Colors.black,
                 secondary: Colors.black),
+
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );

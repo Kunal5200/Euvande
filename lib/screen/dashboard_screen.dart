@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:euvande/screen/image_screen.dart';
+import 'package:euvande/screen/product_auction_dashboard_screen.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/utilities/constants.dart';
@@ -70,7 +71,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ImageScreen()),
+                          MaterialPageRoute(builder: (context) => const ProductAuctionDashboardScreen()),
                         )
                       },
                       AssetImage("assets/icons/car.png"),
