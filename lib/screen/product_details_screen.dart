@@ -179,7 +179,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               onPressed: () => {},
               style: raisedButtonStyleRound,
               child: Text(
-                "OVERVIEW",
+                "GALLERY",
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ))
         ],
