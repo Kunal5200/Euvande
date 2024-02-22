@@ -5,16 +5,18 @@ import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:flutter/material.dart';
 
-class UsedProductListScreen extends StatefulWidget {
-  const UsedProductListScreen({super.key});
+class SearchProductListScreen extends StatefulWidget {
+  const SearchProductListScreen({super.key});
 
   @override
-  State<UsedProductListScreen> createState() => _UsedProductListScreenState();
+  State<SearchProductListScreen> createState() =>
+      _SearchProductListScreenState();
 }
 
-class _UsedProductListScreenState extends State<UsedProductListScreen> {
+class _SearchProductListScreenState extends State<SearchProductListScreen> {
   bool isDataLoading = true;
   GetCarListResponseModel? getCarListResponseModel;
+  final TextEditingController maxWidthController = TextEditingController();
 
   @override
   void initState() {
@@ -28,7 +30,40 @@ class _UsedProductListScreenState extends State<UsedProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Buy Used Car"),
+          title: Text("Search Cars"),
+          bottom: PreferredSize(
+              preferredSize: Size.fromHeight(40),
+              child: Expanded(
+                child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: Colors.black38),
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                ),
+                child: TextField(
+                  style: TextStyle(fontSize: 12),
+                    controller: maxWidthController,
+                    keyboardType: TextInputType.name,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(color: Colors.black38),
+                      hintText: 'Search by Make or Model (e.g Rolls Royce '
+                          'Cullinan)',
+                      suffixIcon: Padding(
+                        padding: EdgeInsets.only(left: 25),
+                        child: GestureDetector( behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                          callGetCarListApi();
+                          },
+                          child: Icon(  Icons.search,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    )),
+              ),
+              )),
         ),
         body: Container(
           child: SingleChildScrollView(

@@ -8,16 +8,16 @@ import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class ProfileSettingScreen extends StatefulWidget {
+class UpdateProfileScreen extends StatefulWidget {
   final Key? key;
 
-  const ProfileSettingScreen({this.key}) : super(key: key);
+  const UpdateProfileScreen({this.key}) : super(key: key);
 
   @override
-  State<ProfileSettingScreen> createState() => _ProfileSettingScreenState();
+  State<UpdateProfileScreen> createState() => _UpdateProfileScreenState();
 }
 
-class _ProfileSettingScreenState extends State<ProfileSettingScreen> {
+class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   bool isDataLoading = false;
   GetUserDetailResponseModel? getUserDetailResponseModel;
   String submitButtonText = 'Proceed'.toUpperCase();

@@ -4,6 +4,7 @@ import 'package:euvande/model/response/GetCarListResponseModel.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
+import 'package:euvande/screen/search_product_list_screen.dart';
 import 'package:euvande/screen/used_product_list_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/ProductItemList.dart';
@@ -165,29 +166,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildSearch() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SearchProductListScreen()),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
           // border: Border.all(
           //   // color: Colors.black12,
           // ),
-          color: Colors.black12,
-          borderRadius: BorderRadius.all(Radius.circular(25))),
-      margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-      child: Row(
-        children: [
-          Icon(
-            Icons.search,
-            color: Colors.black54,
-          ),
-          SizedBox(width: 10.0),
-          Text(
-            "Search Cars",
-            style: TextStyle(color: Colors.black54),
-          )
-        ],
+            color: Colors.black12,
+            borderRadius: BorderRadius.all(Radius.circular(25))),
+        margin: EdgeInsets.only(left: 20, right: 20, top: 20),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search,
+              color: Colors.black54,
+            ),
+            SizedBox(width: 10.0),
+            Text(
+              "Search Cars",
+              style: TextStyle(color: Colors.black54),
+            )
+          ],
+        ),
       ),
-    );
+    ) ;
   }
 
   Widget _buildCarouselSlider() {

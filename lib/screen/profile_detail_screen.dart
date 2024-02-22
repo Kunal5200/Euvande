@@ -7,10 +7,12 @@ import 'package:euvande/screen/address_list_screen.dart';
 import 'package:euvande/screen/change_password_screen.dart';
 import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/pending_product_list_screen.dart';
-import 'package:euvande/screen/profile_setting_screen.dart';
+import 'package:euvande/screen/product_auction_dashboard_screen.dart';
+import 'package:euvande/screen/update_profile_screen.dart';
 import 'package:euvande/screen/shortlist_product_list_screen.dart';
 import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProfileDetailsScreen extends StatefulWidget {
@@ -88,7 +90,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
     // Navigator.pop on the Selection Screen.
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ProfileSettingScreen()),
+      MaterialPageRoute(builder: (context) => UpdateProfileScreen()),
     );
 
     // When a BuildContext is used from a StatefulWidget, the mounted property
@@ -140,6 +142,18 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
               );
             },
             child: _buildMenuItem("Shortlisted Vehicles", Icons.card_giftcard),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                    const ProductAuctionDashboardScreen()),
+              );
+            },
+            child: _buildMenuItem("Auction", CupertinoIcons.hammer_fill),
           ),
           Divider(),
           GestureDetector( behavior: HitTestBehavior.translucent,
@@ -321,6 +335,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
       ),
     );
   }
+
 }
 
 

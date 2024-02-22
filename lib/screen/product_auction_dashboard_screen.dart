@@ -1,18 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:euvande/component/ProductJourneyTabView.dart';
-import 'package:euvande/screen/dashboard_screen.dart';
+import 'package:euvande/screen/product_auction_details_screen.dart';
 import 'package:euvande/screen/product_auction_info_screen.dart';
-import 'package:euvande/screen/product_sell_brands_screen.dart';
-import 'package:euvande/screen/product_sell_contact_info_screen.dart';
-import 'package:euvande/screen/product_sell_location_screen.dart';
-import 'package:euvande/screen/product_sell_model_screen.dart';
-import 'package:euvande/screen/product_sell_odometer_screen.dart';
-import 'package:euvande/screen/product_sell_ownership_screen.dart';
-import 'package:euvande/screen/product_sell_period_screen.dart';
-import 'package:euvande/screen/product_sell_specification_screen.dart';
-import 'package:euvande/screen/product_sell_variant_screen.dart';
-import 'package:euvande/screen/product_sell_vehicle_image_upload_screen.dart';
-import 'package:euvande/utilities/constants.dart';
 import 'package:flutter/material.dart';
 
 class ProductAuctionDashboardScreen extends StatefulWidget {
@@ -82,9 +69,9 @@ class _ProductAuctionDashboardScreenState
       case "auctionCnf":
         return ProductAuctionInfoScreen();
       case "auction":
-        return ProductSellPeriodScreen();
-      case "carSale":
-        return ProductSellModelScreen();
+        return ProductAuctionDetailsScreen();
+      // case "carSale":
+      //   return ProductSellModelScreen();
     }
 
     return Text("n/a");

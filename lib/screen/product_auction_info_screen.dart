@@ -1,4 +1,5 @@
 import 'package:euvande/utilities/IconTextItem.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
 import 'package:euvande/utilities/constants.dart';
