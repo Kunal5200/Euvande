@@ -7,6 +7,7 @@ import 'package:euvande/model/request/AddSpecificationRequestModel.dart';
 import 'package:euvande/model/request/ChangePasswordRequestModel.dart';
 import 'package:euvande/model/request/EditAddressRequestModel.dart';
 import 'package:euvande/model/request/FavoriteRequestModel.dart';
+import 'package:euvande/model/request/GetCarListRequestModel.dart';
 import 'package:euvande/model/request/GetModelRequestModel.dart';
 import 'package:euvande/model/request/GetPeriodByMakeRequestModel.dart';
 import 'package:euvande/model/request/GetVariantByModelRequestModel.dart';
@@ -24,6 +25,7 @@ import 'package:euvande/model/response/EditAddressResponseModel.dart';
 import 'package:euvande/model/response/FavoriteResponseModel.dart';
 import 'package:euvande/model/response/GetAddressResponseModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
+import 'package:euvande/model/response/GetCarDetailsResponseModel.dart';
 import 'package:euvande/model/response/GetCarListResponseModel.dart';
 import 'package:euvande/model/response/GetDefaultSpecificationResponseModel.dart';
 import 'package:euvande/model/response/GetFavouriteCarsResponseModel.dart';
@@ -44,24 +46,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 
 class ApiService {
-
-  final option = Options(responseType: ResponseType.json, headers: {
-    Headers.contentTypeHeader: Headers.jsonContentType,
-    // "Authorization":"Bearer ${token}",
-  });
-
+  var option;
   final dio = Dio();
 
   final BuildContext context;
 
   ApiService(this.context) {
+    option = Options(responseType: ResponseType.json, headers: {
+      Headers.contentTypeHeader: Headers.jsonContentType,
+      "accesstoken": SharedPrefManager.accessToken,
+      // "Authorization":"Bearer ${token}",
+    });
+
     dio.interceptors.addAll([
       LoggerInterceptor(context), //custom logger interceptor.
     ]);
-    option.headers = {
-      Headers.contentTypeHeader: Headers.jsonContentType,
-      "accesstoken": SharedPrefManager.accessToken,
-    };
+
   }
 
   Future<RegisterResponseModel> register(
@@ -120,6 +120,20 @@ class ApiService {
     }
   }
 
+  Future<LoginResponseModel> guestLogin() async {
+    Response response = await dio.get(
+      ApiConstants.baseUrl + ApiConstants.guestLogin,
+      options: option,
+    );
+
+    if (response.statusCode == 200) {
+      return LoginResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
   Future<RegisterResponseModel> forgotPassword(
       RegisterRequestModel registerRequestModel) async {
     Response response = await dio.post(
@@ -163,8 +177,9 @@ class ApiService {
   }
 
   Future<GetAllMakeResponseModel> getAllMakePublic() async {
-    Response response = await dio
-        .get(ApiConstants.baseUrl + ApiConstants.getAllMakePublic, options: option);
+    Response response = await dio.get(
+        ApiConstants.baseUrl + ApiConstants.getAllMakePublic,
+        options: option);
 
     if (response.statusCode == 200) {
       return GetAllMakeResponseModel.fromJson(response.data);
@@ -221,6 +236,7 @@ class ApiService {
 
   Future<AddMediaResponseModel> addMedia(int carId, String key, File file,
       ProgressCallback? onSendProgress) async {
+    print("carId : " + carId.toString());
     var formData = FormData.fromMap({
       'carId': carId,
       key:
@@ -259,7 +275,7 @@ class ApiService {
 
   Future<SendForApprovalResponseModel> sendForApproval(String carId) async {
     Response response = await dio.get(
-      ApiConstants.baseUrl + ApiConstants.sendForApproval + "/" +carId,
+      ApiConstants.baseUrl + ApiConstants.sendForApproval + "/" + carId,
       options: option,
     );
 
@@ -287,12 +303,29 @@ class ApiService {
 
   Future<GetPendingCarsResponseModel> getPendingCars(String status) async {
     Response response = await dio.get(
-      ApiConstants.baseUrl + ApiConstants.getPendingCars +"?PageSize=10000" + (status.isEmpty ? "" : "&status="+status),
+      ApiConstants.baseUrl +
+          ApiConstants.getPendingCars +
+          "?PageSize=10000" +
+          (status.isEmpty ? "" : "&status=" + status),
       options: option,
     );
 
     if (response.statusCode == 200) {
       return GetPendingCarsResponseModel.fromJson(response.data);
+    } else {
+      return Future.error(
+          "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
+    }
+  }
+
+  Future<GetCarDetailsResponseModel> getCarDetailById(String carId) async {
+    Response response = await dio.get(
+      ApiConstants.baseUrl + ApiConstants.getCarDetailById + "/${carId}",
+      options: option,
+    );
+
+    if (response.statusCode == 200) {
+      return GetCarDetailsResponseModel.fromJson(response.data);
     } else {
       return Future.error(
           "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
@@ -392,10 +425,10 @@ class ApiService {
     }
   }
 
-  Future<UpdateProfileResponseModel> updateUserDetail(UpdateProfileRequestModel updateProfileRequestModel) async {
+  Future<UpdateProfileResponseModel> updateUserDetail(
+      UpdateProfileRequestModel updateProfileRequestModel) async {
     Response response = await dio.post(
-      ApiConstants.baseUrl +
-          ApiConstants.updateUserDetail,
+      ApiConstants.baseUrl + ApiConstants.updateUserDetail,
       data: updateProfileRequestModel,
       options: option,
     );
@@ -422,11 +455,12 @@ class ApiService {
     }
   }
 
-  Future<GetCarListResponseModel> getCarList() async {
+  Future<GetCarListResponseModel> getCarList(
+      GetCarListRequestModel getCarListRequestModel) async {
     Response response = await dio.post(
-      ApiConstants.baseUrl + ApiConstants.getCarList,
-      options: option,
-    );
+        ApiConstants.baseUrl + ApiConstants.getCarList,
+        options: option,
+        data: getCarListRequestModel);
 
     if (response.statusCode == 200) {
       return GetCarListResponseModel.fromJson(response.data);
@@ -450,11 +484,10 @@ class ApiService {
     }
   }
 
-  Future<FavoriteResponseModel> favorite(FavoriteRequestModel favoriteRequestModel)
-  async {
+  Future<FavoriteResponseModel> favorite(
+      FavoriteRequestModel favoriteRequestModel) async {
     Response response = await dio.post(
-      ApiConstants.baseUrl +
-          ApiConstants.favorite,
+      ApiConstants.baseUrl + ApiConstants.favorite,
       data: favoriteRequestModel,
       options: option,
     );
@@ -466,5 +499,4 @@ class ApiService {
           "{'code' : '${response.statusCode}', 'message' : '${response.statusMessage}'}");
     }
   }
-
 }

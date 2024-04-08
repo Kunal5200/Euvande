@@ -411,6 +411,7 @@ class Specification {
     required this.equipments,
     required this.power,
     required this.color,
+    required this.specificationList,
   });
 
   final int id;
@@ -424,6 +425,7 @@ class Specification {
   final List<String> equipments;
   final String power;
   final String color;
+  final List<SpecificationList> specificationList;
 
   factory Specification.fromJson(Map<String, dynamic> json){
     return Specification(
@@ -438,6 +440,8 @@ class Specification {
       equipments: json["equipments"] == null ? [] : List<String>.from(json["equipments"]!.map((x) => x)),
       power: json["power"] ?? "",
       color: json["color"] ?? "",
+      specificationList: json["specificationList"] == null ? [] : List<SpecificationList>
+          .from(json["specificationList"]!.map((x) => x)),
     );
   }
 
@@ -457,6 +461,32 @@ class Specification {
 
 }
 
+class SpecificationList {
+  SpecificationList({
+    required this.label,
+    required this.title,
+    required this.value,
+  });
+
+  final String label;
+  final String title;
+  final String value;
+
+  factory SpecificationList.fromJson(Map<String, dynamic> json){
+    return SpecificationList(
+      label: json["label"] ?? "",
+      title: json["title"] ?? "",
+      value: json["value"] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "label": label,
+    "title": title,
+    "value": value,
+  };
+
+}
 class Variant {
   Variant({
     required this.id,

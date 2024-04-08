@@ -11,10 +11,13 @@ String addCarRequestModelToJson(AddCarRequestModel data) => json.encode(data.toJ
 class AddCarRequestModel {
   AddCarRequestModel({
      this.id,
+     this.vin,
      this.modelId,
      this.makeId,
      this.periodId,
      this.variantId,
+     this.variantName,
+     this.fuelType,
      this.odometer,
      this.ownership,
      this.contactInfo,
@@ -22,11 +25,14 @@ class AddCarRequestModel {
      this.price,
   });
 
-  num? id;
+  int? id;
+  String? vin;
   num? modelId;
   num? makeId;
   num? periodId;
   num? variantId;
+  String? variantName;
+  String? fuelType;
   String? odometer;
   num? year;
   String? ownership;
@@ -37,10 +43,13 @@ class AddCarRequestModel {
   factory AddCarRequestModel.fromJson(Map<String, dynamic> json){
     return AddCarRequestModel(
       id: json["id"] ?? 0,
+      vin: json["vin"] ?? "",
       modelId: json["modelId"] ?? 0,
       makeId: json["makeId"] ?? 0,
       periodId: json["periodId"] ?? 0,
       variantId: json["variantId"] ?? 0,
+      variantName: json["variantName"] ?? "",
+      fuelType: json["fuelType"] ?? "",
       odometer: json["odometer"] ?? "",
       ownership: json["ownership"] ?? "",
       price: json["price"] ?? 0,
@@ -51,10 +60,13 @@ class AddCarRequestModel {
 
   Map<String, dynamic> toJson() => {
     "id": id,
+    "vin": vin,
     "modelId": modelId,
     "makeId": makeId,
     "periodId": periodId,
     "variantId": variantId,
+    "variantName": variantName,
+    "fuelType": fuelType,
     "odometer": odometer,
     "ownership": ownership,
     "price": price,

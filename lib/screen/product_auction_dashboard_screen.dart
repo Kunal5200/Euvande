@@ -42,7 +42,7 @@ class _ProductAuctionDashboardScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Product Sell Dashboard"),
+          title: Text("Auction"),
           bottom: TabBar(
               indicatorSize: TabBarIndicatorSize.label,
               isScrollable: true,

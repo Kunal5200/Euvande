@@ -84,8 +84,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
     );
   }
 
-  Future<void> _navigateUpdateProfileScreen(
-      BuildContext context) async {
+  Future<void> _navigateUpdateProfileScreen(BuildContext context) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
     final result = await Navigator.push(
@@ -98,18 +97,20 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
     if (!mounted) return;
 
     if (result != null) {
-
-      GetUserDetailResponseModel getUserDetailResponseModel =   GetUserDetailResponseModel.fromJson(json.decode(result["data"]));
+      GetUserDetailResponseModel getUserDetailResponseModel =
+          GetUserDetailResponseModel.fromJson(json.decode(result["data"]));
 
       SharedPrefManager.getLoginData().then((value) => {
-        setState(() {
-          loginResponseModel = value;
-          loginResponseModel!.data.name = getUserDetailResponseModel.data!.name;
-          print(getUserDetailResponseModel.data!.name);
+            setState(() {
+              loginResponseModel = value;
+              loginResponseModel!.data.name =
+                  getUserDetailResponseModel.data!.name;
+              print(getUserDetailResponseModel.data!.name);
 
-          SharedPrefManager.setLoginData(jsonEncode(loginResponseModel!.toJson()));
-        }),
-      });
+              SharedPrefManager.setLoginData(
+                  jsonEncode(loginResponseModel!.toJson()));
+            }),
+          });
     }
   }
 
@@ -123,25 +124,16 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(height: 10),
-          GestureDetector( behavior: HitTestBehavior.translucent,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PendingProductListScreen()),
-              );
-            },
-            child: _buildMenuItem("My Cars", Icons.production_quantity_limits),
-          ),
-          GestureDetector( behavior: HitTestBehavior.translucent,
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                    const ShortlistProductListScreen()),
+                    builder: (context) => const PendingProductListScreen()),
               );
             },
-            child: _buildMenuItem("Shortlisted Vehicles", Icons.card_giftcard),
+            child: _buildMenuItem("My Cars", Icons.production_quantity_limits),
           ),
           GestureDetector(
             behavior: HitTestBehavior.translucent,
@@ -149,14 +141,26 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                    const ProductAuctionDashboardScreen()),
+                    builder: (context) => const ShortlistProductListScreen()),
               );
             },
-            child: _buildMenuItem("Auction", CupertinoIcons.hammer_fill),
+            child: _buildMenuItem("Shortlisted Vehicles", Icons.card_giftcard),
           ),
+          // GestureDetector(
+          //   behavior: HitTestBehavior.translucent,
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //           builder: (context) =>
+          //           const ProductAuctionDashboardScreen()),
+          //     );
+          //   },
+          //   child: _buildMenuItem("Auction", CupertinoIcons.hammer_fill),
+          // ),
           Divider(),
-          GestureDetector( behavior: HitTestBehavior.translucent,
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               showModalBottomSheet<void>(
                 isScrollControlled: true,
@@ -170,7 +174,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                       height: 200,
                       child: Column(
                         children: [
-                          SizedBox(height: 20,),
+                          SizedBox(
+                            height: 20,
+                          ),
                           Align(
                             alignment: Alignment.center,
                             child: Text(
@@ -181,8 +187,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                                   color: Colors.black),
                             ),
                           ),
-                          SizedBox(height: 20,),
-                          GestureDetector( behavior: HitTestBehavior.translucent,
+                          SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
                             onTap: () {
                               Navigator.pop(context);
                               _navigateUpdateProfileScreen(context);
@@ -211,8 +220,11 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 5,),
-                          GestureDetector( behavior: HitTestBehavior.translucent,
+                          SizedBox(
+                            height: 5,
+                          ),
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -254,7 +266,8 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
             },
             child: _buildMenuItem("Profile Setting", Icons.settings),
           ),
-          GestureDetector( behavior: HitTestBehavior.translucent,
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               Navigator.push(
                 context,
@@ -262,7 +275,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                     builder: (context) => const ChangePasswordScreen()),
               );
             },
-            child: _buildMenuItem("Change Password", Icons.settings),
+            child: _buildMenuItem("Change Password", Icons.lock_reset),
           ),
           SizedBox(height: 30),
           ElevatedButton(
@@ -288,7 +301,24 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
             },
           ),
           SizedBox(
-            height: 10,
+            height: 30,
+          ),
+          Opacity(
+            opacity: 0.30,
+            child: Column(
+              children: [
+                Container(
+                  width: 150.0,
+                  height: 50.0,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: AssetImage("assets/logos/logo.png")),
+                  ),
+                ),
+                Text("v1.0.0", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, fontStyle: FontStyle.italic ),)
+              ],
+            ),
           ),
         ],
       ),
@@ -335,7 +365,4 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
       ),
     );
   }
-
 }
-
-

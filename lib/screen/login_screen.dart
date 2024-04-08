@@ -22,7 +22,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> _formKey = GlobalKey();
-  GlobalKey<FormState> _formForgetPasswordKey = GlobalKey();
 
   final textFieldFocusNode = FocusNode();
   bool _obscured = true;
@@ -38,13 +37,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   String submitButtonText = "Login";
-  String sendOTPButtonText = "Next";
   bool isEnabled = true;
+  final TextEditingController emailResetController =
+  TextEditingController(text: "");
   final TextEditingController emailController =
-      TextEditingController(text: "raj@yopmail.com");
+      TextEditingController(text: "");
   final TextEditingController passwordController =
-      TextEditingController(text: "123456");
+      TextEditingController(text: "");
 
+  String sendOTPButtonText = "Next";
+  GlobalKey<FormState> _formForgetPasswordKey = GlobalKey();
   @override
   void dispose() {
     emailController.dispose();
@@ -57,9 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xfffafcff),
-      ),
+        appBar: AppBar(
+          backgroundColor: Color(0xfffafcff),
+        ),
         body: Container(
             padding: EdgeInsets.symmetric(horizontal: 25),
             child: SingleChildScrollView(
@@ -69,7 +71,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(height: 50,),
+                    SizedBox(
+                      height: 50,
+                    ),
                     Container(
                       width: 150.0,
                       height: 50.0,
@@ -79,8 +83,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             image: AssetImage("assets/logos/logo.png")),
                       ),
                     ),
-                    Text("Enter your information to login account", style: TextStyle(color: Colors.black54, fontSize: 14,),),
-                    SizedBox(height: 30,),
+                    Text(
+                      "Enter your information to login account",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
                     TextFormField(
                       controller: emailController,
                       validator: (value) {
@@ -124,7 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: Icon(Icons.lock_rounded, size: 24),
                           suffixIcon: Padding(
                             padding: EdgeInsets.only(right: 4),
-                            child: GestureDetector( behavior: HitTestBehavior.translucent,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
                               onTap: _toggleObscured,
                               child: Icon(
                                 _obscured
@@ -138,101 +151,108 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 15,
                     ),
-                    GestureDetector( behavior: HitTestBehavior.translucent,
+                    GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () => {
                         showModalBottomSheet<void>(
                           isScrollControlled: true,
                           context: context,
                           backgroundColor: Colors.white,
                           builder: (BuildContext context) {
-                            return Padding(padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).viewInsets.bottom),
-                            child: Form(
-                                key: _formForgetPasswordKey,
-                                child: SizedBox(
-                                  height: 250,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15))),
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 20),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        const Text(
-                                          "Forget Password",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          "Provide your account's email which you want to\nreset your password.",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 15,
-                                        ),
-                                        TextFormField(
-                                          controller: emailController,
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'This field is required';
-                                            } else if (!RegExp(
-                                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                                .hasMatch(value)) {
-                                              return 'Invalid email entered';
-                                            }
-                                            return null;
-                                          },
-                                          decoration: InputDecoration(
-                                            labelText: 'Email',
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(),
+                            return StatefulBuilder(builder:
+                                (BuildContext context, StateSetter setState) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context)
+                                        .viewInsets
+                                        .bottom),
+                                child: Form(
+                                    key: _formForgetPasswordKey,
+                                    child: SizedBox(
+                                      height: 250,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15))),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 20),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            const Text(
+                                              "Forget Password",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            prefixIcon:
-                                            Icon(Icons.email, size: 24),
-                                          ),
-                                          keyboardType:
-                                          TextInputType.emailAddress,
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              "Provide your account's email which you want to\nreset your password.",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 15,
+                                            ),
+                                            TextFormField(
+                                              controller: emailResetController,
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'This field is required';
+                                                } else if (!RegExp(
+                                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                                    .hasMatch(value)) {
+                                                  return 'Invalid email entered';
+                                                }
+                                                return null;
+                                              },
+                                              decoration: InputDecoration(
+                                                labelText: 'Email',
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide(),
+                                                ),
+                                                prefixIcon:
+                                                    Icon(Icons.email, size: 24),
+                                              ),
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            ElevatedButton(
+                                              style: raisedButtonStyle,
+                                              child: Text(
+                                                sendOTPButtonText,
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 14),
+                                              ),
+                                              onPressed: () {
+                                                if (isEnabled &&
+                                                    _formForgetPasswordKey
+                                                        .currentState!
+                                                        .validate()) {
+                                                  callForgetOTPAPI(setState);
+                                                }
+                                              },
+                                            ),
+                                          ],
                                         ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        ElevatedButton(
-                                          style: raisedButtonStyle,
-                                          child: Text(
-                                            sendOTPButtonText,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14),
-                                          ),
-                                          onPressed: () {
-                                            if (isEnabled &&
-                                                _formForgetPasswordKey
-                                                    .currentState!
-                                                    .validate()) {
-                                              callForgetOTPAPI();
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )),
-                            );
+                                      ),
+                                    )),
+                              );
+                            });
                           },
                         )
                       },
@@ -265,7 +285,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    GestureDetector( behavior: HitTestBehavior.translucent,
+                    GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () => {
                         Navigator.pushReplacement(
                           context,
@@ -329,8 +350,9 @@ class _LoginScreenState extends State<LoginScreen> {
       isEnabled = false;
     });
 
-    Future<LoginResponseModel> response = ApiService(context).login(LoginRequestModel(
-        email: emailController.text, password: passwordController.text));
+    Future<LoginResponseModel> response = ApiService(context).login(
+        LoginRequestModel(
+            email: emailController.text, password: passwordController.text));
     response
         .then((value) => {
               SharedPrefManager.setLoginData(jsonEncode(value.toJson())),
@@ -352,13 +374,10 @@ class _LoginScreenState extends State<LoginScreen> {
         submitButtonText = "Login";
         isEnabled = true;
       });
-
-
     });
   }
 
-  void callForgetOTPAPI() {
-
+  void callForgetOTPAPI(StateSetter setState) {
     setState(() {
       sendOTPButtonText = "Logging...";
       isEnabled = false;
@@ -366,11 +385,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Future<RegisterResponseModel> response = ApiService(context).forgotPassword(
         RegisterRequestModel(
-            email: emailController.text, password: '', name: ''));
+            email: emailResetController.text, password: '', name: ''));
     response
         .then((value) => {
-
-    Navigator.pop(context),
+              Navigator.pop(context),
               _navigateOTPScreen(context, value),
               setState(() {
                 sendOTPButtonText = "Next";
@@ -378,7 +396,6 @@ class _LoginScreenState extends State<LoginScreen> {
               })
             })
         .catchError((onError) {
-
       setState(() {
         sendOTPButtonText = "Next";
         isEnabled = true;
@@ -388,7 +405,5 @@ class _LoginScreenState extends State<LoginScreen> {
         content: Text(onError.message),
       ));
     });
-
-
   }
 }

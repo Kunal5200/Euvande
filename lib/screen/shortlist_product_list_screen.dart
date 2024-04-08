@@ -116,7 +116,10 @@ class _ShortlistProductListScreenState extends State<ShortlistProductListScreen>
                                             children: [
                                               Text(
                                                 // "2015 Mercedes Maybach S-Class",
-                                                "${getCarListResponseModel!.data!.docs[index].make!.makeName} ${getCarListResponseModel!.data!.docs[index].model!.modelName}",
+                                                // "${getCarListResponseModel!
+                                                //     .data!.docs[index].period!
+                                                // .year} "
+                                                    "${getCarListResponseModel!.data!.docs[index].make!.makeName} ${getCarListResponseModel!.data!.docs[index].model!.modelName}",
                                                 style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 12,
@@ -146,22 +149,22 @@ class _ShortlistProductListScreenState extends State<ShortlistProductListScreen>
                                               ),
                                               Row(
                                                 children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      // callFavoriteApi(index);
-                                                    },
-                                                    child: Icon(
-                                                      // getCarListResponseModel!
-                                                      //     .data!
-                                                      //     .docs[index]
-                                                      //     .favourite
-                                                      //     ? Icons.favorite
-                                                      //     :
-                                                    Icons
-                                                          .favorite_border_outlined,
-                                                      size: 15,
-                                                    ),
-                                                  ),
+                                                  // GestureDetector(
+                                                  //   onTap: () {
+                                                  //     // callFavoriteApi(index);
+                                                  //   },
+                                                  //   child: Icon(
+                                                  //     // getCarListResponseModel!
+                                                  //     //     .data!
+                                                  //     //     .docs[index]
+                                                  //     //     .favourite
+                                                  //     //     ? Icons.favorite
+                                                  //     //     :
+                                                  //   Icons
+                                                  //         .favorite_border_outlined,
+                                                  //     size: 15,
+                                                  //   ),
+                                                  // ),
                                                   Text(
                                                     "                                   View Details >",
                                                     // "${getCarListResponseModel!.data!.docs[index].variant!.fuelType} »  ${getCarListResponseModel!.data!.docs[index].ownership} Owner",

@@ -13,6 +13,8 @@ class ProductSellOdometerScreen extends StatefulWidget {
 }
 
 class _ProductSellOdometerScreenState extends State<ProductSellOdometerScreen> {
+  int currentSelectedPeriod = -1;
+
   final items = [
     "0-10000",
     "10000-20000",
@@ -28,40 +30,32 @@ class _ProductSellOdometerScreenState extends State<ProductSellOdometerScreen> {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTitleSection(),
-            SizedBox(
-              height: 10,
-            ),
-            _buildYearListSection(),
-          ],
-        ),
-      ),
-    );
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    setState(() {
+      if(ProductSellJourneyScreen.addCarRequestModel.odometer!= null)
+      for (int index = 0; index < items.length; index++) {
+        if (ProductSellJourneyScreen.addCarRequestModel.odometer!
+            .trim()
+            .contains(items[index])) {
+          currentSelectedPeriod = index;
+          break;
+        }
+      }
+    });
   }
 
-  Widget _buildSearch() {
-    return TextField(
-      style: TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Color(0xffebebeb),
-        prefixIcon: Icon(Icons.search_outlined),
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        hintText: "Search",
-        hintStyle: TextStyle(fontSize: 14),
-        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-        border: OutlineInputBorder(
-            // borderSide: BorderSide.none
-            ),
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          _buildTitleSection(),
+          _buildYearListSection(),
+        ],
       ),
-      keyboardType: TextInputType.name,
     );
   }
 
@@ -89,13 +83,17 @@ class _ProductSellOdometerScreenState extends State<ProductSellOdometerScreen> {
           height: 10,
         ),
         Container(
-          height: 450,
           child: ListView.builder(
-              padding: const EdgeInsets.all(8),
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
-                return GestureDetector( behavior: HitTestBehavior.translucent,
+                return GestureDetector(
+                    behavior: HitTestBehavior.translucent,
                     onTap: () {
+                      setState(() {
+                        currentSelectedPeriod = index;
+                      });
                       widget.onNext(items[index]);
                     },
                     child: Container(
@@ -104,18 +102,27 @@ class _ProductSellOdometerScreenState extends State<ProductSellOdometerScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "  " + items[index] + " Kilometers ${(ProductSellDashboardScreen
-                                .getPendingCarsResponseModel != null &&
-                                ProductSellDashboardScreen
-                                    .getPendingCarsResponseModel!.data.length > 0
-                                && ProductSellDashboardScreen
-                                    .getPendingCarsResponseModel!.data[0]
-                                    .odometer.toLowerCase() == items[index]
-                                    .toLowerCase()) ?
-                            " ✓" : ""}",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              Text(
+                                "  ${items[index] + " Kilometers"}",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: currentSelectedPeriod == index
+                                        ? Colors.black
+                                        : Colors.black54,
+                                    fontWeight: currentSelectedPeriod == index
+                                        ? FontWeight.bold
+                                        : FontWeight.normal),
+                              ),
+                              Spacer(),
+                              Text(
+                                "${currentSelectedPeriod == index ? "✓   "
+                                    "" : ""}",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
                           SizedBox(
                             height: 5,

@@ -1,13 +1,15 @@
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
 import 'package:euvande/screen/pending_product_details_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PendingProductListScreen extends StatefulWidget {
   const PendingProductListScreen({super.key});
 
   @override
-  State<PendingProductListScreen> createState() => _PendingProductListScreenState();
+  State<PendingProductListScreen> createState() =>
+      _PendingProductListScreenState();
 }
 
 class _PendingProductListScreenState extends State<PendingProductListScreen> {
@@ -26,7 +28,7 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Pending For Approval"),
+          title: Text("My Cars"),
         ),
         body: Container(
           child: SingleChildScrollView(
@@ -45,9 +47,10 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                           Container(
                             child: ListView.builder(
                                 shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
                                 padding: const EdgeInsets.all(8),
-                                itemCount: getPendingCarsResponseModel!
-                                    .data.length,
+                                itemCount:
+                                    getPendingCarsResponseModel!.data.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   return Container(
                                     padding: EdgeInsets.symmetric(
@@ -67,12 +70,16 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(5)),
                                     ),
-                                    child: GestureDetector( behavior: HitTestBehavior.translucent,
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
                                       onTap: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>  PendingProductDetailsScreen(getPendingCarsResponseModel!.data[index])),
+                                              builder: (context) =>
+                                                  PendingProductDetailsScreen(
+                                                      getPendingCarsResponseModel!
+                                                          .data[index])),
                                         );
                                       },
                                       child: Row(
@@ -83,10 +90,17 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                             decoration: BoxDecoration(
                                               image: DecorationImage(
                                                   fit: BoxFit.cover,
-                                                  image:
-                                                      getPendingCarsResponseModel!.data[index].carImages.length>0 ?
-                                                      NetworkImage(getPendingCarsResponseModel!.data[index].carImages[0]) as ImageProvider:
-                                                      AssetImage(
+                                                  image: getPendingCarsResponseModel!
+                                                              .data[index]
+                                                              .carImages
+                                                              .length >
+                                                          0
+                                                      ? NetworkImage(
+                                                              getPendingCarsResponseModel!
+                                                                  .data[index]
+                                                                  .carImages[0])
+                                                          as ImageProvider
+                                                      : AssetImage(
                                                           "assets/images/mercedes/1.jpg")),
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(8.0)),
@@ -97,10 +111,8 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                             width: 15,
                                           ),
                                           Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 // "2015 Mercedes Maybach S-Class",
@@ -109,7 +121,7 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                                     color: Colors.black,
                                                     fontSize: 12,
                                                     fontWeight:
-                                                        FontWeight.bold),
+                                                    FontWeight.bold),
                                               ),
                                               Text(
                                                 // "50,000 km • CNG • Manual",
@@ -118,7 +130,7 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                                     color: Colors.black54,
                                                     fontSize: 12,
                                                     fontWeight:
-                                                        FontWeight.normal),
+                                                    FontWeight.normal),
                                               ),
                                               Text(
                                                 // "€ 47899",
@@ -127,33 +139,41 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
                                                     color: Colors.black,
                                                     fontSize: 18,
                                                     fontWeight:
-                                                        FontWeight.bold),
+                                                    FontWeight.bold),
                                               ),
                                               SizedBox(
                                                 height: 2,
                                               ),
                                               Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceBetween,
                                                 children: [
-                                                  Icon(
-                                                    Icons
-                                                        .favorite_border_outlined,
-                                                    size: 15,
-                                                  ),
                                                   Text(
-                                                    "                                   View Details >",
-                                                    // "${getPendingCarsResponseModel!.data[index].variant!.fuelType} »  ${getPendingCarsResponseModel!.data[index].ownership} Owner",
-                                                    style: TextStyle(
-                                                        color: Colors.blue,
-                                                        fontSize: 12,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                    "‣ "
+                                                        "${getPendingCarsResponseModel!.data[index].status}",
+                                                    style:
+                                                    TextStyle(fontSize:
+                                                    12, color: Colors
+                                                        .deepOrange, ),
                                                   ),
+                                                  // Text(
+                                                  //   "                   Tap to view details >",
+                                                  //   // "${getPendingCarsResponseModel!.data[index].variant!.fuelType} »  ${getPendingCarsResponseModel!.data[index].ownership} Owner",
+                                                  //   style: TextStyle(
+                                                  //       color: Colors.blue,
+                                                  //       fontSize: 12,
+                                                  //       fontStyle:
+                                                  //           FontStyle.italic,
+                                                  //       fontWeight:
+                                                  //           FontWeight.bold),
+                                                  // ),
                                                 ],
-                                              )
+                                              ),
                                             ],
-                                          )
+                                          ),
+                                          Spacer(flex: 1,),
+                                          Icon(CupertinoIcons.right_chevron)
                                         ],
                                       ),
                                     ),
@@ -184,7 +204,7 @@ class _PendingProductListScreenState extends State<PendingProductListScreen> {
         ApiService(context).getPendingCars("Pending");
     response
         .then((value) => {
-      getPendingCarsResponseModel = value,
+              getPendingCarsResponseModel = value,
               setState(() {
                 isDataLoading = false;
               }),

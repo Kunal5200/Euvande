@@ -61,7 +61,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ImageViewerScreen(widget.doc.carImages)),
+                          ImageViewerScreen(widget.doc.carImages, index)),
                 );
               },
               child: Container(
@@ -287,6 +287,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           SizedBox(
             height: 5,
           ),
+          Wrap(
+            // runSpacing: 8,
+            spacing: 8,
+            children:  List.generate(
+                widget.doc.specification!.equipments.length, (index) {
+            return Chip(
+              avatar: Icon(Icons.check_circle_outline, color: Colors.white,),
+              label: Text(widget.doc.specification!.equipments[index],
+                style:
+              TextStyle(color: Colors.white, fontSize: 10),),
+              backgroundColor: Colors.black,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all
+                (Radius.circular(25))),
+            );
+          }),
+          )
+
         ],
       ),
     );
@@ -317,14 +334,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             crossAxisCount: 3,
             // Generate 100 widgets that display their index in the List.
             children: List.generate(widget.doc.carImages.length, (index) {
-              return Center(
-                child: Container(
-                  width: 100.0,
-                  height: 100.0,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(widget.doc.carImages[index])),
+              return GestureDetector( behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ImageViewerScreen(widget.doc.carImages, index)),
+                  );
+                },
+                child: Center(
+                  child: Container(
+                    width: 100.0,
+                    height: 100.0,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(widget.doc.carImages[index])),
+                    ),
                   ),
                 ),
               );

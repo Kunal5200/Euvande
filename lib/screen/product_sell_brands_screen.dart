@@ -19,6 +19,7 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
   bool isBrandLoading = true;
   GetAllMakeResponseModel? getAllMakeResponseModel;
   List<GetAllMakeData> originalData = [];
+  int currentSelectedBrand = -1;
 
   _ProductSellBrandsScreenState();
 
@@ -37,8 +38,13 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
         alignment: Alignment.center,
         child: Column(
           children: [
-            SizedBox(height: 50,),
-            Text("Sorry, brand not found", style: TextStyle(fontSize: 18),),
+            SizedBox(
+              height: 50,
+            ),
+            Text(
+              "Sorry, brand not found",
+              style: TextStyle(fontSize: 18),
+            ),
             SizedBox(
                 height: 200,
                 width: 200,
@@ -46,8 +52,7 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
                   'assets/lottie/nodata.json',
                 )),
           ],
-        )
-    );
+        ));
   }
 
   onSearchTextChanged(String text) async {
@@ -91,19 +96,15 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTitleSection(),
-            SizedBox(
-              height: 10,
-            ),
-            _buildSearch(),
-            isBrandLoading ? _showLoader() : _buildBrandsSection(),
-          ],
-        ),
+      child: Column(
+        children: [
+          _buildTitleSection(),
+          SizedBox(
+            height: 10,
+          ),
+          _buildSearch(),
+          isBrandLoading ? _showLoader() : _buildBrandsSection(),
+        ],
       ),
     );
   }
@@ -134,40 +135,33 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
         getAllMakeResponseModel!.data.length == 0
             ? _buildNoData()
             : Container(
-                height: 450,
                 child: GridView.count(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  crossAxisCount: 4,
+                  physics: ScrollPhysics(),
+                  crossAxisCount: 3,
                   // Generate 100 widgets that display their index in the List.
                   children: List.generate(getAllMakeResponseModel!.data.length,
                       (index) {
-                    return GestureDetector( behavior: HitTestBehavior.translucent,
+                    return GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () {
+                        setState(() {
+                          currentSelectedBrand = index;
+                        });
                         widget.onNext(getAllMakeResponseModel!.data[index]);
                       },
                       child: Container(
                         margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                              color:  Colors.black),
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          color: (ProductSellDashboardScreen
-                              .getPendingCarsResponseModel !=
-                              null &&
-                              ProductSellDashboardScreen
-                                  .getPendingCarsResponseModel!
-                                  .data
-                                  .length >
-                                  0 &&
-                              ProductSellDashboardScreen
-                                  .getPendingCarsResponseModel!
-                                  .data[0]
-                                  .make!
-                                  .id ==
-                                  getAllMakeResponseModel!
-                                      .data[index].id) ? Color(0x1D06599D) : Colors.transparent
-                        ),
+                            border: Border.all(
+                                width: currentSelectedBrand == index ? 1.5 : 1,
+                                color: currentSelectedBrand == index
+                                    ? Colors.black
+                                    : Colors.black54),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: currentSelectedBrand == index
+                                ? Color(0x1D06599D)
+                                : Colors.transparent),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -177,8 +171,12 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                     fit: BoxFit.fill,
-                                    image: NetworkImage(getAllMakeResponseModel!
-                                        .data[index].logo)),
+                                    image: getAllMakeResponseModel!
+                                            .data[index].logo.isNotEmpty
+                                        ? NetworkImage(getAllMakeResponseModel!
+                                            .data[index].logo) as ImageProvider
+                                        : AssetImage(
+                                            "assets/icons/ic_car.webp")),
                               ),
                             ),
                             SizedBox(
@@ -187,8 +185,13 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
                             Text(
                               getAllMakeResponseModel!.data[index].makeName,
                               style: TextStyle(
-                                color:  Colors.black,
-                                fontSize: 12,
+                                color: currentSelectedBrand == index
+                                    ? Colors.black
+                                    : Colors.black54,
+                                fontWeight: currentSelectedBrand == index
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                fontSize: 14,
                               ),
                             ),
                           ],
@@ -217,11 +220,20 @@ class _ProductSellBrandsScreenState extends State<ProductSellBrandsScreen> {
     Future<GetAllMakeResponseModel> response = ApiService(context).getAllMake();
     response
         .then((value) => {
-              setState(() {
-                isBrandLoading = false;
-              }),
               getAllMakeResponseModel = value,
               originalData.addAll(value.data),
+              setState(() {
+
+                for(int index =0; index<value.data.length;index++){
+                  if(ProductSellJourneyScreen.addCarRequestModel.makeId ==
+                      value.data[index].id){
+                      currentSelectedBrand = index;
+                    break;
+                  }
+                }
+
+                isBrandLoading = false;
+              }),
             })
         .catchError((onError) {
       setState(() {

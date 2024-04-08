@@ -68,9 +68,9 @@ class _ProductSellSpecificationScreenState
   ];
 
   final TextEditingController powerController =
-      TextEditingController(text: "200");
+      TextEditingController(text: "");
   final TextEditingController colorController =
-      TextEditingController(text: "Black");
+      TextEditingController(text: "");
 
   @override
   void initState() {
@@ -88,72 +88,68 @@ class _ProductSellSpecificationScreenState
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.only(left: 10, right: 10, bottom: 50),
-        child: Column(
-          children: [
-            isDataLoading ? _showLoader() : _buildTitleSection(),
-            ElevatedButton(
-              style: raisedButtonStyle,
-              child: Text(
-                'Continue',
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              onPressed: () {
-                if (addSpecificationRequestModel.transmission == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select transmission type"),
-                  ));
-                } else if (addSpecificationRequestModel.vehicleType == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select vehicle type"),
-                  ));
-                } else if (addSpecificationRequestModel.transmission == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select doors"),
-                  ));
-                } else if (addSpecificationRequestModel.driveType4Wd == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select drive type"),
-                  ));
-                } else if (addSpecificationRequestModel.seats == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select seat"),
-                  ));
-                } else if (addSpecificationRequestModel.interiorMaterial ==
-                    null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select interior material"),
-                  ));
-                } else if (addSpecificationRequestModel.vatDeduction == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select vat deduction"),
-                  ));
-                } else if (powerController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please input power of vehicle"),
-                  ));
-                } else if (colorController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please input color of vehicle"),
-                  ));
-                } else if (addSpecificationRequestModel.equipments!.length ==
-                    0) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please select atleast one equipments"),
-                  ));
-                } else {
-                  addSpecificationRequestModel.power =
-                      powerController.text.trim();
-                  addSpecificationRequestModel.color =
-                      colorController.text.trim();
-                  widget.onNext(addSpecificationRequestModel);
-                }
-              },
+      child: Column(
+        children: [
+          isDataLoading ? _showLoader() : _buildTitleSection(),
+          ElevatedButton(
+            style: raisedButtonStyle,
+            child: Text(
+              'Continue',
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-          ],
-        ),
+            onPressed: () {
+              if (addSpecificationRequestModel.transmission == null) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select transmission type"),
+                ));
+              } else if (addSpecificationRequestModel.vehicleType == null) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select vehicle type"),
+                ));
+              } else if (addSpecificationRequestModel.transmission == null) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select doors"),
+                ));
+              } else if (addSpecificationRequestModel.driveType4Wd == null) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select drive type"),
+                ));
+              } else if (addSpecificationRequestModel.seats == null) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select seat"),
+                ));
+              } else if (addSpecificationRequestModel.interiorMaterial ==
+                  null) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select interior material"),
+                ));
+              } else if (addSpecificationRequestModel.vatDeduction == null) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select vat deduction"),
+                ));
+              } else if (powerController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please input power of vehicle"),
+                ));
+              } else if (colorController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please input color of vehicle"),
+                ));
+              } else if (addSpecificationRequestModel.equipments!.length ==
+                  0) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please select atleast one equipments"),
+                ));
+              } else {
+                addSpecificationRequestModel.power =
+                    powerController.text.trim();
+                addSpecificationRequestModel.color =
+                    colorController.text.trim();
+                widget.onNext(addSpecificationRequestModel);
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -214,7 +210,7 @@ class _ProductSellSpecificationScreenState
                               _index--;
                             });
                           },
-                          child: const Text('EXIT'),
+                          child: const Text('BACK'),
                         ),
                       ],
                     );

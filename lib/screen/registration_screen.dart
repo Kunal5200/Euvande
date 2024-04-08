@@ -36,9 +36,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   String submitButtonText = 'Proceed'.toUpperCase();
   bool isEnabled = true;
-  final TextEditingController nameController = TextEditingController(text: "ssd");
-  final TextEditingController emailController = TextEditingController(text: "raj@yopmail.com");
-  final TextEditingController passwordController = TextEditingController(text: "123456");
+  final TextEditingController nameController = TextEditingController(text: "");
+  final TextEditingController emailController = TextEditingController(text: "");
+  final TextEditingController passwordController = TextEditingController(text: "");
   final TextEditingController phoneNumberController = TextEditingController();
 
   Future<void> _navigateOTPScreen(

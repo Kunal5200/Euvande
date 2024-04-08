@@ -1,8 +1,15 @@
+import 'package:euvande/model/request/AddCarRequestModel.dart';
+import 'package:euvande/model/request/AddSpecificationRequestModel.dart';
+import 'package:euvande/model/response/AddCarResponseModel.dart';
 import 'package:euvande/model/response/DeleteCarResponseModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
+import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
+import 'package:euvande/screen/product_sell_vin_screen.dart';
+import 'package:euvande/screen/temp_product_sell_journey_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
+import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
@@ -21,13 +28,32 @@ class _ProductSellDashboardScreenState
   bool isBrandLoading = true;
   bool isPendingCarLoading = true;
   GetAllMakeResponseModel? getAllMakeResponseModel;
+  late LoginResponseModel? loginResponseModel;
+
+  TextEditingController vinController = TextEditingController();
+
+  // TextEditingController(text: "1HGBH41JXMN109186");
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    ProductSellDashboardScreen.getPendingCarsResponseModel = null;
+    ProductSellJourneyScreen.addCarRequestModel = AddCarRequestModel();
+    ProductSellJourneyScreen.addSpecificationRequestModel =
+        AddSpecificationRequestModel();
 
-    callGetPendingCarsApi();
+    SharedPrefManager.getLoginData().then((value) => {
+          setState(() {
+            loginResponseModel = value;
+            if (loginResponseModel != null) {
+              callGetPendingCarsApi(null);
+            } else {
+              isPendingCarLoading = false;
+              callGetAllMakeApi();
+            }
+          }),
+        });
   }
 
   @override
@@ -45,13 +71,13 @@ class _ProductSellDashboardScreenState
                 _buildTitleSection(),
                 isPendingCarLoading
                     ? _showLoader()
-                    : ProductSellDashboardScreen.getPendingCarsResponseModel ==
-                            null
-                        ? _showLoader()
-                        : ProductSellDashboardScreen
-                                .getPendingCarsResponseModel!.data.isNotEmpty
-                            ? _buildSelectedProductSection()
-                            : _buildProductSection(),
+                    : ProductSellDashboardScreen
+                    .getPendingCarsResponseModel!=
+                    null && ProductSellDashboardScreen
+                            .getPendingCarsResponseModel!.data.isNotEmpty
+                        ? _buildSelectedProductSection()
+                        : SizedBox(),
+                isBrandLoading ? _showLoader() : _buildProductSection(),
               ],
             ),
           ),
@@ -107,13 +133,20 @@ class _ProductSellDashboardScreenState
           SizedBox(
             height: 10,
           ),
-          _buildPrefilledDetailsSection(),
+          ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: ProductSellDashboardScreen
+                  .getPendingCarsResponseModel!.data.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _buildPrefilledDetailsSection(index);
+              }),
         ],
       ),
     );
   }
 
-  Widget _buildPrefilledDetailsSection() {
+  Widget _buildPrefilledDetailsSection(int index) {
     return Container(
         padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 10),
         margin: EdgeInsets.only(top: 15),
@@ -131,13 +164,20 @@ class _ProductSellDashboardScreenState
                   decoration: BoxDecoration(
                     image: DecorationImage(
                         fit: BoxFit.fill,
-                        image: NetworkImage(
-                            "https://euvande-dev.s3.eu-central-1.amazonaws.com/" +
+                        image: !ProductSellDashboardScreen
+                                .getPendingCarsResponseModel!
+                                .data[index]
+                                .make!
+                                .logo
+                                .isEmpty
+                            ? NetworkImage(
+                                // "https://euvande-dev.s3.eu-central-1.amazonaws.com/" +
                                 ProductSellDashboardScreen
                                     .getPendingCarsResponseModel!
-                                    .data[0]
+                                    .data[index]
                                     .make!
-                                    .logo)),
+                                    .logo) as ImageProvider
+                            : AssetImage("assets/icons/ic_car.webp")),
                   ),
                 ),
                 SizedBox(
@@ -147,7 +187,8 @@ class _ProductSellDashboardScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].period!.year}  ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].make!.makeName} ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].model!.modelName} ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].variant!.fuelType}",
+                      "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].period!.year}"
+                      "  ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].make!.makeName} ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].model!.modelName}",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 12,
@@ -156,7 +197,8 @@ class _ProductSellDashboardScreenState
                     Row(
                       children: [
                         Text(
-                          "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].variant!.fuelType} »  ${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].ownership} Owner",
+                          "${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].variant != null ? ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].variant!.fuelType + " »  " + ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].variant!.variantName : ""}",
+                          //${ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].specification!.transmission}
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 12,
@@ -178,39 +220,20 @@ class _ProductSellDashboardScreenState
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
               onPressed: () {
-                ProductSellJourneyScreen.addCarRequestModel.makeId =
-                    ProductSellDashboardScreen
-                        .getPendingCarsResponseModel!.data[0].make!.id;
-                ProductSellJourneyScreen.addCarRequestModel.periodId =
-                    ProductSellDashboardScreen
-                        .getPendingCarsResponseModel!.data[0].period!.id;
-                ProductSellJourneyScreen.addCarRequestModel.year =
-                    ProductSellDashboardScreen
-                        .getPendingCarsResponseModel!.data[0].period!.year;
-                ProductSellJourneyScreen.addCarRequestModel.modelId =
-                    ProductSellDashboardScreen
-                        .getPendingCarsResponseModel!.data[0].model!.id;
-                ProductSellJourneyScreen.addCarRequestModel.variantId =
-                    ProductSellDashboardScreen
-                        .getPendingCarsResponseModel!.data[0].variant!.id;
-                ProductSellJourneyScreen.addCarRequestModel.ownership =
-                    ProductSellDashboardScreen
-                        .getPendingCarsResponseModel!.data[0].ownership;
-                ProductSellJourneyScreen.addCarRequestModel.odometer =
-                    ProductSellDashboardScreen
-                        .getPendingCarsResponseModel!.data[0].odometer;
+                setSelectedData(index);
 
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ProductSellJourneyScreen(null)),
+                      builder: (context) => TempProductSellJourneyScreen()),
                 );
               },
             ),
-            GestureDetector( behavior: HitTestBehavior.translucent,
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
               onTap: () {
                 callDeleteCarAPI(ProductSellDashboardScreen
-                    .getPendingCarsResponseModel!.data[0].id);
+                    .getPendingCarsResponseModel!.data[index].id);
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -261,6 +284,7 @@ class _ProductSellDashboardScreenState
             height: 10,
           ),
           TextField(
+            controller: vinController,
             style: TextStyle(fontSize: 14),
             decoration: InputDecoration(
               floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -280,9 +304,16 @@ class _ProductSellDashboardScreenState
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Coming Soon"),
-              ));
+              // if (vinController.text.trim().isNotEmpty) {
+                AddCarRequestModel addCarRequestModel = AddCarRequestModel();
+                addCarRequestModel.vin = vinController.text;
+                // callAddCarApi(addCarRequestModel);
+
+              // } else {
+              //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //     content: Text("Please input valid VIN number"),
+              //   ));
+              // }
             },
           ),
           Row(
@@ -319,6 +350,7 @@ class _ProductSellDashboardScreenState
         Container(
           height: 330,
           child: GridView.count(
+            physics: NeverScrollableScrollPhysics(),
             // Create a grid with 2 columns. If you change the scrollDirection to
             // horizontal, this produces 2 rows.
             crossAxisCount: 3,
@@ -336,13 +368,15 @@ class _ProductSellDashboardScreenState
                       ),
                       child: InkWell(
                         onTap: () {
-                          ProductSellDashboardScreen.getPendingCarsResponseModel
-                          = null;
+                          ProductSellDashboardScreen
+                              .getPendingCarsResponseModel = null;
+                          ProductSellJourneyScreen.addCarRequestModel.makeId =
+                              getAllMakeResponseModel!.data[index].id;
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ProductSellJourneyScreen(
-                                    getAllMakeResponseModel!.data[index])),
+                                builder: (context) =>
+                                    TempProductSellJourneyScreen()),
                           );
                         },
                         child: Column(
@@ -353,9 +387,15 @@ class _ProductSellDashboardScreenState
                               height: 35.0,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: NetworkImage(getAllMakeResponseModel!
-                                        .data[index].logo)),
+                                  fit: BoxFit.fill,
+                                  image: !getAllMakeResponseModel!
+                                          .data[index].logo
+                                          .trim()
+                                          .isEmpty
+                                      ? NetworkImage(getAllMakeResponseModel!
+                                          .data[index].logo) as ImageProvider
+                                      : AssetImage("assets/icons/ic_car.webp"),
+                                ),
                               ),
                             ),
                             SizedBox(
@@ -372,13 +412,14 @@ class _ProductSellDashboardScreenState
                         ),
                       ),
                     )
-                  : GestureDetector( behavior: HitTestBehavior.translucent,
+                  : GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  ProductSellJourneyScreen(null)),
+                                  TempProductSellJourneyScreen()),
                         );
                       },
                       child: Container(
@@ -435,25 +476,181 @@ class _ProductSellDashboardScreenState
     });
   }
 
-  void callGetPendingCarsApi() {
+  void callGetPendingCarsApi(String? vin) {
     setState(() {
       isPendingCarLoading = true;
     });
 
     Future<GetPendingCarsResponseModel> response =
-        ApiService(context).getPendingCars("In-Progress");
+    ApiService(context).getPendingCars("In-Progress");
     response
         .then((value) => {
-              setState(() {
-                isPendingCarLoading = false;
-              }),
-              ProductSellDashboardScreen.getPendingCarsResponseModel = value,
-              callGetAllMakeApi()
-            })
+      setState(() {
+        isPendingCarLoading = false;
+      }),
+      ProductSellDashboardScreen.getPendingCarsResponseModel = value,
+      if (vin == null)
+        {
+          callGetAllMakeApi(),
+        }
+      else
+        {
+          for (int index = 0; index < value.data.length; index++)
+            {
+              if (vin == value.data[index].vin) {setSelectedData(index)}
+            }
+        }
+    })
         .catchError((onError) {
       setState(() {
         isPendingCarLoading = false;
       });
     });
   }
+
+  void callGetCarDetailsApi(String carId)   {
+    setState(() {
+      isPendingCarLoading = true;
+    });
+
+    Future<GetPendingCarsResponseModel> response =
+    ApiService(context).getPendingCars("In-Progress");
+    response
+        .then((value) => {
+      setState(() {
+        isPendingCarLoading = false;
+      }),
+      ProductSellDashboardScreen.getPendingCarsResponseModel = value,
+
+    })
+        .catchError((onError) {
+      setState(() {
+        isPendingCarLoading = false;
+      });
+    });
+  }
+
+  void callAddCarApi(AddCarRequestModel addCarRequestModel) {
+    setState(() {
+      showLoaderDialog(context);
+    });
+
+    Future<AddCarResponseModel> response =
+        ApiService(context).addCar(addCarRequestModel);
+    response
+        .then((value) => {
+              setState(() {
+                ProductSellJourneyScreen.addCarRequestModel.id = value.data!.id;
+                ProductSellJourneyScreen.addSpecificationRequestModel.carId =
+                    value.data!.id;
+              }),
+              Navigator.pop(context),
+              // callGetPendingCarsApi(addCarRequestModel.vin),
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content: Text(value.message),
+              // )),
+            })
+        .catchError((onError) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(onError.message),
+      ));
+    });
+  }
+
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(
+              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  setSelectedData(int index) {
+    ProductSellJourneyScreen.addCarRequestModel.id =
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].id;
+    // ProductSellJourneyScreen.addCarRequestModel.vin =
+    //     ProductSellDashboardScreen
+    //         .getPendingCarsResponseModel!.data[index].vin;
+    ProductSellJourneyScreen.addCarRequestModel.makeId =
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[index].make!.id;
+    ProductSellJourneyScreen.addCarRequestModel.periodId =
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[index].period!.id;
+    ProductSellJourneyScreen.addCarRequestModel.year =
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[index].period!.year;
+    ProductSellJourneyScreen.addCarRequestModel.modelId =
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[index].model!.id;
+    ProductSellJourneyScreen.addCarRequestModel.variantId =
+        ProductSellDashboardScreen
+                    .getPendingCarsResponseModel!.data[index].variant !=
+                null
+            ? ProductSellDashboardScreen
+                .getPendingCarsResponseModel!.data[index].variant!.id
+            : null;
+    ProductSellJourneyScreen.addCarRequestModel.ownership =
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[index].ownership;
+    ProductSellJourneyScreen.addCarRequestModel.odometer =
+        ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[index].odometer;
+
+    ProductSellJourneyScreen.addSpecificationRequestModel.carId =
+        ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index].id;
+
+    if (ProductSellDashboardScreen
+            .getPendingCarsResponseModel!.data[index].specification !=
+        null) {
+      ProductSellJourneyScreen.addSpecificationRequestModel.driveType4Wd =
+          ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index]
+              .specification!.driveType4Wd;
+      ProductSellJourneyScreen.addSpecificationRequestModel.doors =
+          ProductSellDashboardScreen
+              .getPendingCarsResponseModel!.data[index].specification!.doors;
+      ProductSellJourneyScreen.addSpecificationRequestModel.interiorMaterial =
+          ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index]
+              .specification!.interiorMaterial;
+      ProductSellJourneyScreen.addSpecificationRequestModel.seats =
+          ProductSellDashboardScreen
+              .getPendingCarsResponseModel!.data[index].specification!.seats;
+      ProductSellJourneyScreen.addSpecificationRequestModel.transmission =
+          ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index]
+              .specification!.transmission;
+      ProductSellJourneyScreen.addSpecificationRequestModel.vatDeduction =
+          ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index]
+              .specification!.vatDeduction;
+      ProductSellJourneyScreen.addSpecificationRequestModel.vehicleType =
+          ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index]
+              .specification!.vehicleType;
+      ProductSellJourneyScreen.addSpecificationRequestModel.power =
+          ProductSellDashboardScreen
+              .getPendingCarsResponseModel!.data[index].specification!.power;
+      ProductSellJourneyScreen.addSpecificationRequestModel.color =
+          ProductSellDashboardScreen
+              .getPendingCarsResponseModel!.data[index].specification!.color;
+      ProductSellJourneyScreen.addSpecificationRequestModel.equipments =
+          ProductSellDashboardScreen.getPendingCarsResponseModel!.data[index]
+              .specification!.equipments;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => TempProductSellJourneyScreen()),
+    );
+  }
+
 }

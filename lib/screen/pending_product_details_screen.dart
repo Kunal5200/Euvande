@@ -1,5 +1,6 @@
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/model/response/GetPendingCarsResponseModel.dart';
+import 'package:euvande/screen/image_viewer_screen.dart';
 import 'package:flutter/material.dart';
 
 class PendingProductDetailsScreen extends StatefulWidget {
@@ -155,15 +156,25 @@ class _PendingProductDetailsScreenState
             // Generate 100 widgets that display their index in the List.
             children: List.generate(widget.getPendingCarsData.carImages.length,
                 (index) {
-              return Center(
-                child: Container(
-                  width: 100.0,
-                  height: 100.0,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(
-                            widget.getPendingCarsData.carImages[index])),
+              return GestureDetector( behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ImageViewerScreen(widget.getPendingCarsData.carImages, index)),
+                  );
+                },
+                child: Center(
+                  child: Container(
+                    width: 100.0,
+                    height: 100.0,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                              widget.getPendingCarsData.carImages[index])),
+                    ),
                   ),
                 ),
               );

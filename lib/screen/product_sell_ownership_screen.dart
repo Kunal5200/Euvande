@@ -14,7 +14,7 @@ class ProductSellOwnerShipScreen extends StatefulWidget {
 
 class _ProductSellOwnerShipScreenState
     extends State<ProductSellOwnerShipScreen> {
-
+  int currentSelectedPeriod = -1;
   final items = [
     "1st",
     "2nd",
@@ -28,21 +28,26 @@ class _ProductSellOwnerShipScreenState
     // TODO: implement initState
     super.initState();
 
+    setState(() {
+      if (ProductSellJourneyScreen.addCarRequestModel.ownership != null)
+        for (int index = 0; index < items.length; index++) {
+          if (ProductSellJourneyScreen.addCarRequestModel.ownership!
+              .contains(items[index])) {
+            currentSelectedPeriod = index;
+            break;
+          }
+        }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTitleSection(),
-            SizedBox(height: 10,),
-            _buildYearListSection(),
-          ],
-        ),
+    return Container(
+      child: Column(
+        children: [
+          _buildTitleSection(),
+          _buildYearListSection(),
+        ],
       ),
     );
   }
@@ -71,13 +76,17 @@ class _ProductSellOwnerShipScreenState
           height: 10,
         ),
         Container(
-          height: 450,
-          child:  ListView.builder(
-              padding: const EdgeInsets.all(8),
+          child: ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
-                return GestureDetector( behavior: HitTestBehavior.translucent,
+                return GestureDetector(
+                  behavior: HitTestBehavior.translucent,
                   onTap: () {
+                    setState(() {
+                      currentSelectedPeriod = index;
+                    });
                     widget.onNext(items[index]);
                   },
                   child: Container(
@@ -86,27 +95,42 @@ class _ProductSellOwnerShipScreenState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("  "+items[index] + " Ownership ${(ProductSellDashboardScreen
-                            .getPendingCarsResponseModel != null &&
-                            ProductSellDashboardScreen
-                                .getPendingCarsResponseModel!.data.length > 0
-                            && ProductSellDashboardScreen
-                                .getPendingCarsResponseModel!.data[0]
-                                .ownership.toLowerCase() == items[index].toLowerCase()) ?
-                        " ✓" : ""}",
-                          style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
-                        SizedBox(height: 5,),
-                        Divider(thickness: 0.5, color: Colors.black26,),
+                        Row(
+                          children: [
+                            Text(
+                              "  ${items[index] + " Ownership"}",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: currentSelectedPeriod == index
+                                      ? Colors.black
+                                      : Colors.black54,
+                                  fontWeight: currentSelectedPeriod == index
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
+                            Spacer(),
+                            Text(
+                              "${currentSelectedPeriod == index ? "✓   "
+                                  "" : ""}",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Divider(
+                          thickness: 0.5,
+                          color: Colors.black26,
+                        ),
                       ],
                     ),
                   ),
                 );
-              }
-          ),
+              }),
         )
       ],
     );
   }
-
 }

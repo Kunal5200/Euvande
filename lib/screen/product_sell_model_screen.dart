@@ -21,6 +21,8 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
   GetModelResponseModel? getModelResponseModel;
   List<ModelData> originalData = [];
 
+  int currentSelectedPeriod = -1;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -32,18 +34,14 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTitleSection(),
-            SizedBox(
-              height: 10,
-            ),
-            isDataLoading ? _showLoader() : _buildYearListSection(),
-          ],
-        ),
+      child: Column(
+        children: [
+          _buildTitleSection(),
+          SizedBox(
+            height: 10,
+          ),
+          isDataLoading ? _showLoader() : _buildYearListSection(),
+        ],
       ),
     );
   }
@@ -132,8 +130,9 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
         ),
         getModelResponseModel!.data.length ==0 ? _buildNoData() :
         Container(
-          height: 450,
           child: ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.all(8),
               itemCount: getModelResponseModel!.data.length,
               itemBuilder: (BuildContext context, int index) {
@@ -141,6 +140,9 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
                   padding: EdgeInsets.symmetric(vertical: 5),
                   child: GestureDetector( behavior: HitTestBehavior.translucent,
                     onTap: () {
+                      setState(() {
+                        currentSelectedPeriod = index;
+                      });
                       widget.onNext(getModelResponseModel!.data[index]);
                     },
                     child: Container(
@@ -148,19 +150,29 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "  ${getModelResponseModel!.data[index]
-                                  .modelName} ${(ProductSellDashboardScreen
-                                  .getPendingCarsResponseModel != null &&
-                                  ProductSellDashboardScreen
-                                      .getPendingCarsResponseModel!.data
-                                      .length > 0 &&
-                                  ProductSellDashboardScreen
-                                      .getPendingCarsResponseModel!.data[0]
-                                      .model!.id == getModelResponseModel!.data[index].id) ?
-                              " ✓" : ""}",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            Row(
+                              children: [
+                                Text(
+                                  "  ${getModelResponseModel!.data[index].modelName}",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: currentSelectedPeriod == index
+                                          ? Colors.black
+                                          : Colors.black54,
+                                      fontWeight:
+                                      currentSelectedPeriod == index
+                                          ? FontWeight.bold
+                                          : FontWeight.normal),
+                                ),
+                                Spacer(),
+                                Text(
+                                  "${currentSelectedPeriod == index ? "✓   "
+                                      "" : ""}",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                             SizedBox(
                               height: 5,
@@ -197,12 +209,21 @@ class _ProductSellModelScreenState extends State<ProductSellModelScreen> {
         ApiService(context).getModel(getModelRequestModel);
     response
         .then((value) => {
-              setState(() {
-                isDataLoading = false;
-              }),
+
               getModelResponseModel = value,
       originalData.addAll(value.data),
-      
+      setState(() {
+
+        for(int index =0; index<value.data.length;index++){
+          if(ProductSellJourneyScreen.addCarRequestModel.modelId ==
+              value.data[index].id){
+            currentSelectedPeriod = index;
+            break;
+          }
+        }
+
+        isDataLoading = false;
+      }),
             })
         .catchError((onError) {
       setState(() {

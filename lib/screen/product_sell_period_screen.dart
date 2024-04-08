@@ -21,6 +21,7 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
   bool isDataLoading = true;
   GetPeriodByMakeResponseModel? getPeriodByMakeResponseModel;
   List<GetPeriodByMakeData> originalData = [];
+  int currentSelectedPeriod = -1;
 
   @override
   void initState() {
@@ -32,18 +33,14 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTitleSection(),
-            SizedBox(
-              height: 10,
-            ),
-            isDataLoading ? _showLoader() : _buildYearListSection(),
-          ],
-        ),
+      child: Column(
+        children: [
+          _buildTitleSection(),
+          SizedBox(
+            height: 10,
+          ),
+          isDataLoading ? _showLoader() : _buildYearListSection(),
+        ],
       ),
     );
   }
@@ -113,15 +110,20 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
         getPeriodByMakeResponseModel!.data.length == 0
             ? _buildNoData()
             : Container(
-                height: 450,
                 child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(8),
                     itemCount: getPeriodByMakeResponseModel!.data.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
                         padding: EdgeInsets.symmetric(vertical: 5),
-                        child: GestureDetector( behavior: HitTestBehavior.translucent,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
                           onTap: () {
+                            setState(() {
+                              currentSelectedPeriod = index;
+                            });
                             widget.onNext(
                                 getPeriodByMakeResponseModel!.data[index]);
                           },
@@ -130,11 +132,29 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "  ${getPeriodByMakeResponseModel!.data[index].year} ${(ProductSellDashboardScreen.getPendingCarsResponseModel != null && ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length > 0 && ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0].period!.id == getPeriodByMakeResponseModel!.data[index].id) ? " ✓" : ""}",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "  ${getPeriodByMakeResponseModel!.data[index].year}",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: currentSelectedPeriod == index
+                                              ? Colors.black
+                                              : Colors.black54,
+                                          fontWeight:
+                                              currentSelectedPeriod == index
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal),
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      "${currentSelectedPeriod == index ? "✓   "
+                                          "" : ""}",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(
                                   height: 5,
@@ -168,8 +188,13 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
         alignment: Alignment.center,
         child: Column(
           children: [
-            SizedBox(height: 50,),
-            Text("Sorry, period not found", style: TextStyle(fontSize: 18),),
+            SizedBox(
+              height: 50,
+            ),
+            Text(
+              "Sorry, period not found",
+              style: TextStyle(fontSize: 18),
+            ),
             SizedBox(
                 height: 200,
                 width: 200,
@@ -177,8 +202,7 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
                   'assets/lottie/nodata.json',
                 )),
           ],
-        )
-    );
+        ));
   }
 
   void callGetPeriodByMakeApi() {
@@ -197,6 +221,15 @@ class _ProductSellPeriodScreenState extends State<ProductSellPeriodScreen> {
               getPeriodByMakeResponseModel = value,
               originalData.addAll(value.data),
               setState(() {
+
+                for(int index =0; index<value.data.length;index++){
+                  if(ProductSellJourneyScreen.addCarRequestModel.periodId ==
+                      value.data[index].id){
+                    currentSelectedPeriod = index;
+                    break;
+                  }
+                }
+
                 isDataLoading = false;
               }),
             })

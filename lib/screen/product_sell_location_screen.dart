@@ -1,5 +1,6 @@
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
+import 'package:euvande/utilities/GeoLocation.dart';
 import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:flutter/material.dart';
 
@@ -42,37 +43,33 @@ class _ProductSellLocationScreenState extends State<ProductSellLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTitleSection(),
-            SizedBox(
-              height: 10,
+      child: Column(
+        children: [
+          _buildTitleSection(),
+          SizedBox(
+            height: 10,
+          ),
+          _buildLocationSection(),
+          SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
+            style: raisedButtonStyle,
+            child: Text(
+              'Continue',
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-            _buildLocationSection(),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(
-              style: raisedButtonStyle,
-              child: Text(
-                'Continue',
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              onPressed: () {
-                if (cityController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Please enter your city name"),
-                  ));
-                } else {
-                  widget.onNext(cityController.text);
-                }
-              },
-            ),
-          ],
-        ),
+            onPressed: () {
+              if (cityController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Please enter your city name"),
+                ));
+              } else {
+                widget.onNext(cityController.text);
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -120,16 +117,55 @@ class _ProductSellLocationScreenState extends State<ProductSellLocationScreen> {
         SizedBox(
           width: 10,
         ),
-        Container(
-          width: 50.0,
-          height: 50.0,
-          decoration: BoxDecoration(
-            border: Border.all(width: 1, color: Colors.black),
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        InkWell(
+          onTap: () {
+
+            showLoaderDialog(context);
+            MyGeoLocation()
+                .getLocation(context)
+                .then((value) => {
+              Navigator.pop(context),
+                  if(value.length >0 &&value[0].locality!= null){
+                    cityController.text=value[0].locality.toString()
+                  }else{
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("Location couldn't be fetched"),
+                    )),
+                  }
+
+
+                    });
+          },
+          child: Container(
+            width: 50.0,
+            height: 50.0,
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            ),
+            child: Icon(Icons.my_location),
           ),
-          child: Icon(Icons.my_location),
-        ),
+        )
       ],
+    );
+  }
+
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(
+              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

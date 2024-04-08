@@ -66,11 +66,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   String sendOTPButtonText = "Next";
   bool isEnabled = true;
   final TextEditingController oldPasswordController =
-      TextEditingController(text: "123456");
+      TextEditingController(text: "");
   final TextEditingController passwordController =
-      TextEditingController(text: "123456");
+      TextEditingController(text: "");
   final TextEditingController confirmPasswordController =
-      TextEditingController(text: "123456");
+      TextEditingController(text: "");
 
   @override
   void dispose() {
@@ -108,7 +108,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             fit: BoxFit.cover,
                             image: AssetImage("assets/logos/logo.png")),
                       ),
-                    ),TextFormField(
+                    ),
+                    TextFormField(
                         controller: oldPasswordController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {

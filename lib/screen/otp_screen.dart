@@ -30,34 +30,9 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
   String sendOTPButtonText = "Submit";
   bool isEnabled = true;
   final TextEditingController passwordController =
-      TextEditingController(text: "123456");
+      TextEditingController(text: "");
   final TextEditingController rePasswordController =
-      TextEditingController(text: "123456");
-
-  final textFieldFocusNode = FocusNode();
-  final textFieldFocusNode1 = FocusNode();
-  bool _obscured = true;
-  bool _obscured1 = true;
-
-  void _toggleObscured() {
-    setState(() {
-      _obscured = !_obscured;
-      if (textFieldFocusNode.hasPrimaryFocus)
-        return; // If focus is on text field, dont unfocus
-      textFieldFocusNode.canRequestFocus =
-          false; // Prevents focus if tap on eye
-    });
-  }
-
-  void _toggleObscured1() {
-    setState(() {
-      _obscured1 = !_obscured1;
-      if (textFieldFocusNode1.hasPrimaryFocus)
-        return; // If focus is on text field, dont unfocus
-      textFieldFocusNode1.canRequestFocus =
-          false; // Prevents focus if tap on eye
-    });
-  }
+      TextEditingController(text: "");
 
   // Constants
   final int time = 30;
@@ -327,11 +302,11 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
-    passwordController.dispose();
-    rePasswordController.dispose();
-    textFieldFocusNode.dispose();
-    textFieldFocusNode1.dispose();
+    // _controller.dispose();
+    // passwordController.dispose();
+    // rePasswordController.dispose();
+    // textFieldFocusNode.dispose();
+    // textFieldFocusNode1.dispose();
 
     super.dispose();
   }
@@ -460,139 +435,174 @@ class _OtpState extends State<Otp> with SingleTickerProviderStateMixin {
               isDismissible: false,
               backgroundColor: Colors.white,
               builder: (BuildContext context) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: Form(
-                    key: _formKey,
-                    child: SizedBox(
-                      height: 300,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(15))),
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              "New Password",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              "Enter a new password to reset your password.",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            TextFormField(
-                              controller: passwordController,
-                              keyboardType: TextInputType.visiblePassword,
-                              obscureText: _obscured,
-                              focusNode: textFieldFocusNode,
-                              decoration: InputDecoration(
-                                labelText: "Password",
-                                border: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(), // Apply corner radius
+
+                final textFieldFocusNode = FocusNode();
+                final textFieldFocusNode1 = FocusNode();
+                bool _obscured = true;
+                bool _obscured1 = true;
+
+
+                return StatefulBuilder(builder: (BuildContext context,
+                    StateSetter setState)
+                {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery
+                            .of(context)
+                            .viewInsets
+                            .bottom),
+                    child: Form(
+                        key: _formKey,
+                        child: SizedBox(
+                          height: 300,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  "New Password",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                                prefixIcon: Icon(Icons.lock_rounded, size: 24),
-                                suffixIcon: Padding(
-                                  padding:
-                                  const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                  child: GestureDetector( behavior: HitTestBehavior.translucent,
-                                    onTap: _toggleObscured,
-                                    child: Icon(
-                                      _obscured
-                                          ? Icons.visibility_rounded
-                                          : Icons.visibility_off_rounded,
-                                      size: 24,
-                                    ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  "Enter a new password to reset your password.",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
                                   ),
                                 ),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'This field is required';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            TextFormField(
-                              controller: rePasswordController,
-                              keyboardType: TextInputType.visiblePassword,
-                              obscureText: _obscured1,
-                              focusNode: textFieldFocusNode1,
-                              decoration: InputDecoration(
-                                labelText: "Re-Type Password",
-                                border: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(), // Apply corner radius
+                                SizedBox(
+                                  height: 15,
                                 ),
-                                prefixIcon: Icon(Icons.lock_rounded, size: 24),
-                                suffixIcon: Padding(
-                                  padding:
-                                  const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                  child: GestureDetector( behavior: HitTestBehavior.translucent,
-                                    onTap: _toggleObscured1,
-                                    child: Icon(
-                                      _obscured1
-                                          ? Icons.visibility_rounded
-                                          : Icons.visibility_off_rounded,
-                                      size: 24,
+                                TextFormField(
+                                  controller: passwordController,
+                                  keyboardType: TextInputType.visiblePassword,
+                                  obscureText: _obscured,
+                                  focusNode: textFieldFocusNode,
+                                  decoration: InputDecoration(
+                                    labelText: "Password",
+                                    border: OutlineInputBorder(
+                                      borderSide:
+                                      BorderSide(), // Apply corner radius
+                                    ),
+                                    prefixIcon: Icon(
+                                        Icons.lock_rounded, size: 24),
+                                    suffixIcon: Padding(
+                                      padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: () {
+                                          setState(() {
+                                            _obscured = !_obscured;
+                                            if (textFieldFocusNode.hasPrimaryFocus)
+                                              return; // If focus is on text field, dont unfocus
+                                            textFieldFocusNode.canRequestFocus =
+                                            false; // Prevents focus if tap on eye
+                                          });
+                                        },
+                                        child: Icon(
+                                          _obscured
+                                              ? Icons.visibility_rounded
+                                              : Icons.visibility_off_rounded,
+                                          size: 24,
+                                        ),
+                                      ),
                                     ),
                                   ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'This field is required';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'This field is required';
-                                } else if (passwordController.text != value) {
-                                  return 'Password not matched';
-                                }
-                                return null;
-                              },
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                TextFormField(
+                                  controller: rePasswordController,
+                                  keyboardType: TextInputType.visiblePassword,
+                                  obscureText: _obscured1,
+                                  focusNode: textFieldFocusNode1,
+                                  decoration: InputDecoration(
+                                    labelText: "Re-Type Password",
+                                    border: OutlineInputBorder(
+                                      borderSide:
+                                      BorderSide(), // Apply corner radius
+                                    ),
+                                    prefixIcon: Icon(
+                                        Icons.lock_rounded, size: 24),
+                                    suffixIcon: Padding(
+                                      padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: () {
+                                          setState(() {
+                                            _obscured1 = !_obscured1;
+                                            if (textFieldFocusNode1.hasPrimaryFocus)
+                                              return; // If focus is on text field, dont unfocus
+                                            textFieldFocusNode1.canRequestFocus =
+                                            false; // Prevents focus if tap on eye
+                                          });
+                                        },
+                                        child: Icon(
+                                          _obscured1
+                                              ? Icons.visibility_rounded
+                                              : Icons.visibility_off_rounded,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'This field is required';
+                                    } else
+                                    if (passwordController.text != value) {
+                                      return 'Password not matched';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                ElevatedButton(
+                                  style: raisedButtonStyle,
+                                  child: Text(
+                                    sendOTPButtonText,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 14),
+                                  ),
+                                  onPressed: () {
+                                    if (isEnabled &&
+                                        _formKey.currentState!.validate()) {
+                                      verifyForgetPasswordOTP(
+                                          otp, passwordController.text);
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            ElevatedButton(
-                              style: raisedButtonStyle,
-                              child: Text(
-                                sendOTPButtonText,
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14),
-                              ),
-                              onPressed: () {
-                                if (isEnabled &&
-                                    _formKey.currentState!.validate()) {
-                                  verifyForgetPasswordOTP(
-                                      otp, passwordController.text);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    )),
-                );
+                          ),
+                        )),
+                  );
+                });
               },
             );
             break;

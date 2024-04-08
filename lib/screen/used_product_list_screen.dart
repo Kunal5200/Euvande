@@ -1,8 +1,11 @@
 import 'package:euvande/model/request/FavoriteRequestModel.dart';
+import 'package:euvande/model/request/GetCarListRequestModel.dart';
 import 'package:euvande/model/response/FavoriteResponseModel.dart';
 import 'package:euvande/model/response/GetCarListResponseModel.dart';
+import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
+import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:flutter/material.dart';
 
 class UsedProductListScreen extends StatefulWidget {
@@ -15,13 +18,19 @@ class UsedProductListScreen extends StatefulWidget {
 class _UsedProductListScreenState extends State<UsedProductListScreen> {
   bool isDataLoading = true;
   GetCarListResponseModel? getCarListResponseModel;
+  late LoginResponseModel? loginResponseModel;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    callGetCarListApi();
+    SharedPrefManager.getLoginData().then((value) => {
+      setState(() {
+        loginResponseModel = value;
+        callGetCarListApi();
+      }),
+    });
   }
 
   @override
@@ -205,7 +214,11 @@ class _UsedProductListScreenState extends State<UsedProductListScreen> {
       isDataLoading = true;
     });
 
-    Future<GetCarListResponseModel> response = ApiService(context).getCarList();
+    GetCarListRequestModel getCarListRequestModel = GetCarListRequestModel
+      (userId: loginResponseModel ==
+        null ? 0 : loginResponseModel!.data.referenceId);
+
+    Future<GetCarListResponseModel> response = ApiService(context).getCarList(getCarListRequestModel);
     response
         .then((value) => {
               setState(() {

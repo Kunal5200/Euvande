@@ -20,6 +20,8 @@ import 'package:flutter/material.dart';
 class ProductSellJourneyScreen extends StatefulWidget {
   final GetAllMakeData? selectedBrand;
   static late AddCarRequestModel addCarRequestModel = AddCarRequestModel();
+  static late AddSpecificationRequestModel addSpecificationRequestModel =
+  AddSpecificationRequestModel();
 
   const ProductSellJourneyScreen(
     this.selectedBrand, {
@@ -243,6 +245,11 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
         return ProductSellVariantScreen(
           onNext: (data) {
             ProductSellJourneyScreen.addCarRequestModel.variantId = data.id;
+            ProductSellJourneyScreen.addCarRequestModel.variantName =
+                data.variantName;
+            ProductSellJourneyScreen.addCarRequestModel.fuelType =
+                data.fuelType;
+
             _tabController.index++;
             currentIndex = _tabController.index;
             // callAddCarApi(addCarRequestModel, 4);
@@ -271,13 +278,14 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
           onNext: (data) {
             Location location = Location(city: data, latitude: 1, longitude: 1);
             ProductSellJourneyScreen.addCarRequestModel.location = location;
-            callAddCarApi(ProductSellJourneyScreen.addCarRequestModel, 6);
+            // callAddCarApi(ProductSellJourneyScreen.addCarRequestModel, 6);
           },
         );
       case "specifications":
         return ProductSellSpecificationScreen(
           onNext: (data) {
-            callAddSpecificationApi(data, 7);
+            ProductSellJourneyScreen.addSpecificationRequestModel = data;
+            // callAddSpecificationApi(data, 7);
           },
           carId: carId,
         );
@@ -293,7 +301,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
 
             ProductSellJourneyScreen.addCarRequestModel.contactInfo =
                 contactInfo;
-            callAddCarApi(ProductSellJourneyScreen.addCarRequestModel, 8);
+            // callAddCarApi(ProductSellJourneyScreen.addCarRequestModel, 8);
           },
         );
       case "photos":
@@ -304,7 +312,6 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
             ));
             // _tabController.index = 1;
           },
-          carId: carId,
         );
     }
 
@@ -328,7 +335,7 @@ class _ProductSellJourneyScreenState extends State<ProductSellJourneyScreen>
               Navigator.pop(context),
               _tabController.index =
                   (tabItems.length == 9 ? indexNext : indexNext + 1),
-      currentIndex = _tabController.index,
+              currentIndex = _tabController.index,
               // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               //   content: Text(value.message),
               // )),

@@ -13,10 +13,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProductSellVehicleImageUploadScreen extends StatefulWidget {
-  final int carId;
+  int carId = 0;
 
-  const ProductSellVehicleImageUploadScreen(
-      {super.key, required this.onNext, required this.carId});
+  ProductSellVehicleImageUploadScreen(
+      {super.key, required this.onNext, int? carId}) {
+    carId == null ? this.carId = 0 : this.carId = carId;
+  }
 
   final TabChangeCallback onNext;
 
@@ -33,6 +35,7 @@ class _ProductSellVehicleImageUploadScreenState
   List<KeyFileModel?> _imageExterior = List.generate(8, (index) => null);
   List<KeyFileModel?> _imageInterior = List.generate(8, (index) => null);
   List<KeyFileModel?> _imageWheel = List.generate(8, (index) => null);
+  List<KeyFileModel?> _imageVideo = List.generate(1, (index) => null);
 
   List<List<KeyFileModel?>> selectedImageHolder = [];
 
@@ -167,11 +170,20 @@ class _ProductSellVehicleImageUploadScreenState
     },
   ];
 
+  final videoList = [
+    {
+      "key": "videos",
+      "title": "360 Videos",
+      "image": "assets/images/video/video.webp"
+    },
+  ];
+
   final picker = ImagePicker();
 
   List<double> _imageExteriorUploadProgress = List.generate(8, (index) => 0.0);
   List<double> _imageInteriorUploadProgress = List.generate(8, (index) => 0.0);
   List<double> _imageWheelUploadProgress = List.generate(8, (index) => 0.0);
+  List<double> _imageVideoUploadProgress = List.generate(1, (index) => 0.0);
 
   List<List<double>> selectedUploadProgressHolder = [];
 
@@ -184,10 +196,12 @@ class _ProductSellVehicleImageUploadScreenState
     selectedImageHolder.add(_imageExterior);
     selectedImageHolder.add(_imageInterior);
     selectedImageHolder.add(_imageWheel);
+    selectedImageHolder.add(_imageVideo);
 
     selectedUploadProgressHolder.add(_imageExteriorUploadProgress);
     selectedUploadProgressHolder.add(_imageInteriorUploadProgress);
     selectedUploadProgressHolder.add(_imageWheelUploadProgress);
+    selectedUploadProgressHolder.add(_imageVideoUploadProgress);
 
     if (ProductSellDashboardScreen.getPendingCarsResponseModel != null &&
         ProductSellDashboardScreen.getPendingCarsResponseModel!.data.length >
@@ -202,87 +216,195 @@ class _ProductSellVehicleImageUploadScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTitleSection(),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              "Exterior",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            _buildLocationSection(exteriorImageList, 0),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              "Interior",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            _buildLocationSection(interiorImageList, 1),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              "Wheel",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            _buildLocationSection(wheelImageList, 2),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(
-              style: raisedButtonStyle,
-              child: Text(
-                'Continue',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Media upload"),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          child: Column(
+            children: [
+              _buildSteps(),
+              SizedBox(
+                height: 10,
               ),
-              onPressed: () {
-                var flag = false;
+              _buildTitleSection(),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                "Exterior",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              _buildLocationSection(exteriorImageList, 0),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                "Interior",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              _buildLocationSection(interiorImageList, 1),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                "Wheel",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              _buildLocationSection(wheelImageList, 2),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                "Video",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              _buildLocationSection(videoList, 3),
+              SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                style: raisedButtonStyle,
+                child: Text(
+                  'Continue',
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+                onPressed: () {
+                  var flag = false;
 
-                for(int i=0; i < selectedImageHolder.length;i++){
-                  for(var mainData in selectedImageHolder[i]){
-                    if(mainData !=null){
-                      flag = true;
-                      break;
+                  for (int i = 0; i < selectedImageHolder.length; i++) {
+                    for (var mainData in selectedImageHolder[i]) {
+                      if (mainData != null) {
+                        flag = true;
+                        break;
+                      }
                     }
-
                   }
-                }
 
-                if(flag || mediaImages!=null){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProductSellDetailsScreen()),
-                  );
-                }else{
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("Upload all mandatory images"),
-                  ));
-                }
-
-
-              },
-            ),
-          ],
+                  if (flag || mediaImages != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const ProductSellDetailsScreen()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("Upload all mandatory images"),
+                    ));
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildSteps() {
+    return Container(
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(),
+        child: Row(
+          children: [
+            Container(
+              width: 15,
+              height: 15,
+              alignment: Alignment.center,
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.green),
+              child: Text(
+                "✓",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              "Specifications",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Divider(),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Container(
+              width: 15,
+              height: 15,
+              alignment: Alignment.center,
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.green),
+              child: Text(
+                "✓",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              "Personal Info",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Divider(),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Container(
+              width: 15,
+              height: 15,
+              alignment: Alignment.center,
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.blue),
+              child: Text(
+                "3",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              "Photos",
+              style: TextStyle(fontSize: 12),
+            ),
+          ],
+        ));
   }
 
   Widget _buildTitleSection() {
@@ -312,6 +434,18 @@ class _ProductSellVehicleImageUploadScreenState
         ],
       ),
     );
+  }
+
+  Future getVideoFromGallery(int categoryIndex, int index, String key) async {
+    final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        selectedImageHolder[categoryIndex][index] =
+            KeyFileModel(file: File(pickedFile.path), key: key);
+        callAddMediaApi(key, File(pickedFile.path), categoryIndex, index);
+      }
+    });
   }
 
   Future getImageFromGallery(int categoryIndex, int index, String key) async {
@@ -419,9 +553,16 @@ class _ProductSellVehicleImageUploadScreenState
         physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: 2,
         children: List.generate(imageListData.length, (index) {
-          return GestureDetector( behavior: HitTestBehavior.translucent,
+          return GestureDetector(
+              behavior: HitTestBehavior.translucent,
               onTap: () {
-                showOptions(categoryIndex, index, imageListData[index]["key"]!);
+                if (categoryIndex == 3) {
+                  getVideoFromGallery(categoryIndex, index,
+                      imageListData[index]["key"]!);
+                } else {
+                  showOptions(
+                      categoryIndex, index, imageListData[index]["key"]!);
+                }
               },
               child: Container(
                 margin: EdgeInsets.all(5),
@@ -440,8 +581,8 @@ class _ProductSellVehicleImageUploadScreenState
                       ),
                     ),
                     selectedImageHolder[categoryIndex][index] == null
-                        ? mediaImages !=null &&
-                    mediaImages[imageListData[index]["key"]] != null
+                        ? mediaImages != null &&
+                                mediaImages[imageListData[index]["key"]] != null
                             ? Container(
                                 decoration: BoxDecoration(
                                   borderRadius:

@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:euvande/model/response/LoginResponseModel.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/KeyConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefManager {
-
-  static String? accessToken = "";
+  static String accessToken = "";
 
   static void setLoginData(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -16,7 +16,27 @@ class SharedPrefManager {
   static Future<LoginResponseModel?> getLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var result = prefs.getString(LOCAL_STORAGE_LOGIN_DATA);
-    var data =  result == null
+    var data = result == null
+        ? null
+        : LoginResponseModel.fromJson(json.decode(result));
+
+    if(data != null){
+      accessToken = data.data.accessToken;
+    }
+
+
+    return data;
+  }
+
+  static void setGuestLoginData(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(LOCAL_STORAGE_GUEST_LOGIN_DATA, value);
+  }
+
+  static Future<LoginResponseModel?> getGuestData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var result = prefs.getString(LOCAL_STORAGE_GUEST_LOGIN_DATA);
+    var data = result == null
         ? null
         : LoginResponseModel.fromJson(json.decode(result));
 
@@ -27,11 +47,11 @@ class SharedPrefManager {
   static void updateAccessToken(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var result = prefs.getString(LOCAL_STORAGE_LOGIN_DATA);
-    var data =  result == null
+    var data = result == null
         ? null
         : LoginResponseModel.fromJson(json.decode(result));
-    
-    if(data != null){
+
+    if (data != null) {
       data.data.accessToken = value;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString(LOCAL_STORAGE_LOGIN_DATA, jsonEncode(data));
@@ -40,7 +60,7 @@ class SharedPrefManager {
     accessToken = value;
   }
 
-  static void logout() async{
+  static void logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(LOCAL_STORAGE_LOGIN_DATA);
   }

@@ -1,15 +1,24 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:euvande/model/request/AddCarRequestModel.dart';
+import 'package:euvande/model/request/AddSpecificationRequestModel.dart';
+import 'package:euvande/model/request/GetCarListRequestModel.dart';
+import 'package:euvande/model/request/LoginRequestModel.dart';
 import 'package:euvande/model/response/GetAllMakeResponseModel.dart';
 import 'package:euvande/model/response/GetCarListResponseModel.dart';
+import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/screen/product_details_screen.dart';
 import 'package:euvande/screen/product_sell_dashboard_screen.dart';
 import 'package:euvande/screen/product_sell_journey_screen.dart';
+import 'package:euvande/screen/product_sell_vin_screen.dart';
 import 'package:euvande/screen/search_product_list_screen.dart';
+import 'package:euvande/screen/temp_product_sell_journey_screen.dart';
 import 'package:euvande/screen/used_product_list_screen.dart';
 import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/ProductItemList.dart';
+import 'package:euvande/utilities/StyleConstants.dart';
 import 'package:euvande/utilities/TitleDescriptionItemList.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -26,10 +35,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Container(
       margin: EdgeInsets.all(6.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(5.0),
         image: DecorationImage(
-          image: NetworkImage(
-              "https://storage.pixteller.com/designs/designs-images/2020-12-21/04/rent-a-car-sale-banner-1-5fe0b5604db74.png"),
+          image: AssetImage("assets/images/banner1.png"),
           fit: BoxFit.fill,
         ),
       ),
@@ -37,21 +45,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Container(
       margin: EdgeInsets.all(6.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(5.0),
         image: DecorationImage(
-          image: NetworkImage(
-              "https://storage.pixteller.com/designs/designs-images/2020-12-21/04/rent-a-car-sale-banner-1-5fe0b5604db74.png"),
-          fit: BoxFit.fill,
-        ),
-      ),
-    ),
-    Container(
-      margin: EdgeInsets.all(6.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        image: DecorationImage(
-          image: NetworkImage(
-              "https://storage.pixteller.com/designs/designs-images/2020-12-21/04/rent-a-car-sale-banner-1-5fe0b5604db74.png"),
+          image: AssetImage("assets/images/banner2.png"),
           fit: BoxFit.fill,
         ),
       ),
@@ -89,21 +85,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: "European Dreams, Driven Reality.",
         description:
             "Turn your European dreams into reality with the perfect car. Explore iconic destinations, scenic routes, and cityscapes on your terms. Your dream ride awaits.",
-        imageURLs: 'assets/images/placeholder.webp'));
+        imageURLs: 'assets/icons/european_dreams_driven_reality.svg'));
     howWorksItemList.add(TitleDescription(
         title: "Expert Eyes, Thorough Inspection.",
         description:
             "Our expert eyes ensure a meticulous inspection, guaranteeing your peace of mind.",
-        imageURLs: 'assets/images/placeholder.webp'));
+        imageURLs: 'assets/icons/expert_eyes_thorough_inspection.svg'));
     howWorksItemList.add(TitleDescription(
         title: "Delivered to Your Doorstep.",
         description:
             "Experience seamless convenience with our direct-to-your-door delivery service – your dream car, delivered effortlessly to your home.",
-        imageURLs: 'assets/images/placeholder.webp'));
+        imageURLs: 'assets/icons/delivered_to_your_doorstep.svg'));
 
     callGetCarListApi();
     callGetAllMakeApi();
-
   }
 
   @override
@@ -121,37 +116,157 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: <Widget>[
             _buildSearch(),
             _buildCarouselSlider(),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              _buildSellPurchase(
-                  () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const UsedProductListScreen()),
-                        )
-                      },
-                  AssetImage("assets/icons/car.png"),
-                  "Buy Used Car",
-                  "pre-owned car for sale →",
-                  Colors.green[100]),
-              SizedBox(
-                width: 10,
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: Colors.black
               ),
-              _buildSellPurchase(
-                  () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProductSellDashboardScreen()),
-                        )
-                      },
-                  AssetImage("assets/icons/car.png"),
-                  "Sell Car",
-                  "from your home",
-                  Colors.blue[100])
-            ]),
+              child: Row(
+                children: [
+                  Expanded(child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                            // const TempProductSellDashboardScreen()
+                            const UsedProductListScreen()),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Image(
+                          image: AssetImage("assets/icons/car1.png"),
+                          height: 40,
+                          width: 40,
+                        ),
+                        Text("Buy Premium Car", style: TextStyle(color: Colors
+                            .white,
+                            fontWeight: FontWeight.bold),),
+                      ],
+                    ),
+                  )),
+                  Container(color: Colors.white,height: 50,width: 1,),
+                  Expanded(child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                            // const TempProductSellDashboardScreen()
+                            const ProductSellVinScreen()),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Image(
+                          image: AssetImage("assets/icons/car1.png", ),
+                          height: 40,
+                          width: 40,
+                        ),
+                        Text("Sell Premium Car", style: TextStyle(color: Colors
+                            .white,
+                            fontWeight: FontWeight.bold),),
+                      ],
+                    )),
+                  ),
+
+                ],
+              ),
+            ),
+            // Container(
+            //   width: double.infinity,
+            //   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            //   decoration: BoxDecoration(
+            //     color: Colors.white,
+            //     border: Border.all(color: Colors.black, width: 1),
+            //     borderRadius: BorderRadius.circular(5),
+            //   ),
+            //   child: Stack(
+            //     children: [
+            //       Align(
+            //         alignment: Alignment.centerRight,
+            //         child: Container(
+            //           width: 150.0,
+            //           height: 110.0,
+            //           decoration: BoxDecoration(
+            //             borderRadius: BorderRadius.circular(15),
+            //             image: DecorationImage(
+            //                 fit: BoxFit.cover,
+            //                 image: AssetImage("assets/images/vintage.jpg")),
+            //           ),
+            //         ),
+            //       ),
+            //       Container(
+            //         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            //         child: Column(
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             Text("Want to sell your Car ?", style: TextStyle
+            //               (fontSize: 18, fontWeight: FontWeight.bold),)
+            //             , Text("Sell your car at best price.", style: TextStyle
+            //               (fontSize:
+            //             14, fontWeight: FontWeight.normal, color: Colors.black54,
+            //                 fontStyle: FontStyle.italic),),
+            //             SizedBox(height: 10,),
+            //             SizedBox(
+            //               width: 200,
+            //               child: ElevatedButton(
+            //                 style: raisedButtonStyle,
+            //                 child: Text(
+            //                   'Sell Car'.toUpperCase(),
+            //                   style: TextStyle(color: Colors.white, fontSize: 14),
+            //                 ),
+            //                 onPressed: () {
+            //                   Navigator.push(
+            //                     context,
+            //                     MaterialPageRoute(
+            //                         builder: (context) =>
+            //                         // const TempProductSellDashboardScreen()
+            //                         const ProductSellVinScreen()),
+            //                   );
+            //                 },
+            //
+            //               ),
+            //             )
+            //           ],
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            // Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            //   _buildSellPurchase(
+            //       () => {
+            //             Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) =>
+            //                       const UsedProductListScreen()),
+            //             )
+            //           },
+            //       AssetImage("assets/icons/car.png"),
+            //       "Buy Used Car",
+            //       "pre-owned car for sale →",
+            //       Colors.green[100]),
+            //   SizedBox(
+            //     width: 10,
+            //   ),
+            //   _buildSellPurchase(
+            //       () => {
+            //     Navigator.push(
+            //               context,
+            //               MaterialPageRoute(
+            //                   builder: (context) =>
+            //                       // const TempProductSellDashboardScreen()
+            //                       const ProductSellVinScreen()),
+            //             )
+            //           },
+            //       AssetImage("assets/icons/car.png"),
+            //       "Sell Car",
+            //       "from your home →",
+            //       Colors.blue[100])
+            // ]),
             SizedBox(
               height: 10,
             ),
@@ -176,9 +291,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          // border: Border.all(
-          //   // color: Colors.black12,
-          // ),
+            // border: Border.all(
+            //   // color: Colors.black12,
+            // ),
             color: Colors.black12,
             borderRadius: BorderRadius.all(Radius.circular(25))),
         margin: EdgeInsets.only(left: 20, right: 20, top: 20),
@@ -196,7 +311,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-    ) ;
+    );
   }
 
   Widget _buildCarouselSlider() {
@@ -261,6 +376,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(
+            height: 5,
+          ),
           Container(
             padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
             child: Text(
@@ -275,13 +393,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               alignment: Alignment.centerLeft,
               height: 200,
               child: ListView.builder(
-                scrollDirection: Axis.horizontal,
+                  scrollDirection: Axis.horizontal,
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(8),
                   itemCount: getCarListResponseModel!.data!.docs.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return _buildProductItem(getCarListResponseModel!.data!
-                        .docs[index]);
+                    return _buildProductItem(
+                        getCarListResponseModel!.data!.docs[index]);
                   })),
         ],
       ),
@@ -312,8 +430,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.all(8),
                   itemCount: getCarListResponseModel!.data!.docs.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return _buildProductItem(getCarListResponseModel!.data!
-                        .docs[index]);
+                    return _buildProductItem(
+                        getCarListResponseModel!.data!.docs[index]);
                   })),
         ],
       ),
@@ -341,11 +459,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: BoxDecoration(
                 image: DecorationImage(
                     fit: BoxFit.cover,
-                    image:doc.carImages.isNotEmpty ?
-                    NetworkImage(doc.carImages[0]) as ImageProvider:
-                    AssetImage(
-                        "assets/images/mercedes/1.jpg")
-                ),
+                    image: doc.carImages.isNotEmpty
+                        ? NetworkImage(doc.carImages[0]) as ImageProvider
+                        : AssetImage("assets/images/mercedes/1.jpg")),
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
                 color: Colors.white,
               ),
@@ -389,13 +505,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 150.0,
-            height: 75.0,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.cover, image: AssetImage(itemList.imageURLs)),
-            ),
+          SvgPicture.asset(
+            itemList.imageURLs,
+            width: 50.0,
+            height: 50.0,
           ),
           SizedBox(
             height: 10,
@@ -485,78 +598,94 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       : getAllMakeResponseModel!.data.length, (index) {
                 return index < 11
                     ? Container(
-                  margin: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      ProductSellDashboardScreen.getPendingCarsResponseModel
-                      = null;
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProductSellJourneyScreen(
-                                getAllMakeResponseModel!.data[index])),
-                      );
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 40.0,
-                          height: 35.0,
+                        margin: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            ProductSellDashboardScreen
+                                .getPendingCarsResponseModel = null;
+                            ProductSellJourneyScreen.addCarRequestModel =
+                                AddCarRequestModel();
+                            ProductSellJourneyScreen
+                                    .addSpecificationRequestModel =
+                                AddSpecificationRequestModel();
+                            ProductSellJourneyScreen.addCarRequestModel.makeId =
+                                getAllMakeResponseModel!.data[index].id;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      TempProductSellJourneyScreen()),
+                            );
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 40.0,
+                                height: 35.0,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      fit: BoxFit.fill,
+                                      image: NetworkImage(
+                                          getAllMakeResponseModel!
+                                              .data[index].logo)),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                getAllMakeResponseModel!.data[index].makeName,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          ProductSellDashboardScreen
+                              .getPendingCarsResponseModel = null;
+                          ProductSellJourneyScreen.addCarRequestModel =
+                              AddCarRequestModel();
+                          ProductSellJourneyScreen
+                                  .addSpecificationRequestModel =
+                              AddSpecificationRequestModel();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    TempProductSellJourneyScreen()),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: NetworkImage(getAllMakeResponseModel!
-                                    .data[index].logo)),
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          getAllMakeResponseModel!.data[index].makeName,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 10,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "View All\nBrands",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                    : GestureDetector( behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                ProductSellJourneyScreen(null)),
-                      );
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "View All\nBrands",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ));
+                        ));
               }),
             ),
           ),
@@ -577,7 +706,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       isDataLoading = true;
     });
 
-    Future<GetCarListResponseModel> response = ApiService(context).getCarList();
+    GetCarListRequestModel getCarListRequestModel = GetCarListRequestModel();
+
+    Future<GetCarListResponseModel> response =
+        ApiService(context).getCarList(getCarListRequestModel);
     response
         .then((value) => {
               setState(() {
@@ -597,14 +729,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       isBrandLoading = true;
     });
 
-    Future<GetAllMakeResponseModel> response = ApiService(context).getAllMakePublic();
+    Future<GetAllMakeResponseModel> response =
+        ApiService(context).getAllMakePublic();
     response
         .then((value) => {
-      setState(() {
-        isBrandLoading = false;
-      }),
-      getAllMakeResponseModel = value,
-    })
+              setState(() {
+                isBrandLoading = false;
+              }),
+              getAllMakeResponseModel = value,
+            })
         .catchError((onError) {
       setState(() {
         isBrandLoading = false;

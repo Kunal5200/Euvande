@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:euvande/model/response/LoginResponseModel.dart';
 import 'package:euvande/screen/dashboard_screen.dart';
 import 'package:euvande/screen/login_screen.dart';
 import 'package:euvande/screen/profile_detail_screen.dart';
 import 'package:euvande/screen/splash_screen.dart';
+import 'package:euvande/utilities/ApiService.dart';
 import 'package:euvande/utilities/MyLocalStorage.dart';
 import 'package:flutter/material.dart';
 
@@ -27,11 +30,11 @@ class MyApp extends StatelessWidget {
                 background: Color(0xfffafcff),
                 primary: Colors.black,
                 secondary: Colors.black),
-
       ),
       builder: (context, child) {
         // this is the key
-        return GestureDetector( behavior: HitTestBehavior.translucent,
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: child,
         );
@@ -81,6 +84,17 @@ class _MyHomePageState extends State<MyHomePage> {
     SharedPrefManager.getLoginData().then((value) => {
           setState(() {
             loginResponseModel = value;
+            if (value == null) {
+              SharedPrefManager.getGuestData().then((value) {
+
+                print("accessToken : "+SharedPrefManager.accessToken.toString());
+
+                if (value == null) {
+
+                  callGuestLoginAPI();
+                }
+              });
+            }
           }),
         });
   }
@@ -91,9 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
       onWillPop: () async {
         print(_selectedIndex);
 
-        if(_selectedIndex==0){
+        if (_selectedIndex == 0) {
           return true;
-        }else {
+        } else {
           setState(() {
             _selectedIndex = 0;
           });
@@ -115,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
             BottomNavigationBarItem(
               icon: Image.asset("assets/icons/user.png",
                   color: Colors.black54, height: 20, width: 20),
-              label: 'Profile',
+              label: 'Account',
               activeIcon: Image.asset("assets/icons/user.png",
                   color: Colors.black, height: 20, width: 20),
             ),
@@ -126,5 +140,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void callGuestLoginAPI() {
+    Future<LoginResponseModel> response = ApiService(context).guestLogin();
+    response.then((value) => {
+      SharedPrefManager.accessToken = value.data.accessToken,
+      SharedPrefManager.setGuestLoginData(jsonEncode(value.toJson())),
+
+    }).catchError((onError) {});
   }
 }

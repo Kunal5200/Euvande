@@ -28,13 +28,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   bool isDataLoading = false;
 
   final TextEditingController streetController =
-      TextEditingController(text: "11");
+      TextEditingController(text: "");
   final TextEditingController houseNoController =
-      TextEditingController(text: "adgds");
+      TextEditingController(text: "");
   final TextEditingController pincodeController =
-      TextEditingController(text: "123456");
+      TextEditingController(text: "");
   final TextEditingController cityController =
-      TextEditingController(text: "sdaf");
+      TextEditingController(text: "");
 
   dynamic _currentSelectedValue = null;
   dynamic countries = null;

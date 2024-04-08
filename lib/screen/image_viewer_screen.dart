@@ -12,9 +12,9 @@ import 'package:photo_view/photo_view_gallery.dart';
 
 class ImageViewerScreen extends StatefulWidget {
   final List<String> galleryItems;
+  final int imgIndex;
 
-  const ImageViewerScreen(
-    this.galleryItems, {
+  ImageViewerScreen(this.galleryItems, this.imgIndex, {
     super.key,
   });
 
@@ -23,6 +23,10 @@ class ImageViewerScreen extends StatefulWidget {
 }
 
 class _ImageViewerScreenState extends State<ImageViewerScreen> {
+
+  late PageController _pageController = PageController(initialPage:   widget
+      .imgIndex);
+
   @override
   void initState() {
     // TODO: implement initState
@@ -40,28 +44,30 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
           color: Colors.black,
           child: Container(
               child: PhotoViewGallery.builder(
-            scrollPhysics: const BouncingScrollPhysics(),
-            builder: (BuildContext context, int index) {
-              return PhotoViewGalleryPageOptions(
-                imageProvider: NetworkImage(widget.galleryItems[index]),
-                initialScale: PhotoViewComputedScale.contained * 0.8,
-                heroAttributes: PhotoViewHeroAttributes(tag: index),
-              );
-            },
-            itemCount: widget.galleryItems.length,
-            loadingBuilder: (context, event) => Center(
-              child: Container(
-                width: 20.0,
-                height: 20.0,
-                child: CircularProgressIndicator(
-                  value: event == null
-                      ? 0
-                      : event.cumulativeBytesLoaded /
-                          event.expectedTotalBytes!.toInt(),
-                ),
-              ),
-            ),
-          )),
+                pageController: _pageController,
+                scrollPhysics: const BouncingScrollPhysics(),
+                builder: (BuildContext context, int index) {
+                  return PhotoViewGalleryPageOptions(
+                    imageProvider: NetworkImage(widget.galleryItems[index]),
+                    initialScale: PhotoViewComputedScale.contained * 0.8,
+                    heroAttributes: PhotoViewHeroAttributes(tag: index),
+                  );
+                },
+                itemCount: widget.galleryItems.length,
+                loadingBuilder: (context, event) =>
+                    Center(
+                      child: Container(
+                        width: 20.0,
+                        height: 20.0,
+                        child: CircularProgressIndicator(
+                          value: event == null
+                              ? 0
+                              : event.cumulativeBytesLoaded /
+                              event.expectedTotalBytes!.toInt(),
+                        ),
+                      ),
+                    ),
+              )),
         ));
   }
 }

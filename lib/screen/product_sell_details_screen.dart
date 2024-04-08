@@ -169,7 +169,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
                   ProductSellDashboardScreen
                       .getPendingCarsResponseModel!
                       .data[0]
-                      .carImages)),
+                      .carImages, 0)),
         );
       },
       child: Container(
@@ -193,7 +193,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
             GridView.count(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              crossAxisCount: 3,
+              crossAxisCount: 3, 
               // Generate 100 widgets that display their index in the List.
               children: List.generate(
                   ProductSellDashboardScreen.getPendingCarsResponseModel!.data[0]
@@ -201,6 +201,7 @@ class _ProductSellDetailsScreenState extends State<ProductSellDetailsScreen> {
                 return Container(
                   width: 100.0,
                   height: 100.0,
+                  margin: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     image: DecorationImage(
                         fit: BoxFit.cover,
